@@ -78,58 +78,55 @@ class PseudoClassSelector(val c: ElementPseudoClass) : Selector() {
 
 }
 
-fun selector(id: String? = null, class_: String? = null, type: String? = null): CompoundSelector {
-    val cs = CompoundSelector()
-    id?.let { cs.id(it) }
-    type?.let { cs.type(it) }
-    class_?.let { cs.class_(it) }
-    return cs
+
+
+class SelectorBuilder {
+
+    var active = CompoundSelector()
+
+    fun id(query:String, psuedo:String?=null):CompoundSelector {
+        active.selectors.add(IdentitySelector(query))
+        return active
+    }
+    fun type(query:String, psuedo:String?=null):CompoundSelector {
+        active.selectors.add(TypeSelector(ElementType(query)))
+        return active
+    }
+    fun `class`(query:String, psuedo:String?=null):CompoundSelector {
+        active.selectors.add(ClassSelector(ElementClass(query)))
+        return active
+    }
+
+}
+infix fun CompoundSelector.followedBy(function: SelectorBuilder.() -> CompoundSelector):CompoundSelector {
+    return selector(function).apply {
+        previous = Pair(Combinator.LATER_SIBLING, this@followedBy)
+    }
 }
 
-fun select(id: String? = null, class_: String? = null, type: String? = null, pseudoClass:String? = null, init: CompoundSelector.() -> Unit): CompoundSelector {
-
-    val cs = CompoundSelector()
-    id?.let { cs.id(it) }
-    type?.let { cs.type(it) }
-    class_?.let { cs.class_(it) }
-    pseudoClass?.let { cs.pseudoClass(it)}
-
-    cs.init()
-    return cs
+infix fun CompoundSelector.nextTo(function: SelectorBuilder.() -> CompoundSelector):CompoundSelector {
+    return selector(function).apply {
+        previous = Pair(Combinator.NEXT_SIBLING, this@nextTo)
+    }
 }
 
 
-infix fun CompoundSelector.withChild(selector: CompoundSelector): CompoundSelector {
-    return CompoundSelector(
-            previous = Pair(Combinator.CHILD, this),
-            selectors = selector.selectors)
+infix fun CompoundSelector.withChild(function: SelectorBuilder.() -> CompoundSelector):CompoundSelector {
+    return selector(function).apply {
+        previous = Pair(Combinator.CHILD, this@withChild)
+    }
 }
 
-infix fun CompoundSelector.withDescendant(selector: CompoundSelector): CompoundSelector {
-    return CompoundSelector(
-            previous = Pair(Combinator.DESCENDANT, this),
-            selectors = selector.selectors)
+infix fun CompoundSelector.withDescendant(function: SelectorBuilder.() -> CompoundSelector):CompoundSelector {
+    return selector(function).apply {
+        previous = Pair(Combinator.DESCENDANT, this@withDescendant)
+    }
 }
 
-infix fun CompoundSelector.followedBy(selector: CompoundSelector): CompoundSelector {
-    return CompoundSelector(
-            previous = Pair(Combinator.LATER_SIBLING, this),
-            selectors = selector.selectors)
+
+fun selector(builder: SelectorBuilder.()->CompoundSelector):CompoundSelector {
+    return SelectorBuilder().apply { builder() }.active
+
 }
 
-fun CompoundSelector.id(s: String) {
-    selectors.add(IdentitySelector(s))
-}
-
-fun CompoundSelector.type(s: String) {
-    selectors.add(TypeSelector(ElementType(s)))
-}
-
-fun CompoundSelector.class_(s: String) {
-    selectors.add(ClassSelector(ElementClass(s)))
-}
-
-fun CompoundSelector.pseudoClass(s:String) {
-    selectors.add(PseudoClassSelector(ElementPseudoClass(s)))
-}
 

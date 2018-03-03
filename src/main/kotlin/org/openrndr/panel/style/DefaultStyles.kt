@@ -10,12 +10,12 @@ fun defaultStyles(
                  ) = listOf(
 
         styleSheet {
-            selector = select(type = "item") {}
+            selector = selector { type("item") }
             display = Display.NONE
         },
 
         styleSheet {
-            selector = select(type = "dropdown-button") {}
+            selector = selector { type("dropdown-button") }
             width = 100.px
             height = 30.px
             background = Color.RGBa(controlBackground)
@@ -26,7 +26,7 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "colorpicker-button") {}
+            selector = selector { type("colorpicker-button") }
             width = 100.px
             height = 30.px
             background = Color.RGBa(controlBackground)
@@ -36,7 +36,7 @@ fun defaultStyles(
             marginBottom = 5.px
         },
         styleSheet {
-            selector = select(type = "envelope-button") {}
+            selector = selector { type("envelope-button") }
             width = 100.px
             height = 40.px
             background = Color.RGBa(controlBackground)
@@ -47,12 +47,12 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "body") {}
+            selector = selector { type("body") }
             fontSize = 12.px
             fontFamily = "default"
         },
         styleSheet {
-            selector = select(type = "slider") {}
+            selector = selector { type("slider") }
             height = 15.px
             width = 100.percent
             marginTop = 5.px
@@ -61,7 +61,7 @@ fun defaultStyles(
             marginRight = 5.px
         },
         styleSheet {
-            selector = select(type = "envelope-editor") {}
+            selector = selector { type("envelope-editor") }
             height = 60.px
             width = 100.percent
             marginTop = 5.px
@@ -71,7 +71,7 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "colorpicker") {}
+            selector = selector { type("colorpicker") }
             height = 80.px
             width = 100.percent
             marginTop = 5.px
@@ -82,13 +82,13 @@ fun defaultStyles(
 
 
         styleSheet {
-            selector = select(class_ = "overlay") {}
+            selector = selector { `class`("overlay") }
             zIndex = ZIndex.Value(1)
 
 
         },
         styleSheet {
-            selector = select(type = "toggle") {}
+            selector = selector { type("toggle") }
             height = 15.px
             width = 100.percent
             marginTop = 5.px
@@ -99,7 +99,7 @@ fun defaultStyles(
 
 
         styleSheet {
-            selector = select(type = "h1") {}
+            selector = selector { type("h1") }
             fontSize = 24.px
             width = 100.percent
             height = LinearDimension.Auto
@@ -107,7 +107,7 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "h2") {}
+            selector = selector { type("h2") }
             fontSize = 20.px
             width = 100.percent
             height = LinearDimension.Auto
@@ -115,7 +115,7 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "h3") {}
+            selector = selector { type("h3") }
             fontSize = 16.px
             width = 100.percent
             height = LinearDimension.Auto
@@ -123,25 +123,25 @@ fun defaultStyles(
         },
 
         styleSheet {
-            selector = select(type = "p") {}
+            selector = selector { type("p") }
             fontSize = 12.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
         styleSheet {
-            selector = select(type = "dropdown-button", pseudoClass = "hover") {}
+            selector = selector { type("dropdown-button", psuedo = "hover") }
             display = Display.BLOCK
             background = Color.RGBa(controlHoverBackground)
         },
         styleSheet {
-            selector = select(type = "button", pseudoClass = "hover") {}
+            selector = selector { type("button", psuedo = "hover") }
             display = Display.BLOCK
             background = Color.RGBa(controlHoverBackground)
         },
 
         styleSheet {
-            selector = select(type = "button") {}
+            selector = selector { type("button") }
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
             width = 80.px
