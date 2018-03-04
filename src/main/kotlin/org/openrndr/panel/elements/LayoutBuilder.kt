@@ -45,9 +45,10 @@ fun Element.envelopeButton(init: EnvelopeButton.()->Unit) = initElement(Envelope
 fun Element.envelopeEditor(init: EnvelopeEditor.()->Unit) = initElement(EnvelopeEditor().apply {}, init)
 
 
-fun DropdownButton.item(init:Item.() -> String) : Item {
-    val item = Item()
-    item.label = item.init()
+fun DropdownButton.item(init:Item.() -> Unit) : Item {
+    val item = Item().apply(init)
+
+
     append(item)
     return item
 }

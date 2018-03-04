@@ -6,6 +6,7 @@ import org.openrndr.math.Vector2
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.background
 import org.openrndr.panel.style.color
+import org.openrndr.panel.style.position
 import org.openrndr.text.Writer
 import rx.subjects.PublishSubject
 
@@ -36,7 +37,7 @@ class Button : Element(ElementType("button")) {
             drawer.fill = ((it.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
             drawer.stroke = null
             drawer.strokeWeight = 0.0
-//            drawer.smooth(false)
+
             drawer.rectangle(0.0, 0.0, layout.screenWidth, layout.screenHeight)
 
             (root() as? Body)?.controlManager?.fontManager?.let {

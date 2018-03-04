@@ -9,6 +9,20 @@ import rx.subjects.PublishSubject
 class Item:Element(ElementType("item")) {
     var label:String = ""
     var data:Any? = null
+
+    class PickedEvent(val source:Item)
+
+
+    class Events {
+        val picked = PublishSubject.create<Item.PickedEvent>()
+    }
+
+    val events = Events()
+
+
+    fun picked() {
+        events.picked.onNext(PickedEvent(this))
+    }
 }
 
 class DropdownButton: Element(ElementType("dropdown-button")) {
@@ -19,14 +33,17 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
     class ValueChangedEvent(val source:DropdownButton, val value:Item)
 
     class Events {
-
         val valueChanged = PublishSubject.create<ValueChangedEvent>()
     }
 
     val events = Events()
     init {
         mouse.clicked.subscribe {
+            if (children.none { it is SlideOut })
             append(SlideOut(0.0,screenArea.height, screenArea.width, 200.0, this))
+            else {
+                (children.first { it is SlideOut } as SlideOut?)?.dispose()
+            }
         }
     }
     override fun append(element:Element) {
@@ -92,6 +109,7 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
                     events.clicked.subscribe {
                         parent.value = it.source.data as Item
                         parent.events.valueChanged.onNext(ValueChangedEvent(parent, it.source.data as Item))
+                        (data as Item).picked()
                         dispose()
                     }
                 })
@@ -100,7 +118,10 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
 
         override fun draw(drawer:Drawer) {
             drawer.fill = ((computedStyle.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
+            drawer.stroke = null
+            drawer.strokeWeight = 0.0
             drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
+            drawer.strokeWeight = 1.0
         }
 
         fun dispose() {

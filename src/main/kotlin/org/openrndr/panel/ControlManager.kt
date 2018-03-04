@@ -181,6 +181,7 @@ class ControlManager : Extension {
                 val rt = renderTargetCache.computeIfAbsent(element) {
                     renderTarget(width, height, contentScale) {
                         colorBuffer()
+                        depthBuffer()
                     }
                 }
 
@@ -206,27 +207,28 @@ class ControlManager : Extension {
                 drawer.popTransforms()
 
                 drawer.drawStyle.blendMode = BlendMode.OVER
+                //drawer.image(rt.colorBuffer(0))
                 drawer.image(rt.colorBuffer(0), Rectangle(Vector2(area.x, area.y), area.width, area.height),
                         Rectangle(Vector2(area.x, area.y), area.width, area.height))
             }
         }
     }
 
-    class ProfileData(var hits:Int=0, var time:Long=0) {
+    class ProfileData(var hits: Int = 0, var time: Long = 0) {
 
     }
 
     val profiles = mutableMapOf<String, ProfileData>()
-    fun profile(name:String, f:()->Unit) {
+    fun profile(name: String, f: () -> Unit) {
         val start = System.currentTimeMillis()
         f()
         val end = System.currentTimeMillis()
         val pd = profiles.getOrPut(name) { ProfileData(0, 0L) }
-        pd.hits ++
-        pd.time += (end-start)
+        pd.hits++
+        pd.time += (end - start)
 
         if (pd.hits == 100) {
-            println("name:  $name, avg: ${pd.time/pd.hits}ms, ${pd.hits}")
+            println("name:  $name, avg: ${pd.time / pd.hits}ms, ${pd.hits}")
             pd.hits = 0
             pd.time = 0
         }
@@ -266,13 +268,11 @@ class ControlManager : Extension {
 
 
                     body?.let {
-                        if (redraw) {
-                            program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
-                            layouter.computeStyles(it)
-                            layouter.layout(it)
-                            drawElement(it, program.drawer, 0, 0)
-                            drawElement(it, program.drawer, 1, 0)
-                        }
+                        program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
+                        layouter.computeStyles(it)
+                        layouter.layout(it)
+                        drawElement(it, program.drawer, 0, 0)
+                        drawElement(it, program.drawer, 1, 0)
                     }
                     renderTarget.unbind()
                 }
