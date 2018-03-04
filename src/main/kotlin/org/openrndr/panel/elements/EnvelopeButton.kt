@@ -48,11 +48,6 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
         drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
 
         (root() as? Body)?.controlManager?.fontManager?.let {
-            val font = it.font(computedStyle)
-
-            val writer = Writer(drawer)
-            drawer.fontMap = (font)
-
             var chartHeight = 0.0
 
             (root() as? Body)?.controlManager?.fontManager?.let {

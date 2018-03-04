@@ -84,16 +84,22 @@ class SelectorBuilder {
 
     var active = CompoundSelector()
 
-    fun id(query:String, psuedo:String?=null):CompoundSelector {
+    fun id(query:String, pseudo:String?=null):CompoundSelector {
+
         active.selectors.add(IdentitySelector(query))
+        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
         return active
     }
-    fun type(query:String, psuedo:String?=null):CompoundSelector {
+    fun type(query:String, pseudo:String?=null):CompoundSelector {
         active.selectors.add(TypeSelector(ElementType(query)))
+        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
+
         return active
     }
-    fun `class`(query:String, psuedo:String?=null):CompoundSelector {
+    fun `class`(query:String, pseudo:String?=null):CompoundSelector {
         active.selectors.add(ClassSelector(ElementClass(query)))
+        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
+
         return active
     }
 

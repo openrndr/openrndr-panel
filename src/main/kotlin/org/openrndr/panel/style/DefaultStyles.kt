@@ -130,12 +130,12 @@ fun defaultStyles(
             display = Display.BLOCK
         },
         styleSheet {
-            selector = selector { type("dropdown-button", psuedo = "hover") }
+            selector = selector { type("dropdown-button", pseudo = "hover") }
             display = Display.BLOCK
             background = Color.RGBa(controlHoverBackground)
         },
         styleSheet {
-            selector = selector { type("button", psuedo = "hover") }
+            selector = selector { type("button", pseudo = "hover") }
             display = Display.BLOCK
             background = Color.RGBa(controlHoverBackground)
         },

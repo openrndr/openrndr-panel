@@ -32,7 +32,6 @@ class Toggle : Element(ElementType("toggle")) {
             draw.dirty = true
         }
         mouse.dragged.subscribe {
-            val t = (it.position.x - layout.screenX) / layout.screenWidth
             value = !value
             draw.dirty = true
         }

@@ -34,9 +34,10 @@ class Button : Element(ElementType("button")) {
             drawer.pushTransforms()
             drawer.pushStyle()
             drawer.fill = ((it.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
+            drawer.stroke = null
+            drawer.strokeWeight = 0.0
 //            drawer.smooth(false)
             drawer.rectangle(0.0, 0.0, layout.screenWidth, layout.screenHeight)
-
 
             (root() as? Body)?.controlManager?.fontManager?.let {
                 val font = it.font(computedStyle)
@@ -53,6 +54,7 @@ class Button : Element(ElementType("button")) {
                 drawer.text(label, 0.0 + offset, 0.0 + yOffset)
                 drawer.stroke = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
+                drawer.strokeWeight = 1.0
                 val dx = (layout.screenWidth - textWidth) / 2.0
 
                 drawer.lineSegment(Vector2(dx, yOffset + 3.5), Vector2(dx + textWidth, yOffset + 3.5))

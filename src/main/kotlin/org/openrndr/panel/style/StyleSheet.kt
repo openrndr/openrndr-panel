@@ -59,10 +59,10 @@ class PropertyHandler<T>(
     @Suppress("USELESS_CAST", "UNCHECKED_CAST")
     operator fun getValue(stylesheet: StyleSheet, property: KProperty<*>): T {
         val value: T? = stylesheet.getProperty(name)?.value as T?
-        if (value != null) {
-            return value
+        return if (value != null) {
+            value
         } else {
-            return PropertyBehaviours.behaviours[name]!!.intitial as T
+            PropertyBehaviours.behaviours[name]!!.intitial as T
         }
 
     }
@@ -117,6 +117,7 @@ sealed class FlexGrow(inherit: Boolean = false) : PropertyValue(inherit) {
 class StyleSheet {
 
 
+    val children = mutableListOf<StyleSheet>()
     val properties = HashMap<String, Property>()
 
     var selector: CompoundSelector? = null
@@ -133,7 +134,7 @@ class StyleSheet {
     fun getProperty(name: String) = properties.get(name)
 
     fun setProperty(name: String, value: Any?) {
-        properties.put(name, Property(name, value))
+        properties[name] = Property(name, value)
     }
 
     fun cascadeOnto(onto: StyleSheet): StyleSheet {
@@ -146,12 +147,6 @@ class StyleSheet {
     override fun toString(): String {
         return "StyleSheet(properties=$properties)"
     }
-
-//    // computed fields
-//    var screenX: Double = 0.0
-//    var screenY: Double = 0.0
-//    var screenWidth: Double = 0.0
-//    var screenHeight: Double = 0.0
 }
 
 var StyleSheet.width by PropertyHandler<LinearDimension>("width", RESET, LinearDimension.Auto)
@@ -164,8 +159,8 @@ var StyleSheet.marginBottom by PropertyHandler<LinearDimension>("margin-bottom",
 var StyleSheet.marginLeft by PropertyHandler<LinearDimension>("margin-left", RESET, 0.px)
 var StyleSheet.marginRight by PropertyHandler<LinearDimension>("margin-right", RESET, 0.px)
 
-var StyleSheet.position by PropertyHandler<Position>("position", RESET, Position.STATIC)
-var StyleSheet.display by PropertyHandler<Display>("display", RESET, Display.BLOCK) // css default is inline
+var StyleSheet.position by PropertyHandler("position", RESET, Position.STATIC)
+var StyleSheet.display by PropertyHandler("display", RESET, Display.BLOCK) // css default is inline
 
 var StyleSheet.flexDirection by PropertyHandler<FlexDirection>("flex-direction", RESET, FlexDirection.Row)
 var StyleSheet.flexGrow by PropertyHandler<FlexGrow>("flex-grow", RESET, FlexGrow.Ratio(0.0))
@@ -175,7 +170,7 @@ var StyleSheet.background by PropertyHandler<Color>("background-color", RESET, C
 var StyleSheet.color by PropertyHandler<Color>("color", INHERIT, Color.RGBa(ColorRGBa.WHITE))
 
 var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 12.px)
-var StyleSheet.fontFamily by PropertyHandler<String>("font-family", INHERIT, "default")
+var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
 
 var StyleSheet.overflow by PropertyHandler<Overflow>("overflow", RESET, Overflow.Visible)
 
@@ -184,6 +179,12 @@ var StyleSheet.zIndex by PropertyHandler<ZIndex>("z-index", RESET, ZIndex.Auto)
 val Number.px: LinearDimension.PX get() = LinearDimension.PX(this.toDouble())
 val Number.percent: LinearDimension.Percent get() = LinearDimension.Percent(this.toDouble())
 
+
+fun StyleSheet.withChild(init: StyleSheet.() -> Unit) {
+    val stylesheet = StyleSheet().apply(init)
+    stylesheet.selector!!.previous = Pair(Combinator.CHILD, this@withChild.selector!!)
+    children.add(stylesheet)
+}
 fun styleSheet(init: StyleSheet.() -> Unit): StyleSheet {
     return StyleSheet().apply { init() }
 }

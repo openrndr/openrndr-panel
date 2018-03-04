@@ -103,8 +103,7 @@ class Colorpicker : Element {
         val x = 0.0
         val y = 50+30.0
         val width = layout.screenWidth
-        val height = layout.screenHeight
-        val font = (root() as Body)?.controlManager!!.fontManager.font(computedStyle)
+        val font = (root() as Body).controlManager.fontManager.font(computedStyle)
         drawer.fill = (ColorRGBa.WHITE)
 
         drawer.fontMap = font
