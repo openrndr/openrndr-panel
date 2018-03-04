@@ -50,7 +50,7 @@ object PropertyBehaviours {
 
 class PropertyHandler<T>(
         val name: String, val inheritance: PropertyInheritance, val initial: T
-                        ) {
+) {
 
     init {
         PropertyBehaviours.behaviours.set(name, PropertyBehaviour(inheritance, initial as Any))
@@ -110,7 +110,7 @@ sealed class ZIndex(inherit: Boolean = false) : PropertyValue(inherit) {
 }
 
 sealed class FlexGrow(inherit: Boolean = false) : PropertyValue(inherit) {
-    class Ratio(val value: Double):FlexGrow()
+    class Ratio(val value: Double) : FlexGrow()
     object Inherit : FlexGrow(inherit = true)
 }
 
@@ -185,6 +185,12 @@ fun StyleSheet.withChild(init: StyleSheet.() -> Unit) {
     stylesheet.selector!!.previous = Pair(Combinator.CHILD, this@withChild.selector!!)
     children.add(stylesheet)
 }
+
+fun StyleSheet.flatten(): List<StyleSheet> {
+    return listOf(this) + children
+}
+
+
 fun styleSheet(init: StyleSheet.() -> Unit): StyleSheet {
     return StyleSheet().apply { init() }
 }

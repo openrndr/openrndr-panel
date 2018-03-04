@@ -5,12 +5,14 @@ import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.math.Vector2
+import org.openrndr.panel.elements.Body
 import org.openrndr.panel.elements.Element
 import org.openrndr.panel.elements.ElementPseudoClass
 import org.openrndr.panel.elements.visit
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
+import javax.swing.text.Style
 
 class ControlManager : Extension {
     var body: Element? = null
@@ -291,6 +293,30 @@ class ControlManager : Extension {
 
         }
     }
+}
+
+class ControlManagerBuilder(val controlManager: ControlManager) {
+    fun styleSheet(init: StyleSheet.() -> Unit) {
+        println("creating a style sheet")
+        controlManager.layouter.styleSheets.addAll( StyleSheet().apply { init() }.flatten() )
+    }
+
+    fun layout(init: Body.() -> Unit) {
+        println("creating the layout")
+        val body = Body(controlManager)
+        body.init()
+        controlManager.body = body
+    }
+
+}
+
+fun controlManager(builder:ControlManagerBuilder.()->Unit):ControlManager {
+    val cm = ControlManager()
+    cm.fontManager.register("default", "file:data/Roboto-Medium.ttf")
+    cm.layouter.styleSheets.addAll(defaultStyles())
+    val  cmb = ControlManagerBuilder(cm)
+    cmb.builder()
+    return cm
 }
 
 private fun Element.any(function: (Element) -> Boolean): Boolean {
