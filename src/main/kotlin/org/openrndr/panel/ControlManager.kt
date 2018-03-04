@@ -22,6 +22,9 @@ class ControlManager : Extension {
     lateinit var renderTarget: RenderTarget
 
     inner class MouseInput {
+
+        var dragTarget:Element? = null
+
         fun scroll(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
 
@@ -36,6 +39,7 @@ class ControlManager : Extension {
         }
 
         fun click(event: Program.Mouse.MouseEvent) {
+            dragTarget = null
             fun traverse(element: Element) {
                 //  if (element.children.isEmpty()) {
                 //} else {
@@ -53,34 +57,37 @@ class ControlManager : Extension {
 
         fun press(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
-                //  if (element.children.isEmpty()) {
-                //} else {
                 if (element.computedStyle.display != Display.NONE) {
                     element.children.forEach(::traverse)
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
+                    println("setting drag target to: $element")
+                    dragTarget = element
                     element.mouse.pressed.onNext(event)
                 }
-
-                //}
             }
             body?.let(::traverse)
         }
 
-        fun drag(event: Program.Mouse.MouseEvent) {
-            fun traverse(element: Element) {
-                if (element.computedStyle.display != Display.NONE) {
+        fun release(event:Program.Mouse.MouseEvent) {
 
-                    if (element.children.isEmpty()) {
-                        if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                            element.mouse.dragged.onNext(event)
-                        }
-                    } else {
-                        element.children.forEach(::traverse)
-                    }
-                }
-            }
-            body?.let(::traverse)
+        }
+
+        fun drag(event: Program.Mouse.MouseEvent) {
+            dragTarget?.mouse?.dragged?.onNext(event)
+//            fun traverse(element: Element) {
+//                if (element.computedStyle.display != Display.NONE) {
+//
+//                    if (element.children.isEmpty()) {
+//                        if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
+//                            element.mouse.dragged.onNext(event)
+//                        }
+//                    } else {
+//                        element.children.forEach(::traverse)
+//                    }
+//                }
+//            }
+//            body?.let(::traverse)
         }
 
         fun move(event: Program.Mouse.MouseEvent) {
@@ -113,6 +120,7 @@ class ControlManager : Extension {
         program.mouse.scrolled.listen { mouseInput.scroll(it) }
         program.mouse.dragged.listen { mouseInput.drag(it) }
         program.mouse.buttonDown.listen { mouseInput.press(it) }
+
 
         program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
 

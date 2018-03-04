@@ -44,6 +44,10 @@ class Slider : Element(ElementType("slider")) {
     val events = Events()
 
     init {
+
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
+        }
         mouse.clicked.subscribe {
             val t = (it.position.x - layout.screenX) / layout.screenWidth
             value = t * range.span + range.min
