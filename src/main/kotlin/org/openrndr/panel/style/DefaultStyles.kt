@@ -135,6 +135,11 @@ fun defaultStyles(
             background = Color.RGBa(controlHoverBackground)
         },
         styleSheet {
+            selector = selector { type("dropdown-button") } withDescendant { type("button") }
+            width = 100.percent
+        },
+
+        styleSheet {
             selector = selector { type("button", pseudo = "hover") }
             display = Display.BLOCK
             background = Color.RGBa(controlHoverBackground)
