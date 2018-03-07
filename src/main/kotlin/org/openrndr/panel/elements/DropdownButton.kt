@@ -59,6 +59,7 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
     override fun draw(drawer: Drawer) {
 
         drawer.fill = ((computedStyle.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
+        drawer.stroke = null
         drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
 
         (root() as? Body)?.controlManager?.fontManager?.let {
@@ -76,6 +77,7 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
             val yOffset = Math.round((layout.screenHeight/2) + textHeight/2.0) - 2.0
 
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
+
             drawer.text(text, 0.0 + offset   , 0.0 + yOffset)
         }
 
@@ -84,7 +86,7 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
 
         init {
             mouse.scrolled.subscribe {
-                        scrollTop -= it.position.y
+                        scrollTop -= it.rotation.y
                         scrollTop = Math.max(0.0, scrollTop)
                 draw.dirty = true
                 it.cancelPropagation()

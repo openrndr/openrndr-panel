@@ -43,6 +43,7 @@ class Button : Element(ElementType("button")) {
             (root() as? Body)?.controlManager?.fontManager?.let {
                 val font = it.font(computedStyle)
 
+
                 val writer = Writer(drawer)
                 drawer.fontMap = (font)
                 val textWidth = writer.textWidth(label)

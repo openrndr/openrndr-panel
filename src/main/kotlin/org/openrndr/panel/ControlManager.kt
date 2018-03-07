@@ -12,6 +12,7 @@ import org.openrndr.panel.elements.visit
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
+import java.net.URL
 import javax.swing.text.Style
 
 class ControlManager : Extension {
@@ -63,7 +64,6 @@ class ControlManager : Extension {
                     element.children.forEach(::traverse)
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                    println("setting drag target to: $element")
                     dragTarget = element
                     element.mouse.pressed.onNext(event)
                 }
@@ -297,12 +297,10 @@ class ControlManager : Extension {
 
 class ControlManagerBuilder(val controlManager: ControlManager) {
     fun styleSheet(init: StyleSheet.() -> Unit) {
-        println("creating a style sheet")
         controlManager.layouter.styleSheets.addAll( StyleSheet().apply { init() }.flatten() )
     }
 
     fun layout(init: Body.() -> Unit) {
-        println("creating the layout")
         val body = Body(controlManager)
         body.init()
         controlManager.body = body
@@ -310,9 +308,15 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
 
 }
 
+fun resource(name:String): URL {
+    val url = ControlManager::class.java.getResource(name)
+
+    return url
+}
+
 fun controlManager(builder:ControlManagerBuilder.()->Unit):ControlManager {
     val cm = ControlManager()
-    cm.fontManager.register("default", "file:data/Roboto-Medium.ttf")
+    cm.fontManager.register("default", resource("/fonts/Roboto-Medium.ttf").toExternalForm())
     cm.layouter.styleSheets.addAll(defaultStyles())
     val  cmb = ControlManagerBuilder(cm)
     cmb.builder()
