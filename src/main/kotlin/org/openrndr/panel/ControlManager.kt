@@ -4,6 +4,7 @@ import org.openrndr.Extension
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
+import org.openrndr.math.Matrix44
 import org.openrndr.math.Vector2
 import org.openrndr.panel.elements.Body
 import org.openrndr.panel.elements.Element
@@ -26,7 +27,7 @@ class ControlManager : Extension {
 
     inner class MouseInput {
 
-        var dragTarget:Element? = null
+        var dragTarget: Element? = null
 
         fun scroll(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
@@ -71,7 +72,7 @@ class ControlManager : Extension {
             body?.let(::traverse)
         }
 
-        fun release(event:Program.Mouse.MouseEvent) {
+        fun release(event: Program.Mouse.MouseEvent) {
 
         }
 
@@ -116,6 +117,7 @@ class ControlManager : Extension {
     val mouseInput = MouseInput()
     override fun setup(program: Program) {
         contentScale = program.window.scale.x
+
         fontManager.contentScale = contentScale
         program.mouse.buttonUp.listen { mouseInput.click(it) }
         program.mouse.moved.listen { mouseInput.move(it) }
@@ -124,7 +126,7 @@ class ControlManager : Extension {
         program.mouse.buttonDown.listen { mouseInput.press(it) }
 
 
-        program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
+        //program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
 
         width = program.width
         height = program.height
@@ -139,14 +141,21 @@ class ControlManager : Extension {
     var height: Int = 0
 
     fun resize(program: Program, width: Int, height: Int) {
+
         this.width = width
         this.height = height
 
         body?.draw?.dirty = true
 
-        renderTarget.colorBuffer(0).destroy()
-        renderTarget.detachColorBuffers()
-        renderTarget.destroy()
+        if (renderTarget.colorBuffers.size > 0) {
+            renderTarget.colorBuffer(0).destroy()
+            renderTarget.detachColorBuffers()
+            renderTarget.destroy()
+        } else {
+            println("that is strange. no color buffers")
+        }
+
+
         renderTarget = renderTarget(program.width, program.height, contentScale) {
             colorBuffer(program.width, program.height)
         }
@@ -244,12 +253,15 @@ class ControlManager : Extension {
         }
     }
 
+    var drawCount = 0
     override fun afterDraw(drawer: Drawer, program: Program) {
 
         profile("after draw") {
 
             if (program.width != renderTarget.width || program.height != renderTarget.height) {
                 profile("resize target") {
+                    body?.draw?.dirty = true
+
                     renderTarget.colorBuffer(0).destroy()
                     renderTarget.destroy()
                     renderTarget = renderTarget(program.width, program.height, contentScale) {
@@ -267,6 +279,10 @@ class ControlManager : Extension {
             } ?: false
 
             if (redraw) {
+                drawer.ortho()
+                drawer.view = Matrix44.IDENTITY
+                drawer.reset()
+
                 profile("redraw") {
                     body?.visit {
                         draw.dirty = false
@@ -275,7 +291,6 @@ class ControlManager : Extension {
                     body?.style = StyleSheet()
                     body?.style?.width = program.width.px
                     body?.style?.height = program.height.px
-
 
                     body?.let {
                         program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
@@ -288,8 +303,14 @@ class ControlManager : Extension {
                 }
             }
             profile("draw image") {
+                drawer.size(program.width, program.height)
+                drawer.ortho()
+                drawer.view = Matrix44.IDENTITY
+                drawer.reset()
                 program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
+
             }
+            drawCount++
 
         }
     }
@@ -297,7 +318,7 @@ class ControlManager : Extension {
 
 class ControlManagerBuilder(val controlManager: ControlManager) {
     fun styleSheet(init: StyleSheet.() -> Unit) {
-        controlManager.layouter.styleSheets.addAll( StyleSheet().apply { init() }.flatten() )
+        controlManager.layouter.styleSheets.addAll(StyleSheet().apply { init() }.flatten())
     }
 
     fun layout(init: Body.() -> Unit) {
@@ -308,17 +329,17 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
 
 }
 
-fun resource(name:String): URL {
+fun resource(name: String): URL {
     val url = ControlManager::class.java.getResource(name)
 
     return url
 }
 
-fun controlManager(builder:ControlManagerBuilder.()->Unit):ControlManager {
+fun controlManager(builder: ControlManagerBuilder.() -> Unit): ControlManager {
     val cm = ControlManager()
     cm.fontManager.register("default", resource("/fonts/Roboto-Medium.ttf").toExternalForm())
     cm.layouter.styleSheets.addAll(defaultStyles())
-    val  cmb = ControlManagerBuilder(cm)
+    val cmb = ControlManagerBuilder(cm)
     cmb.builder()
     return cm
 }
