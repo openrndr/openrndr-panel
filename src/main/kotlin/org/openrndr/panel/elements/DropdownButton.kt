@@ -92,6 +92,10 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
                 it.cancelPropagation()
 
             }
+            mouse.exited.subscribe {
+                it.cancelPropagation()
+                dispose()
+            }
 
             style = StyleSheet().apply {
                 position = Position.ABSOLUTE

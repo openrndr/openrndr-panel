@@ -27,20 +27,48 @@ class Toggle : Element(ElementType("toggle")) {
     val events = Events()
     internal val margin = 7.0
 
+
+    var dragging = false
     init {
+
+
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
+        }
         mouse.clicked.subscribe {
-            value = !value
-            draw.dirty = true
-            events.valueChanged.onNext(ValueChangedEvent(this, !value, value))
+            if  (!dragging) {
+                value = !value
+                draw.dirty = true
+                events.valueChanged.onNext(ValueChangedEvent(this, !value, value))
+                it.cancelPropagation()
+            }
+            dragging = false
         }
         mouse.dragged.subscribe {
-            value = !value
-            draw.dirty = true
-            events.valueChanged.onNext(ValueChangedEvent(this, !value, value))
+
+            val rp = it.position.x - (layout.screenX+margin + (layout.screenWidth-16.0-2*margin))
+
+            dragging = true
+            println(rp)
+
+            if (rp >=0.0) {
+                it.cancelPropagation()
+                val newValue = rp >= 8.0
+
+                if (newValue != value) {
+                    value = newValue
+                    draw.dirty = true
+                    events.valueChanged.onNext(ValueChangedEvent(this, !newValue, newValue))
+                }
+            }
         }
     }
 
     override fun draw(drawer: Drawer) {
+
+        val f = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!
+        drawer.translate(0.0,(layout.screenHeight - 10.0)/2.0 - 8.0)
+
         drawer.stroke = null
         drawer.fill = ((computedStyle.color as? Color.RGBa)?.color)
         drawer.strokeWeight = 8.0

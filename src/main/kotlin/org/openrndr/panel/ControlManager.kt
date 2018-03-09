@@ -1,6 +1,8 @@
 package org.openrndr.panel
 
 import org.openrndr.Extension
+import org.openrndr.MouseButton
+import org.openrndr.MouseEventType
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
@@ -93,12 +95,24 @@ class ControlManager : Extension {
 //            body?.let(::traverse)
         }
 
+        val insideElements = mutableSetOf<Element>()
         fun move(event: Program.Mouse.MouseEvent) {
             val hover = ElementPseudoClass("hover")
+
+
+            val toRemove = insideElements.filter { (event.position !in it.screenArea) }
+
+            toRemove.forEach {
+                it.mouse.exited.onNext(Program.Mouse.MouseEvent(event.position, Vector2.ZERO, Vector2.ZERO, MouseEventType.MOVED, MouseButton.NONE, event.modifiers, false))
+            }
+
+            insideElements.removeAll(toRemove)
 
             fun traverse(element: Element) {
 
                 if (event.position in element.screenArea) {
+
+                    insideElements.add(element)
                     if (hover !in element.pseudoClasses) {
                         element.pseudoClasses.add(hover)
                     }

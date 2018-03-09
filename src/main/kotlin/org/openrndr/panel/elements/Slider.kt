@@ -67,6 +67,9 @@ class Slider : Element(ElementType("slider")) {
 
     override fun draw(drawer: Drawer) {
 
+        val f = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!
+        drawer.translate(0.0,(layout.screenHeight - (10.0 + f.height))/2)
+
         drawer.fill = ((computedStyle.color as Color.RGBa).color)
         drawer.stroke = ((computedStyle.color as Color.RGBa).color)
         drawer.strokeWeight = (8.0)
