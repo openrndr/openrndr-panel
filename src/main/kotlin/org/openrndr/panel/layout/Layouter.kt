@@ -31,7 +31,7 @@ class Layouter {
                             val remainder = (element.layout.screenWidth-totalWidth)
                             val totalGrow = element.children.filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }.map { (it.computedStyle.flexGrow as FlexGrow.Ratio).value }.sum()
 
-                            element.children.forEach {
+                            element.children.filter{  it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }.forEach {
 
                                 val elementGrow = (it.computedStyle.flexGrow as FlexGrow.Ratio).value
                                 val growWidth = if (totalGrow > 0) (elementGrow / totalGrow) * remainder else 0.0
@@ -48,7 +48,7 @@ class Layouter {
                         FlexDirection.Column -> {
                             var maxWidth = 0.0
                             var ly = element.layout.screenY
-                            var lx = element.layout.screenX
+                            val lx = element.layout.screenX
 
                             val totalHeight = element.children
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
@@ -58,7 +58,7 @@ class Layouter {
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
                                     .sumByDouble { (it.computedStyle.flexGrow as FlexGrow.Ratio).value }
 
-                            element.children.forEach {
+                            element.children.filter{  it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }.forEach {
                                 val elementGrow = (it.computedStyle.flexGrow as FlexGrow.Ratio).value
                                 val growHeight = if (totalGrow > 0) (elementGrow / totalGrow) * remainder else 0.0
 

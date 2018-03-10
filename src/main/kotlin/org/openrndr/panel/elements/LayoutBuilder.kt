@@ -30,9 +30,12 @@ fun Element.toggle(init: Toggle.() -> Unit) = initElement(Toggle(), init) as Tog
 fun Element.colorpicker(init: Colorpicker.() -> Unit) = initElement(Colorpicker(), init)
 fun Element.colorpickerButton(init: ColorpickerButton.() -> Unit) = initElement(ColorpickerButton(), init)
 
-fun Element.canvas(init: Canvas.() -> (Drawer)->Unit) {
+fun Canvas.draw(f:(Drawer)->Unit) {
+    this.userDraw = f
+}
+fun Element.canvas(init: Canvas.() ->Unit) {
     val canvas = Canvas()
-    canvas.userDraw = canvas.init()
+    canvas.init()
     append(canvas)
 }
 
