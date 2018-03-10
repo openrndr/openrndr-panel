@@ -64,8 +64,9 @@ class Colorpicker : Element {
             events.colorChanged.onNext(ColorChangedEvent(this, oldColor, color))
             e.cancelPropagation()
         }
-        mouse.clicked.subscribe { pick(it); focussed = true;  }
-        mouse.dragged.subscribe { pick(it); focussed = true; }
+        mouse.pressed.subscribe { it.cancelPropagation(); focussed = true}
+        mouse.clicked.subscribe { it.cancelPropagation(); pick(it); focussed = true;  }
+        mouse.dragged.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
     }
 
     fun generateColorMap() {

@@ -39,8 +39,6 @@ open class Element(val type: ElementType) {
         override fun toString(): String {
             return "Layout(screenX=$screenX, screenY=$screenY, screenWidth=$screenWidth, screenHeight=$screenHeight, growWidth=$growWidth, growHeight=$growHeight)"
         }
-
-
     }
 
     class Draw {
@@ -50,10 +48,17 @@ open class Element(val type: ElementType) {
     val layout = Layout()
 
 
+    class ClassEvent(val source:Element, val `class`:ElementClass)
+    class ClassObserverables {
+        val classAdded = PublishSubject.create<ClassEvent>()
+        val classRemoved = PublishSubject.create<ClassEvent>()
+    }
+
+    val classEvents = ClassObserverables()
+
+
     var id: String? = null
     val classes: ObservableHashSet<ElementClass> = ObservableHashSet()
-
-
     val pseudoClasses: ObservableHashSet<ElementPseudoClass> = ObservableHashSet()
 
     var parent: Element? = null
@@ -67,7 +72,15 @@ open class Element(val type: ElementType) {
         pseudoClasses.changed.subscribe {
             draw.dirty = true }
         classes.changed.subscribe {
-            draw.dirty = true }
+            draw.dirty = true
+            it.added.forEach {
+                classEvents.classAdded.onNext(ClassEvent(this, it))
+            }
+            it.removed.forEach {
+                classEvents.classRemoved.onNext(ClassEvent(this, it))
+            }
+
+        }
 
         children.changed.subscribe {
             draw.dirty = true
@@ -179,6 +192,20 @@ open class Element(val type: ElementType) {
             }
         }
 
+    }
+
+    fun move(steps:Int) {
+        parent?.let { p->
+            if (steps != 0) {
+                val index = p.children.indexOf(this)
+                p.children.add(index + steps, this)
+                if (steps > 0) {
+                    p.children.removeAt(index)
+                } else {
+                    p.children.removeAt(index+1)
+                }
+            }
+        }
     }
 
     fun findFirst(element: Element, matches: (Element) -> Boolean): Element? {

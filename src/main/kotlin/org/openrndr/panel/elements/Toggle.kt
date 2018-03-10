@@ -64,6 +64,13 @@ class Toggle : Element(ElementType("toggle")) {
         }
     }
 
+    /**
+     * Emits the current value through the valueChanged event
+     */
+    fun emit() {
+        events.valueChanged.onNext(Toggle.ValueChangedEvent(this, value, value))
+    }
+
     override fun draw(drawer: Drawer) {
 
         val f = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!

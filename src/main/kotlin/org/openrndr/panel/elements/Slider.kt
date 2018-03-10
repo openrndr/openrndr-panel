@@ -39,7 +39,17 @@ class Slider : Element(ElementType("slider")) {
         val valueChanged = PublishSubject.create<ValueChangedEvent>()
     }
 
+
     val events = Events()
+
+    /**
+     * Emits the current value through the valueChanged event
+     */
+    fun emit() {
+        events.valueChanged.onNext(ValueChangedEvent(this, value, value))
+    }
+
+
     private val margin = 7.0
 
     init {

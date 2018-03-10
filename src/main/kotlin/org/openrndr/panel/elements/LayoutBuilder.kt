@@ -24,8 +24,8 @@ fun Element.button(id:String?=null, label:String="button", init: Button.() -> Un
     return button
 
 }
-fun Element.slider(init: Slider.() -> Unit) = initElement(Slider(), init)
-fun Element.toggle(init: Toggle.() -> Unit) = initElement(Toggle(), init)
+fun Element.slider(init: Slider.() -> Unit) = initElement(Slider(), init) as Slider
+fun Element.toggle(init: Toggle.() -> Unit) = initElement(Toggle(), init) as Toggle
 
 fun Element.colorpicker(init: Colorpicker.() -> Unit) = initElement(Colorpicker(), init)
 fun Element.colorpickerButton(init: ColorpickerButton.() -> Unit) = initElement(ColorpickerButton(), init)

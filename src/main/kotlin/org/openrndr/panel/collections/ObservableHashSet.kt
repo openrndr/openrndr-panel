@@ -5,11 +5,12 @@ import java.util.*
 
 class ObservableHashSet<E>:HashSet<E>() {
 
-    val changed : PublishSubject<ObservableHashSet<E>> = PublishSubject.create()
+    class ChangeEvent<E>(source:ObservableHashSet<E>, val added:Set<E>, val removed:Set<E>)
+    val changed : PublishSubject<ChangeEvent<E>> = PublishSubject.create()
 
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
-            changed.onNext(this)
+            changed.onNext( ChangeEvent(this, setOf(element), emptySet()))
             true
         } else {
             false
@@ -18,7 +19,7 @@ class ObservableHashSet<E>:HashSet<E>() {
 
     override fun remove(element: E): Boolean {
         return if (super.remove(element)) {
-            changed.onNext(this)
+            changed.onNext( ChangeEvent(this, emptySet(), setOf(element)))
             true
         } else {
             false
@@ -26,9 +27,9 @@ class ObservableHashSet<E>:HashSet<E>() {
     }
 
     override fun clear() {
+        val old = this.toSet()
         super.clear()
-        changed.onNext(this)
+        changed.onNext(ChangeEvent(this, emptySet(),old))
     }
-
 
 }
