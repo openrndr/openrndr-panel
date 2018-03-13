@@ -24,6 +24,8 @@ class ControlManager : Extension {
     val fontManager = FontManager()
     private val renderTargetCache = HashMap<Element, RenderTarget>()
 
+    override var enabled: Boolean = true
+
     var contentScale = 1.0
     lateinit var renderTarget: RenderTarget
 
