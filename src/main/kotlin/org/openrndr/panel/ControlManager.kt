@@ -1,9 +1,6 @@
 package org.openrndr.panel
 
-import org.openrndr.Extension
-import org.openrndr.MouseButton
-import org.openrndr.MouseEventType
-import org.openrndr.Program
+import org.openrndr.*
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.math.Matrix44
@@ -28,6 +25,13 @@ class ControlManager : Extension {
 
     var contentScale = 1.0
     lateinit var renderTarget: RenderTarget
+
+    inner class DropInput {
+        fun drop(event:DropEvent) {
+        }
+    }
+
+    val dropInput = DropInput()
 
     inner class MouseInput {
 
@@ -141,6 +145,8 @@ class ControlManager : Extension {
         program.mouse.dragged.listen { mouseInput.drag(it) }
         program.mouse.buttonDown.listen { mouseInput.press(it) }
 
+
+        program.window.drop.listen { dropInput.drop(it) }
 
         //program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
 

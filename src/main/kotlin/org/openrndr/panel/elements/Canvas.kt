@@ -30,6 +30,7 @@ class Canvas : Element(ElementType("canvas")) {
 
             renderTarget?.let {rt ->
                 drawer.isolatedWithTarget(rt) {
+                    model = Matrix44.IDENTITY
                     view = Matrix44.IDENTITY
                     background(ColorRGBa.TRANSPARENT)
                     size(screenArea.width.toInt(), screenArea.height.toInt())

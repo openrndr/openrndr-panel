@@ -1,5 +1,6 @@
 package org.openrndr.panel.elements
 
+import org.openrndr.DropEvent
 import org.openrndr.Program
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
@@ -28,6 +29,12 @@ open class Element(val type: ElementType) {
         val scrolled = PublishSubject.create<Program.Mouse.MouseEvent>()
         val pressed = PublishSubject.create<Program.Mouse.MouseEvent>()
     }
+
+    class DropObserverables {
+        val dropped = PublishSubject.create<DropEvent>()
+    }
+
+    val drop = DropObserverables()
     val mouse = MouseObservables()
     class Layout {
         var screenX = 0.0
