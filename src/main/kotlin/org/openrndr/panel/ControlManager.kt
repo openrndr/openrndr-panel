@@ -13,7 +13,6 @@ import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import java.net.URL
-import javax.swing.text.Style
 
 class ControlManager : Extension {
     var body: Element? = null
@@ -86,19 +85,6 @@ class ControlManager : Extension {
 
         fun drag(event: Program.Mouse.MouseEvent) {
             dragTarget?.mouse?.dragged?.onNext(event)
-//            fun traverse(element: Element) {
-//                if (element.computedStyle.display != Display.NONE) {
-//
-//                    if (element.children.isEmpty()) {
-//                        if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-//                            element.mouse.dragged.onNext(event)
-//                        }
-//                    } else {
-//                        element.children.forEach(::traverse)
-//                    }
-//                }
-//            }
-//            body?.let(::traverse)
         }
 
         val insideElements = mutableSetOf<Element>()
