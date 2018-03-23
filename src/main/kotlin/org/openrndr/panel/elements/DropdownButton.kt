@@ -68,17 +68,18 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
             val writer = Writer(drawer)
             drawer.fontMap = (font)
 
-            val text = "$label: ${(value?.label)?:"<choose>"}"
+            val text = "${(value?.label)?:"<choose>"}"
 
             val textWidth = writer.textWidth(text)
             val textHeight = font.ascenderLength
 
-            val offset = Math.round((layout.screenWidth-textWidth) / 2.0)
+            val offset = Math.round((layout.screenWidth-textWidth))
             val yOffset = Math.round((layout.screenHeight/2) + textHeight/2.0) - 2.0
 
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
-            drawer.text(text, 0.0 + offset   , 0.0 + yOffset)
+            drawer.text("$label", 5.0, 0.0 + yOffset)
+            drawer.text(text, -5.0 + offset   , 0.0 + yOffset)
         }
 
     }

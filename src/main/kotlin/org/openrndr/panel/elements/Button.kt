@@ -59,7 +59,7 @@ class Button : Element(ElementType("button")) {
                 drawer.strokeWeight = 1.0
                 val dx = (layout.screenWidth - textWidth) / 2.0
 
-                drawer.lineSegment(Vector2(dx, yOffset + 3.5), Vector2(dx + textWidth, yOffset + 3.5))
+                //drawer.lineSegment(Vector2(dx, yOffset + 3.5), Vector2(dx + textWidth, yOffset + 3.5))
             }
             //          drawer.smooth(true)
             drawer.popStyle()
