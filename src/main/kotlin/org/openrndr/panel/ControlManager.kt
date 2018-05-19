@@ -255,7 +255,7 @@ class ControlManager : Extension {
         pd.time += (end - start)
 
         if (pd.hits == 100) {
-            println("name:  $name, avg: ${pd.time / pd.hits}ms, ${pd.hits}")
+            //println("name:  $name, avg: ${pd.time / pd.hits}ms, ${pd.hits}")
             pd.hits = 0
             pd.time = 0
         }
