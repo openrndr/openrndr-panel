@@ -26,11 +26,31 @@ class ControlManager : Extension {
     lateinit var renderTarget: RenderTarget
 
     inner class DropInput {
-        fun drop(event:DropEvent) {
+        var target: Element? = null
+        fun drop(event: DropEvent) {
+            target?.drop?.dropped?.onNext(event)
         }
     }
 
     val dropInput = DropInput()
+
+    inner class KeyboardInput {
+        var target: Element? = null
+
+        fun press(event: KeyEvent) {
+            target?.keyboard?.pressed?.onNext(event)
+        }
+
+        fun release(event: KeyEvent) {
+            target?.keyboard?.released?.onNext(event)
+        }
+
+        fun repeat(event: KeyEvent) {
+            target?.keyboard?.repeated?.onNext(event)
+        }
+    }
+
+    val keyboardInput = KeyboardInput()
 
     inner class MouseInput {
 
@@ -43,6 +63,9 @@ class ControlManager : Extension {
                 if (!event.propagationCancelled) {
                     if (event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                         element.mouse.scrolled.onNext(event)
+                        if (event.propagationCancelled) {
+                            keyboardInput.target = element
+                        }
                     }
                 }
             }
@@ -59,6 +82,9 @@ class ControlManager : Extension {
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                     element.mouse.clicked.onNext(event)
+                    if (event.propagationCancelled) {
+                        keyboardInput.target = element
+                    }
                 }
 
                 //}
@@ -74,6 +100,9 @@ class ControlManager : Extension {
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                     dragTarget = element
                     element.mouse.pressed.onNext(event)
+                    if (event.propagationCancelled) {
+                        keyboardInput.target = element
+                    }
                 }
             }
             body?.let(::traverse)
@@ -103,7 +132,6 @@ class ControlManager : Extension {
             fun traverse(element: Element) {
 
                 if (event.position in element.screenArea) {
-
                     insideElements.add(element)
                     if (hover !in element.pseudoClasses) {
                         element.pseudoClasses.add(hover)
@@ -131,6 +159,10 @@ class ControlManager : Extension {
         program.mouse.dragged.listen { mouseInput.drag(it) }
         program.mouse.buttonDown.listen { mouseInput.press(it) }
 
+
+        program.keyboard.keyDown.listen { keyboardInput.press(it) }
+        program.keyboard.keyUp.listen { keyboardInput.release(it) }
+        program.keyboard.keyRepeat.listen { keyboardInput.repeat(it) }
 
         program.window.drop.listen { dropInput.drop(it) }
 
