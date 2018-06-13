@@ -3,6 +3,10 @@ package org.openrndr.panel.elements
 import org.openrndr.draw.Drawer
 import org.openrndr.panel.ControlManager
 
+fun Element.layout(init: Element.() -> Unit) {
+    init()
+}
+
 fun layout(controlManager: ControlManager, init: Body.() -> Unit) : Body {
     val body = Body(controlManager)
     body.init()

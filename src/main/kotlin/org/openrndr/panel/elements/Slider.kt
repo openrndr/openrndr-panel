@@ -77,6 +77,13 @@ class Slider : Element(ElementType("slider")) {
 
     override fun draw(drawer: Drawer) {
 
+
+        val root = (root() as? Body)
+
+        if (root == null) {
+            throw RuntimeException("i've got no roots")
+        }
+
         val f = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!
         drawer.translate(0.0,(layout.screenHeight - (10.0 + f.height))/2)
 

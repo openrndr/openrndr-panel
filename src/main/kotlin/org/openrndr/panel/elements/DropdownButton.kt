@@ -6,11 +6,11 @@ import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
 import rx.subjects.PublishSubject
 
-class Item:Element(ElementType("item")) {
-    var label:String = ""
-    var data:Any? = null
+class Item : Element(ElementType("item")) {
+    var label: String = ""
+    var data: Any? = null
 
-    class PickedEvent(val source:Item)
+    class PickedEvent(val source: Item)
 
 
     class Events {
@@ -25,36 +25,43 @@ class Item:Element(ElementType("item")) {
     }
 }
 
-class DropdownButton: Element(ElementType("dropdown-button")) {
+class DropdownButton : Element(ElementType("dropdown-button")) {
 
     var label: String = "OK"
     var value: Item? = null
 
-    class ValueChangedEvent(val source:DropdownButton, val value:Item)
+    class ValueChangedEvent(val source: DropdownButton, val value: Item)
 
     class Events {
         val valueChanged = PublishSubject.create<ValueChangedEvent>()
     }
 
     val events = Events()
+
     init {
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
+        }
+
+
         mouse.clicked.subscribe {
             if (children.none { it is SlideOut })
-            append(SlideOut(0.0,screenArea.height, screenArea.width, 200.0, this))
+                append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
             else {
                 (children.first { it is SlideOut } as SlideOut?)?.dispose()
             }
         }
     }
-    override fun append(element:Element) {
-        when(element) {
+
+    override fun append(element: Element) {
+        when (element) {
             is Item, is SlideOut -> super.append(element)
             else -> throw RuntimeException("only item and slideout")
         }
         super.append(element)
     }
 
-    fun items(): List<Item> = children.filter { it is Item}.map { it as Item}
+    fun items(): List<Item> = children.filter { it is Item }.map { it as Item }
 
     override fun draw(drawer: Drawer) {
 
@@ -68,27 +75,28 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
             val writer = Writer(drawer)
             drawer.fontMap = (font)
 
-            val text = "${(value?.label)?:"<choose>"}"
+            val text = "${(value?.label) ?: "<choose>"}"
 
             val textWidth = writer.textWidth(text)
             val textHeight = font.ascenderLength
 
-            val offset = Math.round((layout.screenWidth-textWidth))
-            val yOffset = Math.round((layout.screenHeight/2) + textHeight/2.0) - 2.0
+            val offset = Math.round((layout.screenWidth - textWidth))
+            val yOffset = Math.round((layout.screenHeight / 2) + textHeight / 2.0) - 2.0
 
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
             drawer.text("$label", 5.0, 0.0 + yOffset)
-            drawer.text(text, -5.0 + offset   , 0.0 + yOffset)
+            drawer.text(text, -5.0 + offset, 0.0 + yOffset)
         }
 
     }
-    class SlideOut(val x:Double, val y:Double, val width:Double, val height:Double, parent:Element):Element(ElementType("slide-out")) {
+
+    class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element) : Element(ElementType("slide-out")) {
 
         init {
             mouse.scrolled.subscribe {
-                        scrollTop -= it.rotation.y
-                        scrollTop = Math.max(0.0, scrollTop)
+                scrollTop -= it.rotation.y
+                scrollTop = Math.max(0.0, scrollTop)
                 draw.dirty = true
                 it.cancelPropagation()
 
@@ -123,7 +131,7 @@ class DropdownButton: Element(ElementType("dropdown-button")) {
             }
         }
 
-        override fun draw(drawer:Drawer) {
+        override fun draw(drawer: Drawer) {
             drawer.fill = ((computedStyle.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
             drawer.stroke = null
             drawer.strokeWeight = 0.0

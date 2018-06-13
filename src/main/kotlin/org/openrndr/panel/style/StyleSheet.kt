@@ -167,7 +167,13 @@ var StyleSheet.flexGrow by PropertyHandler<FlexGrow>("flex-grow", RESET, FlexGro
 
 
 var StyleSheet.background by PropertyHandler<Color>("background-color", RESET, Color.RGBa(ColorRGBa.BLACK.opacify(0.0)))
+val StyleSheet.effectiveBackground: ColorRGBa?
+    get() = (background as? Color.RGBa)?.color
+
 var StyleSheet.color by PropertyHandler<Color>("color", INHERIT, Color.RGBa(ColorRGBa.WHITE))
+val StyleSheet.effectiveColor: ColorRGBa?
+    get() = (color as? Color.RGBa)?.color
+
 
 var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 12.px)
 var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
@@ -175,6 +181,7 @@ var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
 var StyleSheet.overflow by PropertyHandler<Overflow>("overflow", RESET, Overflow.Visible)
 
 var StyleSheet.zIndex by PropertyHandler<ZIndex>("z-index", RESET, ZIndex.Auto)
+
 
 val Number.px: LinearDimension.PX get() = LinearDimension.PX(this.toDouble())
 val Number.percent: LinearDimension.Percent get() = LinearDimension.Percent(this.toDouble())

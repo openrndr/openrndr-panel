@@ -1,4 +1,4 @@
-package org.openrndr.panel.elements
+    package org.openrndr.panel.elements
 
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
@@ -22,6 +22,11 @@ class Button : Element(ElementType("button")) {
     val events = Events()
 
     init {
+
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
+        }
+
         mouse.clicked.subscribe {
             events.clicked.onNext(ButtonEvent(this))
             it.cancelPropagation()

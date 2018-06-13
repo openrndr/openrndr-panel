@@ -12,7 +12,6 @@ import org.openrndr.panel.elements.visit
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
-import java.net.URL
 
 class ControlManager : Extension {
     var body: Element? = null
@@ -35,6 +34,7 @@ class ControlManager : Extension {
     inner class MouseInput {
 
         var dragTarget: Element? = null
+        var clickTarget: Element? = null
 
         fun scroll(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
@@ -51,19 +51,23 @@ class ControlManager : Extension {
 
         fun click(event: Program.Mouse.MouseEvent) {
             dragTarget = null
-            fun traverse(element: Element) {
-                //  if (element.children.isEmpty()) {
-                //} else {
-                if (element.computedStyle.display != Display.NONE) {
-                    element.children.forEach(::traverse)
-                }
-                if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                    element.mouse.clicked.onNext(event)
-                }
+//            fun traverse(element: Element) {
+//                //  if (element.children.isEmpty()) {
+//                //} else {
+//                if (element.computedStyle.display != Display.NONE) {
+//                    element.children.forEach(::traverse)
+//                }
+//                if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
+//                    element.mouse.clicked.onNext(event)
+//                }
+//
+//                //}
+//            }
+            //body?.let(::traverse)
 
-                //}
+            if (clickTarget != null) {
+                clickTarget?.mouse?.clicked?.onNext(event)
             }
-            body?.let(::traverse)
         }
 
         fun press(event: Program.Mouse.MouseEvent) {
@@ -73,6 +77,7 @@ class ControlManager : Extension {
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                     dragTarget = element
+                    clickTarget = element
                     element.mouse.pressed.onNext(event)
                 }
             }
@@ -85,6 +90,7 @@ class ControlManager : Extension {
 
         fun drag(event: Program.Mouse.MouseEvent) {
             dragTarget?.mouse?.dragged?.onNext(event)
+            clickTarget = null
         }
 
         val insideElements = mutableSetOf<Element>()
@@ -125,6 +131,7 @@ class ControlManager : Extension {
         contentScale = program.window.scale.x
 
         fontManager.contentScale = contentScale
+        program.mouse.buttonUp.listen { mouseInput.release(it) }
         program.mouse.buttonUp.listen { mouseInput.click(it) }
         program.mouse.moved.listen { mouseInput.move(it) }
         program.mouse.scrolled.listen { mouseInput.scroll(it) }
@@ -329,23 +336,20 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
         controlManager.layouter.styleSheets.addAll(StyleSheet().apply { init() }.flatten())
     }
 
+    fun styleSheets(styleSheets: List<StyleSheet> ) {
+        controlManager.layouter.styleSheets.addAll(styleSheets.flatMap { it.flatten() })
+    }
+
     fun layout(init: Body.() -> Unit) {
         val body = Body(controlManager)
         body.init()
         controlManager.body = body
     }
-
-}
-
-fun resource(name: String): URL {
-    val url = ControlManager::class.java.getResource(name)
-
-    return url
 }
 
 fun controlManager(builder: ControlManagerBuilder.() -> Unit): ControlManager {
     val cm = ControlManager()
-    cm.fontManager.register("default", resource("/fonts/Roboto-Medium.ttf").toExternalForm())
+    cm.fontManager.register("default", resourceUrl("/fonts/Roboto-Medium.ttf"))
     cm.layouter.styleSheets.addAll(defaultStyles())
     val cmb = ControlManagerBuilder(cm)
     cmb.builder()
