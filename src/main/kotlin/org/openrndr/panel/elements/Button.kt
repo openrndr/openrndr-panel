@@ -1,4 +1,4 @@
-    package org.openrndr.panel.elements
+package org.openrndr.panel.elements
 
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
@@ -30,6 +30,13 @@ class Button : Element(ElementType("button")) {
         mouse.clicked.subscribe {
             events.clicked.onNext(ButtonEvent(this))
             it.cancelPropagation()
+        }
+
+        keyboard.pressed.subscribe {
+            if (it.key == 32) {
+                it.cancelPropagation()
+                events.clicked.onNext(ButtonEvent(this))
+            }
         }
     }
 
