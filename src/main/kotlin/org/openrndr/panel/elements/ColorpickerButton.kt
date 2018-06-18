@@ -21,8 +21,12 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
     val events = Events()
 
     init {
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
+        }
         mouse.clicked.subscribe {
             append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
+            it.cancelPropagation()
         }
     }
 
@@ -67,7 +71,6 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             drawer.lineSegment(2.0, layout.screenHeight - 2.0, layout.screenWidth - 2.0, layout.screenHeight - 2.0)
             drawer.popStyle()
         }
-
     }
 
     class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element) : Element(ElementType("slide-out")) {
@@ -95,17 +98,6 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             mouse.exited.subscribe {
                 dispose()
             }
-            
-            append(Button().apply {
-                label = "done"
-                events.clicked.subscribe {
-                    //parent.value = it.source.data as Item
-                    //parent.events.valueChanged.onNext(ValueChangedEvent(parent, it.source.data as Item))
-                    dispose()
-                }
-            })
-
-
         }
 
         override fun draw(drawer: Drawer) {

@@ -14,6 +14,13 @@ fun defaultStyles(
             display = Display.NONE
         },
 
+
+        styleSheet {
+            selector = selector { type( "textfield") }
+            width = 100.percent
+            height = 50.px
+
+        },
         styleSheet {
             selector = selector { type("dropdown-button") }
             width = 100.px

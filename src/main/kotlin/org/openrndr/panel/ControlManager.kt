@@ -25,16 +25,41 @@ class ControlManager : Extension {
     lateinit var renderTarget: RenderTarget
 
     inner class DropInput {
-        fun drop(event:DropEvent) {
+        var target: Element? = null
+        fun drop(event: DropEvent) {
+            target?.drop?.dropped?.onNext(event)
         }
     }
 
     val dropInput = DropInput()
 
+    inner class KeyboardInput {
+        var target: Element? = null
+
+        fun press(event: KeyEvent) {
+            target?.keyboard?.pressed?.onNext(event)
+        }
+
+        fun release(event: KeyEvent) {
+            target?.keyboard?.released?.onNext(event)
+        }
+
+        fun repeat(event: KeyEvent) {
+            target?.keyboard?.repeated?.onNext(event)
+        }
+
+        fun character(event: Program.CharacterEvent) {
+            target?.keyboard?.character?.onNext(event)
+        }
+    }
+
+    val keyboardInput = KeyboardInput()
+
     inner class MouseInput {
 
         var dragTarget: Element? = null
         var clickTarget: Element? = null
+        var lastClick = System.currentTimeMillis()
 
         fun scroll(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
@@ -43,6 +68,9 @@ class ControlManager : Extension {
                 if (!event.propagationCancelled) {
                     if (event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                         element.mouse.scrolled.onNext(event)
+                        if (event.propagationCancelled) {
+                            keyboardInput.target = element
+                        }
                     }
                 }
             }
@@ -51,23 +79,17 @@ class ControlManager : Extension {
 
         fun click(event: Program.Mouse.MouseEvent) {
             dragTarget = null
-//            fun traverse(element: Element) {
-//                //  if (element.children.isEmpty()) {
-//                //} else {
-//                if (element.computedStyle.display != Display.NONE) {
-//                    element.children.forEach(::traverse)
-//                }
-//                if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-//                    element.mouse.clicked.onNext(event)
-//                }
-//
-//                //}
-//            }
-            //body?.let(::traverse)
-
-            if (clickTarget != null) {
-                clickTarget?.mouse?.clicked?.onNext(event)
+            val ct = System.currentTimeMillis()
+            if (ct - lastClick > 500) {
+                if (clickTarget != null) {
+                    clickTarget?.mouse?.clicked?.onNext(event)
+                }
+            } else {
+                if (clickTarget != null) {
+                    clickTarget?.mouse?.doubleClicked?.onNext(event)
+                }
             }
+            lastClick = ct
         }
 
         fun press(event: Program.Mouse.MouseEvent) {
@@ -76,9 +98,13 @@ class ControlManager : Extension {
                     element.children.forEach(::traverse)
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                    dragTarget = element
-                    clickTarget = element
                     element.mouse.pressed.onNext(event)
+                    if (event.propagationCancelled) {
+                        dragTarget = element
+                        clickTarget = element
+
+                        keyboardInput.target = element
+                    }
                 }
             }
             body?.let(::traverse)
@@ -109,7 +135,6 @@ class ControlManager : Extension {
             fun traverse(element: Element) {
 
                 if (event.position in element.screenArea) {
-
                     insideElements.add(element)
                     if (hover !in element.pseudoClasses) {
                         element.pseudoClasses.add(hover)
@@ -138,6 +163,10 @@ class ControlManager : Extension {
         program.mouse.dragged.listen { mouseInput.drag(it) }
         program.mouse.buttonDown.listen { mouseInput.press(it) }
 
+        program.keyboard.keyDown.listen { keyboardInput.press(it) }
+        program.keyboard.keyUp.listen { keyboardInput.release(it) }
+        program.keyboard.keyRepeat.listen { keyboardInput.repeat(it) }
+        program.keyboard.character.listen { keyboardInput.character(it) }
 
         program.window.drop.listen { dropInput.drop(it) }
 
@@ -184,7 +213,7 @@ class ControlManager : Extension {
     }
 
 
-    fun drawElement(element: Element, drawer: Drawer, zIndex: Int, zComp: Int) {
+    private fun drawElement(element: Element, drawer: Drawer, zIndex: Int, zComp: Int) {
         element.draw.dirty = false
 
         val newZComp =
@@ -271,62 +300,65 @@ class ControlManager : Extension {
     var drawCount = 0
     override fun afterDraw(drawer: Drawer, program: Program) {
 
-        profile("after draw") {
 
-            if (program.width != renderTarget.width || program.height != renderTarget.height) {
-                profile("resize target") {
-                    body?.draw?.dirty = true
+        if (program.width > 0 && program.height > 0) {
+            profile("after draw") {
 
-                    renderTarget.colorBuffer(0).destroy()
-                    renderTarget.destroy()
-                    renderTarget = renderTarget(program.width, program.height, contentScale) {
-                        colorBuffer()
-                    }
+                if (program.width != renderTarget.width || program.height != renderTarget.height) {
+                    profile("resize target") {
+                        body?.draw?.dirty = true
 
-                    renderTarget.bind()
-                    program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
-                    renderTarget.unbind()
-                }
-            }
+                        renderTarget.colorBuffer(0).destroy()
+                        renderTarget.destroy()
+                        renderTarget = renderTarget(program.width, program.height, contentScale) {
+                            colorBuffer()
+                        }
 
-            val redraw = body?.any {
-                it.draw.dirty
-            } ?: false
-
-            if (redraw) {
-                drawer.ortho()
-                drawer.view = Matrix44.IDENTITY
-                drawer.reset()
-
-                profile("redraw") {
-                    body?.visit {
-                        draw.dirty = false
-                    }
-                    renderTarget.bind()
-                    body?.style = StyleSheet()
-                    body?.style?.width = program.width.px
-                    body?.style?.height = program.height.px
-
-                    body?.let {
+                        renderTarget.bind()
                         program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
-                        layouter.computeStyles(it)
-                        layouter.layout(it)
-                        drawElement(it, program.drawer, 0, 0)
-                        drawElement(it, program.drawer, 1, 0)
+                        renderTarget.unbind()
                     }
-                    renderTarget.unbind()
                 }
-            }
-            profile("draw image") {
-                drawer.size(program.width, program.height)
-                drawer.ortho()
-                drawer.view = Matrix44.IDENTITY
-                drawer.reset()
-                program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
+
+                val redraw = body?.any {
+                    it.draw.dirty
+                } ?: false
+
+                if (redraw) {
+                    drawer.ortho()
+                    drawer.view = Matrix44.IDENTITY
+                    drawer.reset()
+
+                    profile("redraw") {
+                        body?.visit {
+                            draw.dirty = false
+                        }
+                        renderTarget.bind()
+                        body?.style = StyleSheet()
+                        body?.style?.width = program.width.px
+                        body?.style?.height = program.height.px
+
+                        body?.let {
+                            program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
+                            layouter.computeStyles(it)
+                            layouter.layout(it)
+                            drawElement(it, program.drawer, 0, 0)
+                            drawElement(it, program.drawer, 1, 0)
+                        }
+                        renderTarget.unbind()
+                    }
+                }
+                profile("draw image") {
+                    drawer.size(program.width, program.height)
+                    drawer.ortho()
+                    drawer.view = Matrix44.IDENTITY
+                    drawer.reset()
+                    program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
+
+                }
+                drawCount++
 
             }
-            drawCount++
-
         }
     }
 }

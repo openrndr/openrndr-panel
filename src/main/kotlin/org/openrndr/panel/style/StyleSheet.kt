@@ -4,6 +4,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.panel.style.PropertyInheritance.INHERIT
 import org.openrndr.panel.style.PropertyInheritance.RESET
 import java.util.*
+import javax.sound.sampled.Line
 import kotlin.reflect.KProperty
 
 enum class PropertyInheritance {
@@ -159,6 +160,13 @@ var StyleSheet.marginBottom by PropertyHandler<LinearDimension>("margin-bottom",
 var StyleSheet.marginLeft by PropertyHandler<LinearDimension>("margin-left", RESET, 0.px)
 var StyleSheet.marginRight by PropertyHandler<LinearDimension>("margin-right", RESET, 0.px)
 
+
+var StyleSheet.paddingTop by PropertyHandler<LinearDimension>("padding-top", RESET, 0.px)
+var StyleSheet.paddingBottom by PropertyHandler<LinearDimension>("padding-bottom", RESET, 0.px)
+var StyleSheet.paddingLeft by PropertyHandler<LinearDimension>("padding-left", RESET, 0.px)
+var StyleSheet.paddingRight by PropertyHandler<LinearDimension>("padding-right", RESET, 0.px)
+
+
 var StyleSheet.position by PropertyHandler("position", RESET, Position.STATIC)
 var StyleSheet.display by PropertyHandler("display", RESET, Display.BLOCK) // css default is inline
 
@@ -175,23 +183,47 @@ val StyleSheet.effectiveColor: ColorRGBa?
     get() = (color as? Color.RGBa)?.color
 
 
+val StyleSheet.effectivePaddingLeft: Double
+    get() = (paddingLeft as? LinearDimension.PX)?.value ?: 0.0
+
+val StyleSheet.effectivePaddingRight: Double
+    get() = (paddingRight as? LinearDimension.PX)?.value ?: 0.0
+
+val StyleSheet.effectivePaddingTop: Double
+    get() = (paddingTop as? LinearDimension.PX)?.value ?: 0.0
+
+val StyleSheet.effectivePaddingBottom: Double
+    get() = (paddingBottom as? LinearDimension.PX)?.value ?: 0.0
+
+
+val StyleSheet.effectivePaddingHeight: Double
+    get() = effectivePaddingBottom + effectivePaddingTop
+
+val StyleSheet.effectivePaddingWidth: Double
+    get() = effectivePaddingLeft + effectivePaddingRight
+
+
+
 var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 12.px)
 var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
-
 var StyleSheet.overflow by PropertyHandler<Overflow>("overflow", RESET, Overflow.Visible)
-
 var StyleSheet.zIndex by PropertyHandler<ZIndex>("z-index", RESET, ZIndex.Auto)
-
 
 val Number.px: LinearDimension.PX get() = LinearDimension.PX(this.toDouble())
 val Number.percent: LinearDimension.Percent get() = LinearDimension.Percent(this.toDouble())
-
 
 fun StyleSheet.withChild(init: StyleSheet.() -> Unit) {
     val stylesheet = StyleSheet().apply(init)
     stylesheet.selector!!.previous = Pair(Combinator.CHILD, this@withChild.selector!!)
     children.add(stylesheet)
 }
+
+fun StyleSheet.withDescendant(init: StyleSheet.() -> Unit) {
+    val stylesheet = StyleSheet().apply(init)
+    stylesheet.selector!!.previous = Pair(Combinator.DESCENDANT, this@withDescendant.selector!!)
+    children.add(stylesheet)
+}
+
 
 fun StyleSheet.flatten(): List<StyleSheet> {
     return listOf(this) + children

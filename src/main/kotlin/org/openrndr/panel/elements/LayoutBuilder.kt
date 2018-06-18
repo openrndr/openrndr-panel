@@ -2,6 +2,7 @@ package org.openrndr.panel.elements
 
 import org.openrndr.draw.Drawer
 import org.openrndr.panel.ControlManager
+import java.awt.TextField
 
 fun Element.layout(init: Element.() -> Unit) {
     init()
@@ -51,6 +52,7 @@ fun Element.dropdownButton(id:String?=null, label:String="button", init: Dropdow
 fun Element.envelopeButton(init: EnvelopeButton.()->Unit) = initElement(EnvelopeButton().apply {}, init)
 fun Element.envelopeEditor(init: EnvelopeEditor.()->Unit) = initElement(EnvelopeEditor().apply {}, init)
 
+fun Element.textfield(init: Textfield.()->Unit) = initElement(Textfield(), init)
 
 fun DropdownButton.item(init:Item.() -> Unit) : Item {
     val item = Item().apply(init)

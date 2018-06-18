@@ -10,8 +10,8 @@ import org.openrndr.panel.style.overflow
 class Div : TextElement(ElementType("div")) {
 
     init {
-        mouse.clicked.subscribe {
-
+        mouse.pressed.subscribe {
+            it.cancelPropagation()
         }
         mouse.scrolled.subscribe {
             computedStyle.let { cs ->

@@ -1,6 +1,7 @@
 package org.openrndr.panel.elements
 
 import org.openrndr.DropEvent
+import org.openrndr.KeyEvent
 import org.openrndr.Program
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
@@ -22,6 +23,7 @@ open class Element(val type: ElementType) {
 
     class MouseObservables {
         val clicked = PublishSubject.create<Program.Mouse.MouseEvent>()
+        val doubleClicked = PublishSubject.create<Program.Mouse.MouseEvent>()
         val entered = PublishSubject.create<Program.Mouse.MouseEvent>()
         val exited = PublishSubject.create<Program.Mouse.MouseEvent>()
         val dragged = PublishSubject.create<Program.Mouse.MouseEvent>()
@@ -36,6 +38,16 @@ open class Element(val type: ElementType) {
 
     val drop = DropObserverables()
     val mouse = MouseObservables()
+
+    class KeyboardObservables {
+        val pressed = PublishSubject.create<KeyEvent>()
+        val released = PublishSubject.create<KeyEvent>()
+        val repeated = PublishSubject.create<KeyEvent>()
+        val character = PublishSubject.create<Program.CharacterEvent>()
+    }
+
+    val keyboard = KeyboardObservables()
+
     class Layout {
         var screenX = 0.0
         var screenY = 0.0
@@ -53,7 +65,6 @@ open class Element(val type: ElementType) {
     }
     val draw = Draw();
     val layout = Layout()
-
 
     class ClassEvent(val source:Element, val `class`:ElementClass)
     class ClassObserverables {
