@@ -14,10 +14,21 @@ class Colorpicker : Element {
 
     internal var colorBuffer: ColorBuffer? = null
 
-    var label:String = "Color"
+    var label: String = "Color"
 
     var saturation = 0.5
-    var color = ColorRGBa.WHITE
+    var color:ColorRGBa
+        set(value) {
+            realColor = value
+            saturation = color.toHSVa().s
+            generateColorMap()
+            draw.dirty = true
+        }
+        get() {
+            return realColor
+        }
+
+    var realColor = ColorRGBa.WHITE
     var focussed = false
 
     class ColorChangedEvent(val source: Colorpicker,
@@ -52,27 +63,24 @@ class Colorpicker : Element {
             }
 
         }
-        fun pick(e : Program.Mouse.MouseEvent) {
+        fun pick(e: Program.Mouse.MouseEvent) {
             val dx = e.position.x - layout.screenX
             var dy = e.position.y - layout.screenY
 
             dy = 50.0 - dy
             val oldColor = color
             val hsv = ColorHSVa(360.0 / layout.screenWidth * dx, saturation, dy / 50.0)
-            color = hsv.toRGBa()
+            realColor = hsv.toRGBa()
             draw.dirty = true
-            events.colorChanged.onNext(ColorChangedEvent(this, oldColor, color))
+            events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
             e.cancelPropagation()
         }
-        mouse.pressed.subscribe { it.cancelPropagation(); focussed = true}
-        mouse.clicked.subscribe { it.cancelPropagation(); pick(it); focussed = true;  }
+        mouse.pressed.subscribe { it.cancelPropagation(); focussed = true }
+        mouse.clicked.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
         mouse.dragged.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
     }
 
     fun generateColorMap() {
-
-
-
         colorBuffer?.shadow?.let {
             for (y in 0..49) {
                 for (x in 0 until it.colorBuffer.width) {
@@ -84,9 +92,7 @@ class Colorpicker : Element {
         }
     }
 
-
     override fun draw(drawer: Drawer) {
-
         if (colorBuffer == null) {
             colorBuffer = ColorBuffer.create(layout.screenWidth.toInt(), 50, 1.0)
             generateColorMap()
@@ -96,24 +102,7 @@ class Colorpicker : Element {
         drawer.fill = (color)
         drawer.stroke = null
         drawer.shadeStyle = null
-        drawer.rectangle(0.0,  50.0, layout.screenWidth, 20.0)
-
-        val valueText = "-"
-
-
-        val x = 0.0
-        val y = 50+30.0
-        val width = layout.screenWidth
-        val font = (root() as Body).controlManager.fontManager.font(computedStyle)
-        drawer.fill = (ColorRGBa.WHITE)
-
-        drawer.fontMap = font
-        val textWidth = Writer(drawer).textWidth(valueText)
-
-        drawer.fontMap = font
-        drawer.text(label, x, y)
-        drawer.text(valueText, x + width - textWidth, y)
-
+        drawer.rectangle(0.0, 50.0, layout.screenWidth, 20.0)
 
     }
 }

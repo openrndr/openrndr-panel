@@ -25,7 +25,7 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             it.cancelPropagation()
         }
         mouse.clicked.subscribe {
-            append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
+            append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, color, this))
             it.cancelPropagation()
         }
     }
@@ -73,7 +73,7 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
         }
     }
 
-    class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element) : Element(ElementType("slide-out")) {
+    class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, color:ColorRGBa, parent: Element) : Element(ElementType("slide-out")) {
 
         init {
             style = StyleSheet().apply {
@@ -83,17 +83,17 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
                 width = LinearDimension.PX(this@SlideOut.width)
                 height = LinearDimension.Auto//LinearDimension.PX(this@SlideOut.height)
                 overflow = Overflow.Scroll
-                zIndex = ZIndex.Value(1)
+                zIndex = ZIndex.Value(1000)
                 background = Color.RGBa(ColorRGBa(0.3, 0.3, 0.3))
             }
 
             append(Colorpicker().apply {
+                this.color = color
                 label = (parent as ColorpickerButton).label
                 events.colorChanged.subscribe {
-                    parent.color = color
+                    parent.color = it.newColor
                     parent.events.valueChanged.onNext(ColorChangedEvent(parent, parent.color))
                 }
-
             })
             mouse.exited.subscribe {
                 dispose()
@@ -109,6 +109,4 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             parent?.remove(this)
         }
     }
-
-
 }
