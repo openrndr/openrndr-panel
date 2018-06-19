@@ -1,4 +1,3 @@
-
 package org.openrndr.panel.layout
 
 import org.openrndr.math.Vector2
@@ -166,7 +165,6 @@ class Layouter {
         } else return 0.0
     }
 
-
     fun marginTop(element: Element) = margin(element, StyleSheet::marginTop)
     fun marginBottom(element: Element) = margin(element, StyleSheet::marginBottom)
     fun marginLeft(element: Element) = margin(element, StyleSheet::marginLeft)
@@ -177,9 +175,7 @@ class Layouter {
     fun paddingLeft(element: Element?) = padding(element, StyleSheet::paddingLeft)
     fun paddingRight(element: Element?) = padding(element, StyleSheet::paddingRight)
 
-
     fun height(element: Element, includeMargins: Boolean = true): Double {
-
         if (element.computedStyle.display == Display.NONE) {
             return 0.0
         }
@@ -188,20 +184,22 @@ class Layouter {
             return element.sizeHint().height + if (includeMargins) marginBottom(element) + marginTop(element) else 0.0
         }
 
-
         return element.computedStyle.let {
             it.height.let {
                 when (it) {
                     is LinearDimension.PX -> it.value
-                    is LinearDimension.Percent -> ((element.parent?.layout?.screenHeight
-                            ?: 0.0) - (element.parent?.computedStyle?.effectivePaddingHeight?:0.0)) * (it.value / 100.0) - 1.0 * (marginBottom(element) + marginTop(element))
+                    is LinearDimension.Percent -> {
+                        val parentHeight = element.parent?.layout?.screenHeight ?: 0.0
+                        val parentPadding = element.parent?.computedStyle?.effectivePaddingHeight ?: 0.0
+                        val margins = marginTop(element) + marginBottom(element)
+                        val effectiveHeight = (parentHeight - parentPadding) * (it.value / 100.0) - margins
+                        effectiveHeight
+                    }
                     is LinearDimension.Auto -> {
-                        positionChildren(element).height
+                        val padding = paddingTop(element) + paddingBottom(element)
+                        positionChildren(element).height + padding
                     }
-
-                    else -> {
-                        throw RuntimeException("not supported")
-                    }
+                    else -> throw RuntimeException("not supported")
                 }
             } + if (includeMargins) ((it.marginTop as? LinearDimension.PX)?.value
                     ?: 0.0) + ((it.marginBottom as? LinearDimension.PX)?.value ?: 0.0) else 0.0
@@ -214,20 +212,20 @@ class Layouter {
         }
 
         val result =
-        it.width.let {
-            when (it) {
-                is LinearDimension.PX -> it.value
-                is LinearDimension.Percent -> {
-                    val parentWidth = element.parent?.layout?.screenWidth?:0.0
-                    val parentPadding = element.parent?.computedStyle?.effectivePaddingWidth?:0.0
-                    val margins = marginLeft(element) + marginRight(element)
-                    val effectiveWidth = (parentWidth - parentPadding) * (it.value / 100.0) - margins
-                    effectiveWidth
-                }
-                is LinearDimension.Auto -> positionChildren(element).width
-                else -> throw RuntimeException("not supported")
-            }
-        } + if (includeMargins) marginLeft(element) + marginRight(element) else 0.0
+                it.width.let {
+                    when (it) {
+                        is LinearDimension.PX -> it.value
+                        is LinearDimension.Percent -> {
+                            val parentWidth = element.parent?.layout?.screenWidth ?: 0.0
+                            val parentPadding = element.parent?.computedStyle?.effectivePaddingWidth ?: 0.0
+                            val margins = marginLeft(element) + marginRight(element)
+                            val effectiveWidth = (parentWidth - parentPadding) * (it.value / 100.0) - margins
+                            effectiveWidth
+                        }
+                        is LinearDimension.Auto -> positionChildren(element).width
+                        else -> throw RuntimeException("not supported")
+                    }
+                } + if (includeMargins) marginLeft(element) + marginRight(element) else 0.0
         result
     }
 
