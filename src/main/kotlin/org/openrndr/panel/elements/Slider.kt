@@ -20,18 +20,36 @@ data class Range(val min: Double, val max: Double) {
 class Slider : Element(ElementType("slider")) {
     var label = ""
     var precision = 3
-    var value = 0.0
+    var value:Double
         set(v) {
-            val cleanV = v.coerceIn(range.min, range.max)
-            val oldV = field
-            val quantized = String.format("%.0${precision}f", cleanV).replace(",", ".").toDouble()
-            field = quantized
+            val oldV = realValue
+            realValue = clean(v)
             draw.dirty = true
-            events.valueChanged.onNext(ValueChangedEvent(this, oldV, field))
+            events.valueChanged.onNext(ValueChangedEvent(this, false, oldV, realValue))
         }
+        get() = realValue
+
+    private var interactiveValue:Double
+        set(v) {
+            val oldV = realValue
+            realValue = clean(v)
+            draw.dirty = true
+            events.valueChanged.onNext(ValueChangedEvent(this, true, oldV, realValue))
+        }
+        get() = realValue
+
+
     var range = Range(0.0, 10.0)
+    private var realValue = 0.0
+
+    fun clean(value:Double):Double {
+        val cleanV = value.coerceIn(range.min, range.max)
+        val quantized = String.format("%.0${precision}f", cleanV).replace(",", ".").toDouble()
+        return quantized
+    }
 
     class ValueChangedEvent(val source: Slider,
+                            val interactive: Boolean,
                             val oldValue: Double,
                             val newValue: Double)
 
@@ -50,36 +68,36 @@ class Slider : Element(ElementType("slider")) {
         }
         mouse.clicked.subscribe {
             val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
-            value = t * range.span + range.min
+            interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
         mouse.dragged.subscribe {
             val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
-            value = t * range.span + range.min
+            interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
 
         mouse.scrolled.subscribe {
             if (Math.abs(it.rotation.y) < 0.001) {
-                value += range.span * 0.001 * it.rotation.x
+                interactiveValue += range.span * 0.001 * it.rotation.x
                 it.cancelPropagation()
             }
         }
+
         keyboard.character.subscribe {
             keyboardInput += it.character
             draw.dirty = true
             it.cancelPropagation()
         }
-        keyboard.pressed.subscribe {
-            println(it.key)
 
+        keyboard.pressed.subscribe {
             val delta = Math.pow(10.0, -(precision - 0.0))
 
             if (it.key == KEY_ARROW_RIGHT) {
-                value += delta
+                interactiveValue += delta
             }
             if (it.key == KEY_ARROW_LEFT) {
-                value -= delta
+                interactiveValue -= delta
             }
 
             if (it.key == KEY_ESCAPE) {
@@ -90,20 +108,22 @@ class Slider : Element(ElementType("slider")) {
             if (it.key == KEY_ENTER) {
                 val number = keyboardInput.toDoubleOrNull()
                 if (number != null) {
-                    value = number.coerceIn(range.min, range.max)
+                    interactiveValue = number.coerceIn(range.min, range.max)
                 }
                 keyboardInput = ""
                 draw.dirty = true
             }
 
             if (it.key == 268) { // home
-                value = range.min
+                interactiveValue = range.min
                 keyboardInput = ""
             }
+
             if (it.key == 269) { // end
-                value = range.max
+                interactiveValue = range.max
                 keyboardInput = ""
             }
+
             it.cancelPropagation()
         }
     }
