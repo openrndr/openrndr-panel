@@ -344,6 +344,7 @@ class ControlManager : Extension {
                             layouter.layout(it)
                             drawElement(it, program.drawer, 0, 0)
                             drawElement(it, program.drawer, 1, 0)
+                            drawElement(it, program.drawer, 1000, 0)
                         }
                         renderTarget.unbind()
                     }
