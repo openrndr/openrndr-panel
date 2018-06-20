@@ -37,7 +37,19 @@ class ControlManager : Extension {
         var target: Element? = null
 
         fun press(event: KeyEvent) {
-            target?.keyboard?.pressed?.onNext(event)
+
+            target?.let {
+
+                var current: Element? = it
+
+                while (current != null) {
+                    println("current $current")
+                    if (!event.propagationCancelled) {
+                        current.keyboard.pressed.onNext(event)
+                    }
+                    current = current.parent
+                }
+            }
         }
 
         fun release(event: KeyEvent) {
@@ -92,22 +104,31 @@ class ControlManager : Extension {
             lastClick = ct
         }
 
+
         fun press(event: Program.Mouse.MouseEvent) {
-            fun traverse(element: Element) {
+            val candidates = mutableListOf<Pair<Element, Int>>()
+
+            fun traverse(element: Element, depth: Int = 0) {
                 if (element.computedStyle.display != Display.NONE) {
-                    element.children.forEach(::traverse)
+                    element.children.forEach { traverse(it, depth + 1) }
                 }
                 if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                    element.mouse.pressed.onNext(event)
-                    if (event.propagationCancelled) {
-                        dragTarget = element
-                        clickTarget = element
+                    candidates.add(Pair(element, depth))
+                }
+            }
 
-                        keyboardInput.target = element
+            body?.let { traverse(it) }
+            candidates.sortByDescending { it.second }
+            for (c in candidates) {
+                if (!event.propagationCancelled) {
+                    c.first.mouse.pressed.onNext(event)
+                    if (event.propagationCancelled) {
+                        dragTarget = c.first
+                        clickTarget = c.first
+                        keyboardInput.target = c.first
                     }
                 }
             }
-            body?.let(::traverse)
         }
 
         fun release(event: Program.Mouse.MouseEvent) {
@@ -369,7 +390,7 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
         controlManager.layouter.styleSheets.addAll(StyleSheet().apply { init() }.flatten())
     }
 
-    fun styleSheets(styleSheets: List<StyleSheet> ) {
+    fun styleSheets(styleSheets: List<StyleSheet>) {
         controlManager.layouter.styleSheets.addAll(styleSheets.flatMap { it.flatten() })
     }
 
