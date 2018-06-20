@@ -24,8 +24,10 @@ class Slider : Element(ElementType("slider")) {
         set(v) {
             val oldV = realValue
             realValue = clean(v)
-            draw.dirty = true
-            events.valueChanged.onNext(ValueChangedEvent(this, false, oldV, realValue))
+            if (realValue != oldV) {
+                draw.dirty = true
+                events.valueChanged.onNext(ValueChangedEvent(this, false, oldV, realValue))
+            }
         }
         get() = realValue
 
@@ -33,13 +35,19 @@ class Slider : Element(ElementType("slider")) {
         set(v) {
             val oldV = realValue
             realValue = clean(v)
-            draw.dirty = true
-            events.valueChanged.onNext(ValueChangedEvent(this, true, oldV, realValue))
+            if (realValue != oldV) {
+                draw.dirty = true
+                events.valueChanged.onNext(ValueChangedEvent(this, true, oldV, realValue))
+            }
         }
         get() = realValue
 
 
     var range = Range(0.0, 10.0)
+    set(value) {
+        field = value
+        this.value = this.value
+    }
     private var realValue = 0.0
 
     fun clean(value:Double):Double {
@@ -95,14 +103,18 @@ class Slider : Element(ElementType("slider")) {
 
             if (it.key == KEY_ARROW_RIGHT) {
                 interactiveValue += delta
+                it.cancelPropagation()
             }
+
             if (it.key == KEY_ARROW_LEFT) {
                 interactiveValue -= delta
+                it.cancelPropagation()
             }
 
             if (it.key == KEY_ESCAPE) {
                 keyboardInput = ""
                 draw.dirty = true
+                it.cancelPropagation()
             }
 
             if (it.key == KEY_ENTER) {
@@ -112,19 +124,20 @@ class Slider : Element(ElementType("slider")) {
                 }
                 keyboardInput = ""
                 draw.dirty = true
+                it.cancelPropagation()
             }
 
             if (it.key == 268) { // home
                 interactiveValue = range.min
                 keyboardInput = ""
+                it.cancelPropagation()
             }
 
             if (it.key == 269) { // end
                 interactiveValue = range.max
                 keyboardInput = ""
+                it.cancelPropagation()
             }
-
-            it.cancelPropagation()
         }
     }
 
@@ -151,7 +164,7 @@ class Slider : Element(ElementType("slider")) {
             val font = it.font(computedStyle)
             val writer = Writer(drawer)
             drawer.fontMap = (font)
-            drawer.fill = (ColorRGBa.BLACK)
+            drawer.fill = computedStyle.effectiveColor
             writer.cursor = Cursor(0.0, 10.0)
             writer.newLine()
             writer.text(label)
