@@ -1,9 +1,6 @@
 package org.openrndr.panel.elements
 
-import org.openrndr.KEY_ARROW_LEFT
-import org.openrndr.KEY_ARROW_RIGHT
-import org.openrndr.KEY_ENTER
-import org.openrndr.KEY_ESCAPE
+import org.openrndr.*
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
@@ -92,11 +89,17 @@ class Slider : Element(ElementType("slider")) {
             }
         }
 
+        keyboard.focusLost.subscribe {
+            keyboardInput = ""
+            draw.dirty = true
+        }
+
         keyboard.character.subscribe {
             keyboardInput += it.character
             draw.dirty = true
             it.cancelPropagation()
         }
+
 
         keyboard.pressed.subscribe {
             val delta = Math.pow(10.0, -(precision - 0.0))
@@ -108,6 +111,15 @@ class Slider : Element(ElementType("slider")) {
 
             if (it.key == KEY_ARROW_LEFT) {
                 interactiveValue -= delta
+                it.cancelPropagation()
+            }
+
+            if (it.key == KEY_BACKSPACE) {
+                if (!keyboardInput.isEmpty()) {
+                    keyboardInput = keyboardInput.substring(0, keyboardInput.length - 1)
+                    draw.dirty= true
+
+                }
                 it.cancelPropagation()
             }
 

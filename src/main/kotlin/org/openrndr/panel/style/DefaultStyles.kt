@@ -5,8 +5,8 @@ import org.openrndr.color.ColorRGBa
 
 fun defaultStyles(
         controlBackground:ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
-        controlHoverBackground:ColorRGBa = controlBackground.shade(1.5)
-
+        controlHoverBackground:ColorRGBa = controlBackground.shade(1.5),
+        controlTextColor:Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8))
                  ) = listOf(
 
         styleSheet {
@@ -18,24 +18,25 @@ fun defaultStyles(
         styleSheet {
             selector = selector { type( "textfield") }
             width = 100.percent
-            height = 50.px
+            height = 64.px
 
         },
         styleSheet {
             selector = selector { type("dropdown-button") }
-            width = 100.px
-            height = 30.px
+            width = LinearDimension.Auto
+            height = 32.px
             background = Color.RGBa(controlBackground)
             marginLeft = 5.px
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
+            fontSize = 16.px
         },
 
         styleSheet {
             selector = selector { type("colorpicker-button") }
             width = 100.px
-            height = 30.px
+            height = 32.px
             background = Color.RGBa(controlBackground)
             marginLeft = 5.px
             marginRight = 5.px
@@ -60,12 +61,14 @@ fun defaultStyles(
         },
         styleSheet {
             selector = selector { type("slider") }
-            height = 30.px
+            height = 32.px
             width = 100.percent
             marginTop = 5.px
             marginBottom = 5.px
             marginLeft = 5.px
             marginRight = 5.px
+            fontSize = 16.px
+            color = controlTextColor
         },
         styleSheet {
             selector = selector { type("envelope-editor") }
@@ -96,12 +99,14 @@ fun defaultStyles(
         },
         styleSheet {
             selector = selector { type("toggle") }
-            height = 15.px
-            width = 100.percent
+            height = 32.px
+            width = LinearDimension.Auto
             marginTop = 5.px
             marginBottom = 5.px
             marginLeft = 5.px
             marginRight = 5.px
+            fontSize = 16.px
+            color = controlTextColor
         },
 
 
@@ -144,6 +149,7 @@ fun defaultStyles(
         styleSheet {
             selector = selector { type("dropdown-button") } withDescendant { type("button") }
             width = 100.percent
+            height = 24.px
         },
 
         styleSheet {
@@ -157,12 +163,13 @@ fun defaultStyles(
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
             width = 80.px
-            height = 30.px
+            height = 32.px
             paddingLeft = 10.px
-            paddingRight =10.px
+            paddingRight = 10.px
             marginLeft = 5.px
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
+            fontSize = 16.px
         }
 )

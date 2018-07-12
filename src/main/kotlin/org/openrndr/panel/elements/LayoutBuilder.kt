@@ -27,8 +27,11 @@ fun Element.button(id:String?=null, label:String="button", init: Button.() -> Un
     }
     initElement(button, init)
     return button
-
 }
+fun Button.clicked(listener:(Button.ButtonEvent)->Unit) {
+    events.clicked.subscribe(listener)
+}
+
 fun Element.slider(init: Slider.() -> Unit) = initElement(Slider(), init) as Slider
 fun Element.toggle(init: Toggle.() -> Unit) = initElement(Toggle(), init) as Toggle
 

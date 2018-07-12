@@ -2,10 +2,6 @@ package org.openrndr.panel.style
 
 import org.openrndr.panel.elements.Element
 
-
-/**
- * Created by voorbeeld on 11/20/16.
- */
 class Matcher {
     enum class MatchingResult {
         MATCHED, NOT_MATCHED, RESTART_FROM_CLOSEST_DESCENDANT, RESTART_FROM_CLOSEST_LATER_SIBLING
@@ -15,9 +11,7 @@ class Matcher {
         return matchesCompound(selector, element) == MatchingResult.MATCHED
     }
 
-
     private fun matchesCompound(selector: CompoundSelector, element: Element): MatchingResult {
-
         if (selector.selectors.any { !it.accept(element) }) {
             return MatchingResult.RESTART_FROM_CLOSEST_LATER_SIBLING
         }
@@ -26,14 +20,11 @@ class Matcher {
             return MatchingResult.MATCHED
         }
 
-
-
         val (siblings, candidateNotFound) =
                 when (selector.previous?.first) {
                     Combinator.NEXT_SIBLING, Combinator.LATER_SIBLING -> Pair(true, MatchingResult.RESTART_FROM_CLOSEST_DESCENDANT)
                     else -> Pair(false, MatchingResult.NOT_MATCHED)
                 }
-
 
         var node = element
         while (true) {
@@ -45,20 +36,17 @@ class Matcher {
                 node = nextNode
             }
 
+            val result = matchesCompound(selector.previous?.second!!, node)
 
-            if (true) {
-                val result = matchesCompound(selector.previous?.second!!, node)
+            if (result == MatchingResult.MATCHED || result == MatchingResult.NOT_MATCHED) {
+                return result
+            }
 
-                if (result == MatchingResult.MATCHED || result == MatchingResult.NOT_MATCHED) {
+            when (selector.previous?.first) {
+                Combinator.CHILD -> return MatchingResult.RESTART_FROM_CLOSEST_DESCENDANT
+                Combinator.NEXT_SIBLING -> return result
+                Combinator.LATER_SIBLING -> if (result == MatchingResult.RESTART_FROM_CLOSEST_DESCENDANT) {
                     return result
-                }
-
-                when (selector.previous?.first) {
-                    Combinator.CHILD -> return MatchingResult.RESTART_FROM_CLOSEST_DESCENDANT
-                    Combinator.NEXT_SIBLING -> return result
-                    Combinator.LATER_SIBLING -> if (result == MatchingResult.RESTART_FROM_CLOSEST_DESCENDANT) {
-                        return result
-                    }
                 }
             }
         }

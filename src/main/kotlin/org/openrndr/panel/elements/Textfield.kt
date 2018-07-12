@@ -1,5 +1,6 @@
 package org.openrndr.panel.elements
 
+import org.openrndr.KEY_BACKSPACE
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
@@ -21,7 +22,8 @@ class Textfield : Element(ElementType("textfield")) {
 
     init {
         keyboard.repeated.subscribe {
-            if (it.key == 259) {
+            println("${it.key} ${KEY_BACKSPACE}")
+            if (it.key == KEY_BACKSPACE) {
                 if (!value.isEmpty())
                     value = value.substring(0, value.length - 1)
             }
@@ -30,7 +32,8 @@ class Textfield : Element(ElementType("textfield")) {
 
         }
         keyboard.pressed.subscribe {
-            if (it.key == 259) {
+            println("${it.key} ${KEY_BACKSPACE}")
+            if (it.key == KEY_BACKSPACE) {
                 if (!value.isEmpty())
                     value = value.substring(0, value.length - 1)
             }

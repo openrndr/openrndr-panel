@@ -2,7 +2,9 @@ package org.openrndr.panel.elements
 
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
+import org.openrndr.draw.FontImageMap
 import org.openrndr.panel.style.*
+import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 import rx.subjects.PublishSubject
 
@@ -18,7 +20,6 @@ class Item : Element(ElementType("item")) {
     }
 
     val events = Events()
-
 
     fun picked() {
         events.picked.onNext(PickedEvent(this))
@@ -43,15 +44,42 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             it.cancelPropagation()
         }
 
-
         mouse.clicked.subscribe {
             if (children.none { it is SlideOut })
-                append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
+                if (screenPosition.y < root().layout.screenHeight-200.0 ) {
+                    append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
+                } else {
+                    val height = items().size * 50.0 + (items().size-1) * 10
+                    append(SlideOut(0.0, screenArea.height-height, screenArea.width, height, this))
+                }
             else {
                 (children.first { it is SlideOut } as SlideOut?)?.dispose()
             }
         }
     }
+
+    override val widthHint:Double?
+        get()  {
+            computedStyle.let { style ->
+                val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily)?:"broken"
+                val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 16.0
+                val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
+                val writer = Writer(null)
+
+                writer.box = Rectangle(0.0,
+                        0.0,
+                        Double.POSITIVE_INFINITY,
+                        Double.POSITIVE_INFINITY)
+
+                val text = "$label  ${(value?.label) ?: "<choose>"}"
+                writer.drawStyle.fontMap = fontMap
+                writer.newLine()
+                writer.text(text, visible = false)
+
+                return writer.cursor.x + 10.0
+            }
+        }
+
 
     override fun append(element: Element) {
         when (element) {
@@ -88,19 +116,17 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             drawer.text("$label", 5.0, 0.0 + yOffset)
             drawer.text(text, -5.0 + offset, 0.0 + yOffset)
         }
-
     }
 
     class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element) : Element(ElementType("slide-out")) {
-
         init {
             mouse.scrolled.subscribe {
                 scrollTop -= it.rotation.y
                 scrollTop = Math.max(0.0, scrollTop)
                 draw.dirty = true
                 it.cancelPropagation()
-
             }
+
             mouse.exited.subscribe {
                 it.cancelPropagation()
                 dispose()
@@ -111,7 +137,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                 left = LinearDimension.PX(x)
                 top = LinearDimension.PX(y)
                 width = LinearDimension.PX(this@SlideOut.width)
-                height = LinearDimension.Auto//LinearDimension.PX(this@SlideOut.height)
+                height = LinearDimension.PX(this@SlideOut.height)
                 overflow = Overflow.Scroll
                 zIndex = ZIndex.Value(1000)
                 background = Color.Inherit
@@ -138,7 +164,6 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
             drawer.strokeWeight = 1.0
         }
-
         fun dispose() {
             parent?.remove(this)
         }

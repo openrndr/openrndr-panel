@@ -5,10 +5,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.math.Matrix44
 import org.openrndr.math.Vector2
-import org.openrndr.panel.elements.Body
-import org.openrndr.panel.elements.Element
-import org.openrndr.panel.elements.ElementPseudoClass
-import org.openrndr.panel.elements.visit
+import org.openrndr.panel.elements.*
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
@@ -40,15 +37,16 @@ class ControlManager : Extension {
 
     inner class KeyboardInput {
         var target: Element? = null
+        set(value) {
+            field?.keyboard?.focusLost?.onNext(FocusEvent())
+            value?.keyboard?.focusGained?.onNext(FocusEvent())
+            field = value
+        }
 
         fun press(event: KeyEvent) {
-
             target?.let {
-
                 var current: Element? = it
-
                 while (current != null) {
-                    println("current $current")
                     if (!event.propagationCancelled) {
                         current.keyboard.pressed.onNext(event)
                     }
@@ -202,7 +200,8 @@ class ControlManager : Extension {
 
         program.window.drop.listen { dropInput.drop(it) }
 
-        //program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
+
+        program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
 
         width = program.width
         height = program.height
@@ -216,6 +215,9 @@ class ControlManager : Extension {
     var width: Int = 0
     var height: Int = 0
 
+
+
+
     fun resize(program: Program, width: Int, height: Int) {
 
         this.width = width
@@ -223,9 +225,11 @@ class ControlManager : Extension {
 
         body?.draw?.dirty = true
 
-        if (renderTarget.colorBuffers.size > 0) {
+        if (renderTarget.colorBuffers.isNotEmpty()) {
             renderTarget.colorBuffer(0).destroy()
+            renderTarget.depthBuffer?.destroy()
             renderTarget.detachColorBuffers()
+            renderTarget.detachDepthBuffer()
             renderTarget.destroy()
         } else {
             println("that is strange. no color buffers")
@@ -233,7 +237,8 @@ class ControlManager : Extension {
 
 
         renderTarget = renderTarget(program.width, program.height, contentScale) {
-            colorBuffer(program.width, program.height)
+            colorBuffer()
+            depthBuffer()
         }
 
         renderTarget.bind()

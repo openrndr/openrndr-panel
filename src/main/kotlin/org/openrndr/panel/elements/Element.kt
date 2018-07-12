@@ -17,6 +17,9 @@ data class ElementClass(val name: String)
 data class ElementPseudoClass(val name: String)
 data class ElementType(val name: String)
 
+class FocusEvent
+
+
 open class Element(val type: ElementType) {
 
     var scrollTop = 0.0
@@ -42,11 +45,14 @@ open class Element(val type: ElementType) {
     val drop = DropObserverables()
     val mouse = MouseObservables()
 
+
     class KeyboardObservables {
         val pressed = PublishSubject.create<KeyEvent>()
         val released = PublishSubject.create<KeyEvent>()
         val repeated = PublishSubject.create<KeyEvent>()
         val character = PublishSubject.create<Program.CharacterEvent>()
+        val focusGained = PublishSubject.create<FocusEvent>()
+        val focusLost = PublishSubject.create<FocusEvent>()
     }
 
     val keyboard = KeyboardObservables()

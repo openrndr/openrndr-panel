@@ -60,7 +60,6 @@ class Button : Element(ElementType("button")) {
 
             return writer.cursor.x
         }
-
     }
     override fun draw(drawer: Drawer) {
 
