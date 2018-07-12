@@ -211,6 +211,10 @@ class Layouter {
             return 0.0
         }
 
+        val widthHint = element.widthHint
+        if (widthHint != null) {
+            return (widthHint +  paddingLeft(element) + paddingRight(element)) + if (includeMargins) (marginLeft(element) + marginRight(element)) else 0.0
+        }
         val result =
                 it.width.let {
                     when (it) {

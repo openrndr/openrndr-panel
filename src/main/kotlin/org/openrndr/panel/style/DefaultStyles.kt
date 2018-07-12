@@ -55,15 +55,15 @@ fun defaultStyles(
 
         styleSheet {
             selector = selector { type("body") }
-            fontSize = 12.px
+            fontSize = 18.px
             fontFamily = "default"
         },
         styleSheet {
             selector = selector { type("slider") }
-            height = 15.px
+            height = 30.px
             width = 100.percent
             marginTop = 5.px
-            marginBottom = 15.px
+            marginBottom = 5.px
             marginLeft = 5.px
             marginRight = 5.px
         },
@@ -131,7 +131,7 @@ fun defaultStyles(
 
         styleSheet {
             selector = selector { type("p") }
-            fontSize = 12.px
+            fontSize = 16.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
@@ -157,7 +157,9 @@ fun defaultStyles(
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
             width = 80.px
-            height = 24.px
+            height = 30.px
+            paddingLeft = 10.px
+            paddingRight =10.px
             marginLeft = 5.px
             marginRight = 5.px
             marginTop = 5.px

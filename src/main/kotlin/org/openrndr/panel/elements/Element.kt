@@ -21,6 +21,9 @@ open class Element(val type: ElementType) {
 
     var scrollTop = 0.0
 
+    open val widthHint:Double?
+    get() { return null }
+
     class MouseObservables {
         val clicked = PublishSubject.create<Program.Mouse.MouseEvent>()
         val doubleClicked = PublishSubject.create<Program.Mouse.MouseEvent>()

@@ -38,8 +38,9 @@ fun Element.colorpickerButton(init: ColorpickerButton.() -> Unit) = initElement(
 fun Canvas.draw(f:(Drawer)->Unit) {
     this.userDraw = f
 }
-fun Element.canvas(init: Canvas.() ->Unit) {
+fun Element.canvas(vararg classes:String, init: Canvas.() ->Unit) {
     val canvas = Canvas()
+    classes.forEach { canvas.classes.add(ElementClass(it)) }
     canvas.init()
     append(canvas)
 }
@@ -71,15 +72,16 @@ fun Element.div(vararg classes:String, init: Div.() -> Unit):Div {
 }
 
 
-inline fun <reified T:TextElement> Element.textElement(id:String?=null, init:T.()->String) {
+inline fun <reified T:TextElement> Element.textElement(id:String?=null, init:T.()->String):T {
     val te = T::class.java.newInstance()
     te.id = id
     te.text(te.init())
     append(te)
+    return te
 }
 
 
-fun Element.p(id:String?=null, init:P.()->String) = textElement(id, init)
-fun Element.h1(id:String?=null, init:H1.()->String) = textElement(id, init)
-fun Element.h2(id:String?=null, init:H2.()->String) = textElement(id, init)
-fun Element.h3(id:String?=null, init:H3.()->String) = textElement(id, init)
+fun Element.p(id:String?=null, init:P.()->String):P = textElement(id, init)
+fun Element.h1(id:String?=null, init:H1.()->String):H1 = textElement(id, init)
+fun Element.h2(id:String?=null, init:H2.()->String):H2 = textElement(id, init)
+fun Element.h3(id:String?=null, init:H3.()->String):H3 = textElement(id, init)

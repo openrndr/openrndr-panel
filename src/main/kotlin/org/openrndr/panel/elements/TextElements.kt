@@ -33,7 +33,7 @@ class TextNode(var text: String) : Element(ElementType("text")) {
     fun sizeHint(): Rectangle {
         computedStyle.let { style ->
             val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily)?:"broken"
-            val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 12.0
+            val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 14.0
             val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
 
             val writer = Writer(null)

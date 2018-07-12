@@ -204,7 +204,7 @@ val StyleSheet.effectivePaddingWidth: Double
 
 
 
-var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 12.px)
+var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 14.px)
 var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
 var StyleSheet.overflow by PropertyHandler<Overflow>("overflow", RESET, Overflow.Visible)
 var StyleSheet.zIndex by PropertyHandler<ZIndex>("z-index", RESET, ZIndex.Auto)
@@ -226,7 +226,7 @@ fun StyleSheet.withDescendant(init: StyleSheet.() -> Unit) {
 
 
 fun StyleSheet.flatten(): List<StyleSheet> {
-    return listOf(this) + children
+    return listOf(this) + children.flatMap { it.flatten() }
 }
 
 

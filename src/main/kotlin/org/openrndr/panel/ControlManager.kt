@@ -31,6 +31,11 @@ class ControlManager : Extension {
         }
     }
 
+
+    fun requestScrollInput(element:Element) {
+
+    }
+
     val dropInput = DropInput()
 
     inner class KeyboardInput {
@@ -137,7 +142,10 @@ class ControlManager : Extension {
 
         fun drag(event: Program.Mouse.MouseEvent) {
             dragTarget?.mouse?.dragged?.onNext(event)
-            clickTarget = null
+
+            if (event.propagationCancelled) {
+                clickTarget = null
+            }
         }
 
         val insideElements = mutableSetOf<Element>()
@@ -156,6 +164,9 @@ class ControlManager : Extension {
             fun traverse(element: Element) {
 
                 if (event.position in element.screenArea) {
+                    if (element !in insideElements) {
+                        element.mouse.entered.onNext(event)
+                    }
                     insideElements.add(element)
                     if (hover !in element.pseudoClasses) {
                         element.pseudoClasses.add(hover)

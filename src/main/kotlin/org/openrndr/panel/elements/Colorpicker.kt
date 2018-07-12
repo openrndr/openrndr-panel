@@ -53,13 +53,13 @@ class Colorpicker : Element {
         mouse.scrolled.subscribe {
 
             if (colorBuffer != null) {
-                if (focussed) {
+                //if (focussed) {
                     saturation = (saturation - it.rotation.y * 0.01).coerceIn(0.0, 1.0)
                     generateColorMap()
                     colorBuffer?.shadow?.upload()
                     it.cancelPropagation()
                     draw.dirty = true
-                }
+                //}
             }
 
         }

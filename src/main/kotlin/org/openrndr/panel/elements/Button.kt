@@ -2,11 +2,10 @@ package org.openrndr.panel.elements
 
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
+import org.openrndr.draw.FontImageMap
 import org.openrndr.math.Vector2
-import org.openrndr.panel.style.Color
-import org.openrndr.panel.style.background
-import org.openrndr.panel.style.color
-import org.openrndr.panel.style.position
+import org.openrndr.panel.style.*
+import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 import rx.subjects.PublishSubject
 
@@ -40,6 +39,29 @@ class Button : Element(ElementType("button")) {
         }
     }
 
+
+    override val widthHint:Double
+    get()  {
+        computedStyle.let { style ->
+            val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily)?:"broken"
+            val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 14.0
+            val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
+
+            val writer = Writer(null)
+
+            writer.box = Rectangle(0.0,
+                    0.0,
+                    Double.POSITIVE_INFINITY,
+                    Double.POSITIVE_INFINITY)
+
+            writer.drawStyle.fontMap = fontMap
+            writer.newLine()
+            writer.text(label, visible = false)
+
+            return writer.cursor.x
+        }
+
+    }
     override fun draw(drawer: Drawer) {
 
         computedStyle.let {
