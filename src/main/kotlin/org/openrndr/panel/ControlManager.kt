@@ -14,6 +14,7 @@ class ControlManager : Extension {
     var body: Element? = null
     val layouter = Layouter()
     val fontManager = FontManager()
+    lateinit var window:Program.Window
     private val renderTargetCache = HashMap<Element, RenderTarget>()
 
     override var enabled: Boolean = true
@@ -52,19 +53,32 @@ class ControlManager : Extension {
                     }
                     current = current.parent
                 }
+                checkForManualRedraw()
+
             }
         }
 
         fun release(event: KeyEvent) {
             target?.keyboard?.released?.onNext(event)
+            if (target != null) {
+                checkForManualRedraw()
+            }
         }
 
         fun repeat(event: KeyEvent) {
             target?.keyboard?.repeated?.onNext(event)
+            if (target != null) {
+                checkForManualRedraw()
+            }
+
         }
 
         fun character(event: Program.CharacterEvent) {
             target?.keyboard?.character?.onNext(event)
+            if (target != null) {
+                checkForManualRedraw()
+            }
+
         }
     }
 
@@ -90,6 +104,8 @@ class ControlManager : Extension {
                 }
             }
             body?.let(::traverse)
+            checkForManualRedraw()
+
         }
 
         fun click(event: Program.Mouse.MouseEvent) {
@@ -105,6 +121,8 @@ class ControlManager : Extension {
                 }
             }
             lastClick = ct
+            checkForManualRedraw()
+
         }
 
 
@@ -131,7 +149,10 @@ class ControlManager : Extension {
                         keyboardInput.target = c.first
                     }
                 }
+
             }
+            checkForManualRedraw()
+
         }
 
         fun release(event: Program.Mouse.MouseEvent) {
@@ -144,6 +165,8 @@ class ControlManager : Extension {
             if (event.propagationCancelled) {
                 clickTarget = null
             }
+            checkForManualRedraw()
+
         }
 
         val insideElements = mutableSetOf<Element>()
@@ -178,12 +201,26 @@ class ControlManager : Extension {
                 element.children.forEach(::traverse)
             }
             body?.let(::traverse)
+            checkForManualRedraw()
+
+        }
+    }
+
+    fun checkForManualRedraw() {
+        if (window.presentationMode == PresentationMode.MANUAL) {
+            val redraw = body?.any {
+                it.draw.dirty
+            } ?: false
+            if (redraw) {
+                window.requestDraw()
+            }
         }
     }
 
     val mouseInput = MouseInput()
     override fun setup(program: Program) {
         contentScale = program.window.scale.x
+        window = program.window
 
         fontManager.contentScale = contentScale
         program.mouse.buttonUp.listen { mouseInput.release(it) }
@@ -419,7 +456,7 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
 
 fun controlManager(builder: ControlManagerBuilder.() -> Unit): ControlManager {
     val cm = ControlManager()
-    cm.fontManager.register("default", resourceUrl("/fonts/Roboto-Medium.ttf"))
+    cm.fontManager.register("default", resourceUrl("/fonts/Roboto-Regular.ttf"))
     cm.layouter.styleSheets.addAll(defaultStyles())
     val cmb = ControlManagerBuilder(cm)
     cmb.builder()

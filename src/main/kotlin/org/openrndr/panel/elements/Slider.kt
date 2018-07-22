@@ -177,7 +177,7 @@ class Slider : Element(ElementType("slider")) {
             val writer = Writer(drawer)
             drawer.fontMap = (font)
             drawer.fill = computedStyle.effectiveColor
-            writer.cursor = Cursor(0.0, 10.0)
+            writer.cursor = Cursor(0.0, 8.0)
             writer.newLine()
             writer.text(label)
 

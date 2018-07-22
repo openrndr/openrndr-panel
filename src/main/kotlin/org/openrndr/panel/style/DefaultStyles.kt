@@ -6,7 +6,8 @@ import org.openrndr.color.ColorRGBa
 fun defaultStyles(
         controlBackground:ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
         controlHoverBackground:ColorRGBa = controlBackground.shade(1.5),
-        controlTextColor:Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8))
+        controlTextColor:Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
+        controlFontSize:Double = 14.0
                  ) = listOf(
 
         styleSheet {
@@ -30,7 +31,7 @@ fun defaultStyles(
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
-            fontSize = 16.px
+            fontSize = controlFontSize.px
         },
 
         styleSheet {
@@ -67,7 +68,7 @@ fun defaultStyles(
             marginBottom = 5.px
             marginLeft = 5.px
             marginRight = 5.px
-            fontSize = 16.px
+            fontSize = controlFontSize.px
             color = controlTextColor
         },
         styleSheet {
@@ -105,7 +106,7 @@ fun defaultStyles(
             marginBottom = 5.px
             marginLeft = 5.px
             marginRight = 5.px
-            fontSize = 16.px
+            fontSize = controlFontSize.px
             color = controlTextColor
         },
 
@@ -170,6 +171,6 @@ fun defaultStyles(
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
-            fontSize = 16.px
+            fontSize = controlFontSize.px
         }
 )
