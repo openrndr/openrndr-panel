@@ -2,7 +2,6 @@ package org.openrndr.panel.elements
 
 import org.openrndr.draw.Drawer
 import org.openrndr.panel.ControlManager
-import java.awt.TextField
 
 fun Element.layout(init: Element.() -> Unit) {
     init()
