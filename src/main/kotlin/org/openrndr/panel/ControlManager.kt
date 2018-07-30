@@ -1,6 +1,8 @@
 package org.openrndr.panel
 
 import org.openrndr.*
+import org.openrndr.binpack.IntPacker
+import org.openrndr.binpack.PackNode
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.math.Matrix44
@@ -8,15 +10,77 @@ import org.openrndr.math.Vector2
 import org.openrndr.panel.elements.*
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
+import org.openrndr.shape.IntRectangle
 import org.openrndr.shape.Rectangle
+
+
+class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
+
+    val cache = renderTarget(width, height, contentScale) {
+        colorBuffer()
+        depthBuffer()
+    }
+
+    private val atlas = mutableMapOf<Element, IntRectangle>()
+
+    private var root: PackNode = PackNode(IntRectangle(0, 0, width, height))
+    val packer = IntPacker()
+
+    fun flush() {
+        atlas.clear()
+        root = PackNode(IntRectangle(0, 0, width, height))
+    }
+
+    fun drawCached(drawer: Drawer, element: Element, f: () -> Unit): IntRectangle {
+
+        val rectangle = atlas.getOrPut(element) {
+            val r = packer.insert(root, IntRectangle(0, 0, Math.ceil(element.layout.screenWidth).toInt(),
+                    Math.ceil(element.layout.screenHeight).toInt()))?.area?:throw RuntimeException("bork")
+
+
+            draw(drawer, r, f)
+            r
+        }
+        if (element.draw.dirty) {
+            draw(drawer, rectangle, f)
+        }
+        drawer.ortho()
+        drawer.isolated {
+            drawer.model = Matrix44.IDENTITY
+            drawer.image(cache.colorBuffer(0), Rectangle(rectangle.corner.x * 1.0, rectangle.corner.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0),
+                    element.screenArea)
+        }
+        return rectangle
+
+    }
+
+    fun draw(drawer: Drawer, rectangle: IntRectangle, f: () -> Unit) {
+        drawer.isolatedWithTarget(cache) {
+            drawer.ortho(cache)
+            drawer.drawStyle.blendMode = BlendMode.REPLACE
+            drawer.drawStyle.fill = ColorRGBa.BLACK.opacify(0.0)
+            drawer.drawStyle.stroke = null
+            drawer.view = Matrix44.IDENTITY
+            drawer.model = Matrix44.IDENTITY
+            drawer.rectangle(Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0))
+
+            drawer.drawStyle.blendMode = BlendMode.OVER
+            drawer.drawStyle.clip = Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0)
+            drawer.view = Matrix44.IDENTITY
+            drawer.model = org.openrndr.math.transforms.translate(rectangle.x * 1.0, rectangle.y * 1.0, 0.0)
+            f()
+        }
+    }
+}
 
 class ControlManager : Extension {
     var body: Element? = null
     val layouter = Layouter()
     val fontManager = FontManager()
-    lateinit var window:Program.Window
+    lateinit var window: Program.Window
     private val renderTargetCache = HashMap<Element, RenderTarget>()
 
+    lateinit var surfaceCache: SurfaceCache
     override var enabled: Boolean = true
 
     var contentScale = 1.0
@@ -30,7 +94,7 @@ class ControlManager : Extension {
     }
 
 
-    fun requestScrollInput(element:Element) {
+    fun requestScrollInput(element: Element) {
 
     }
 
@@ -38,11 +102,11 @@ class ControlManager : Extension {
 
     inner class KeyboardInput {
         var target: Element? = null
-        set(value) {
-            field?.keyboard?.focusLost?.onNext(FocusEvent())
-            value?.keyboard?.focusGained?.onNext(FocusEvent())
-            field = value
-        }
+            set(value) {
+                field?.keyboard?.focusLost?.onNext(FocusEvent())
+                value?.keyboard?.focusGained?.onNext(FocusEvent())
+                field = value
+            }
 
         fun press(event: KeyEvent) {
             target?.let {
@@ -222,6 +286,8 @@ class ControlManager : Extension {
         contentScale = program.window.scale.x
         window = program.window
 
+
+        surfaceCache = SurfaceCache(4096, 4096, contentScale)
         fontManager.contentScale = contentScale
         program.mouse.buttonUp.listen { mouseInput.release(it) }
         program.mouse.buttonUp.listen { mouseInput.click(it) }
@@ -251,8 +317,6 @@ class ControlManager : Extension {
 
     var width: Int = 0
     var height: Int = 0
-
-
 
 
     fun resize(program: Program, width: Int, height: Int) {
@@ -288,7 +352,6 @@ class ControlManager : Extension {
 
 
     private fun drawElement(element: Element, drawer: Drawer, zIndex: Int, zComp: Int) {
-        element.draw.dirty = false
 
         val newZComp =
                 element.computedStyle.zIndex.let {
@@ -300,16 +363,16 @@ class ControlManager : Extension {
 
         if (element.computedStyle.display != Display.NONE) {
             if (element.computedStyle.overflow == Overflow.Visible) {
-                drawer.pushTransforms()
-                drawer.pushStyle()
-                drawer.translate(element.screenPosition)
-
-                if (newZComp == zIndex) {
+                drawer.isolated {
+                    drawer.translate(element.screenPosition)
                     element.draw(drawer)
+//                    if (newZComp == zIndex) {
+//                        surfaceCache.drawCached(drawer, element) {
+//                            element.draw(drawer)
+//                        }
+//
+//                    }
                 }
-                drawer.popStyle()
-                drawer.popTransforms()
-
                 element.children.forEach {
                     drawElement(it, drawer, zIndex, newZComp)
                 }
@@ -349,6 +412,8 @@ class ControlManager : Extension {
                         Rectangle(Vector2(area.x, area.y), area.width, area.height))
             }
         }
+        element.draw.dirty = false
+
     }
 
     class ProfileData(var hits: Int = 0, var time: Long = 0) {
@@ -404,9 +469,6 @@ class ControlManager : Extension {
                     drawer.reset()
 
                     profile("redraw") {
-                        body?.visit {
-                            draw.dirty = false
-                        }
                         renderTarget.bind()
                         body?.style = StyleSheet()
                         body?.style?.width = program.width.px
@@ -423,6 +485,10 @@ class ControlManager : Extension {
                         renderTarget.unbind()
                     }
                 }
+                body?.visit {
+                    draw.dirty = false
+                }
+
                 profile("draw image") {
                     drawer.size(program.width, program.height)
                     drawer.ortho()

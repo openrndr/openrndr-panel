@@ -5,7 +5,7 @@ apply plugin: 'maven'
 
 buildscript {
     ext.kotlin_version = "1.2.51"
-    ext.openrndr_version = "0.3.20"
+    ext.openrndr_version = "0.4.0-SNAPSHOT"
     repositories {
         jcenter()
         mavenCentral()
@@ -42,9 +42,10 @@ dependencies {
     }
     compile 'io.reactivex:rxkotlin:1.0.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.openrndr:openrndr-svg:$openrndr_version"
-    compile "org.openrndr:openrndr-filter:$openrndr_version"
-    compile "org.openrndr:openrndr-animatable:$openrndr_version"
+    implementation "org.openrndr:openrndr-svg:$openrndr_version"
+    implementation "org.openrndr:openrndr-filter:$openrndr_version"
+    implementation "org.openrndr:openrndr-animatable:$openrndr_version"
+    implementation "org.openrndr:openrndr-binpack:$openrndr_version"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2")
