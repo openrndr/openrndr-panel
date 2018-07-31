@@ -12,6 +12,9 @@ abstract class Selector {
 }
 
 class CompoundSelector {
+    companion object {
+        val DUMMY = CompoundSelector()
+    }
     var previous: Pair<Combinator, CompoundSelector>?
     var selectors: MutableList<Selector>
 
@@ -90,6 +93,51 @@ class SelectorBuilder {
         return active
     }
 }
+
+
+object has {
+
+    operator fun invoke (vararg selectors:CompoundSelector) : CompoundSelector {
+        val active = CompoundSelector()
+        selectors.forEach {
+            active.selectors.addAll(it.selectors)
+        }
+        return active
+    }
+
+
+    infix fun state(q:String):CompoundSelector {
+        val active = CompoundSelector()
+        active.selectors.add(PseudoClassSelector(ElementPseudoClass((q))))
+        return active
+    }
+
+    infix fun class_(q:String): CompoundSelector {
+        val active = CompoundSelector()
+        active.selectors.add(ClassSelector(ElementClass(q)))
+        return active
+    }
+    infix fun type(q:String):CompoundSelector {
+        val active = CompoundSelector()
+        active.selectors.add(TypeSelector(ElementType(q)))
+        return active
+    }
+}
+
+infix fun CompoundSelector.and(other:CompoundSelector):CompoundSelector {
+    val c = CompoundSelector()
+    c.previous = previous
+    c.selectors.addAll(selectors)
+    c.selectors.addAll(other.selectors)
+    return c
+}
+
+fun test() {
+    (has class_ "bla") and (has type "kak")
+
+}
+
+
 
 infix fun CompoundSelector.followedBy(function: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
     return selector(function).apply {

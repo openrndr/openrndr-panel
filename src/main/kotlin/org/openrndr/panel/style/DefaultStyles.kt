@@ -4,26 +4,22 @@ import org.openrndr.color.ColorRGBa
 
 
 fun defaultStyles(
-        controlBackground:ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
-        controlHoverBackground:ColorRGBa = controlBackground.shade(1.5),
-        controlTextColor:Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
-        controlFontSize:Double = 14.0
-                 ) = listOf(
+        controlBackground: ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
+        controlHoverBackground: ColorRGBa = controlBackground.shade(1.5),
+        controlTextColor: Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
+        controlFontSize: Double = 14.0
+) = listOf(
 
-        styleSheet {
-            selector = selector { type("item") }
+        styleSheet(has type "item") {
             display = Display.NONE
         },
 
-
-        styleSheet {
-            selector = selector { type( "textfield") }
+        styleSheet(has type "textield") {
             width = 100.percent
             height = 64.px
-
         },
-        styleSheet {
-            selector = selector { type("dropdown-button") }
+
+        styleSheet(has type "dropdown-button") {
             width = LinearDimension.Auto
             height = 32.px
             background = Color.RGBa(controlBackground)
@@ -32,10 +28,18 @@ fun defaultStyles(
             marginTop = 5.px
             marginBottom = 5.px
             fontSize = controlFontSize.px
+
+            and(has state "hover") {
+                background = Color.RGBa(controlHoverBackground)
+            }
+
+            descendant(has type "button") {
+                width = 100.percent
+                height = 24.px
+            }
         },
 
-        styleSheet {
-            selector = selector { type("colorpicker-button") }
+        styleSheet(has type "colorpicker-button") {
             width = 100.px
             height = 32.px
             background = Color.RGBa(controlBackground)
@@ -44,8 +48,7 @@ fun defaultStyles(
             marginTop = 5.px
             marginBottom = 5.px
         },
-        styleSheet {
-            selector = selector { type("envelope-button") }
+        styleSheet(has type "envelope-button") {
             width = 100.px
             height = 40.px
             background = Color.RGBa(controlBackground)
@@ -55,13 +58,12 @@ fun defaultStyles(
             marginBottom = 5.px
         },
 
-        styleSheet {
-            selector = selector { type("body") }
+        styleSheet(has type "body") {
             fontSize = 18.px
             fontFamily = "default"
         },
-        styleSheet {
-            selector = selector { type("slider") }
+
+        styleSheet(has type "slider") {
             height = 32.px
             width = 100.percent
             marginTop = 5.px
@@ -71,8 +73,8 @@ fun defaultStyles(
             fontSize = controlFontSize.px
             color = controlTextColor
         },
-        styleSheet {
-            selector = selector { type("envelope-editor") }
+
+        styleSheet(has type "envelope-editor") {
             height = 60.px
             width = 100.percent
             marginTop = 5.px
@@ -81,8 +83,7 @@ fun defaultStyles(
             marginRight = 5.px
         },
 
-        styleSheet {
-            selector = selector { type("colorpicker") }
+        styleSheet(has type "colorpicker") {
             height = 80.px
             width = 100.percent
             marginTop = 5.px
@@ -91,15 +92,11 @@ fun defaultStyles(
             marginRight = 5.px
         },
 
-
-        styleSheet {
-            selector = selector { `class`("overlay") }
+        styleSheet(has type "overlay") {
             zIndex = ZIndex.Value(1)
-
-
         },
-        styleSheet {
-            selector = selector { type("toggle") }
+
+        styleSheet(has type "toggle") {
             height = 32.px
             width = LinearDimension.Auto
             marginTop = 5.px
@@ -110,57 +107,35 @@ fun defaultStyles(
             color = controlTextColor
         },
 
-
-        styleSheet {
-            selector = selector { type("h1") }
+        styleSheet(has type "h1") {
             fontSize = 24.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
 
-        styleSheet {
-            selector = selector { type("h2") }
+        styleSheet(has type "h2") {
             fontSize = 20.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
 
-        styleSheet {
-            selector = selector { type("h3") }
+        styleSheet(has type "h3") {
             fontSize = 16.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
 
-        styleSheet {
-            selector = selector { type("p") }
+        styleSheet(has type "p") {
             fontSize = 16.px
             width = 100.percent
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
-        styleSheet {
-            selector = selector { type("dropdown-button", pseudo = "hover") }
-            display = Display.BLOCK
-            background = Color.RGBa(controlHoverBackground)
-        },
-        styleSheet {
-            selector = selector { type("dropdown-button") } withDescendant { type("button") }
-            width = 100.percent
-            height = 24.px
-        },
 
-        styleSheet {
-            selector = selector { type("button", pseudo = "hover") }
-            display = Display.BLOCK
-            background = Color.RGBa(controlHoverBackground)
-        },
-
-        styleSheet {
-            selector = selector { type("button") }
+        styleSheet(has type "button") {
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
             width = 80.px
@@ -172,5 +147,9 @@ fun defaultStyles(
             marginTop = 5.px
             marginBottom = 5.px
             fontSize = controlFontSize.px
+
+            and(has state "hover") {
+                background = Color.RGBa(controlHoverBackground)
+            }
         }
 )

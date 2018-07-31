@@ -470,7 +470,7 @@ class ControlManager : Extension {
 
                     profile("redraw") {
                         renderTarget.bind()
-                        body?.style = StyleSheet()
+                        body?.style = StyleSheet(CompoundSelector())
                         body?.style?.width = program.width.px
                         body?.style?.height = program.height.px
 
@@ -505,8 +505,8 @@ class ControlManager : Extension {
 }
 
 class ControlManagerBuilder(val controlManager: ControlManager) {
-    fun styleSheet(init: StyleSheet.() -> Unit) {
-        controlManager.layouter.styleSheets.addAll(StyleSheet().apply { init() }.flatten())
+    fun styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) {
+        controlManager.layouter.styleSheets.addAll(StyleSheet(selector).apply { init() }.flatten())
     }
 
     fun styleSheets(styleSheets: List<StyleSheet>) {

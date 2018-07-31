@@ -115,22 +115,15 @@ sealed class FlexGrow(inherit: Boolean = false) : PropertyValue(inherit) {
     object Inherit : FlexGrow(inherit = true)
 }
 
-class StyleSheet {
+private val dummySelector = CompoundSelector()
 
-
+class StyleSheet(val selector: CompoundSelector) {
     val children = mutableListOf<StyleSheet>()
     val properties = HashMap<String, Property>()
 
-    var selector: CompoundSelector? = null
-        set(value) {
-            field = value
-            precedence = value?.precedence() ?: SelectorPrecedence()
-        }
-
-    var precedence = SelectorPrecedence()
-        private set(value) {
-            field = value
-        }
+    val precedence by lazy {
+        selector.precedence()
+    }
 
     fun getProperty(name: String) = properties.get(name)
 
@@ -139,7 +132,7 @@ class StyleSheet {
     }
 
     fun cascadeOnto(onto: StyleSheet): StyleSheet {
-        val cascaded = StyleSheet()
+        val cascaded = StyleSheet(dummySelector)
         cascaded.properties.putAll(properties)
         cascaded.properties.putAll(onto.properties)
         return cascaded
@@ -202,8 +195,6 @@ val StyleSheet.effectivePaddingHeight: Double
 val StyleSheet.effectivePaddingWidth: Double
     get() = effectivePaddingLeft + effectivePaddingRight
 
-
-
 var StyleSheet.fontSize by PropertyHandler<LinearDimension>("font-size", INHERIT, 14.px)
 var StyleSheet.fontFamily by PropertyHandler("font-family", INHERIT, "default")
 var StyleSheet.overflow by PropertyHandler<Overflow>("overflow", RESET, Overflow.Visible)
@@ -212,24 +203,29 @@ var StyleSheet.zIndex by PropertyHandler<ZIndex>("z-index", RESET, ZIndex.Auto)
 val Number.px: LinearDimension.PX get() = LinearDimension.PX(this.toDouble())
 val Number.percent: LinearDimension.Percent get() = LinearDimension.Percent(this.toDouble())
 
-fun StyleSheet.withChild(init: StyleSheet.() -> Unit) {
-    val stylesheet = StyleSheet().apply(init)
-    stylesheet.selector!!.previous = Pair(Combinator.CHILD, this@withChild.selector!!)
+fun StyleSheet.child(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
+    val stylesheet = StyleSheet(selector).apply(init)
+    stylesheet.selector.previous = Pair(Combinator.CHILD, selector)
     children.add(stylesheet)
 }
 
-fun StyleSheet.withDescendant(init: StyleSheet.() -> Unit) {
-    val stylesheet = StyleSheet().apply(init)
-    stylesheet.selector!!.previous = Pair(Combinator.DESCENDANT, this@withDescendant.selector!!)
+fun StyleSheet.descendant(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
+    val stylesheet = StyleSheet(selector).apply(init)
+    stylesheet.selector.previous = Pair(Combinator.DESCENDANT, selector)
     children.add(stylesheet)
 }
 
+fun StyleSheet.and(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
+    val stylesheet = StyleSheet(this.selector and selector).apply(init)
+    children.add(stylesheet)
+}
 
 fun StyleSheet.flatten(): List<StyleSheet> {
     return listOf(this) + children.flatMap { it.flatten() }
 }
 
-
-fun styleSheet(init: StyleSheet.() -> Unit): StyleSheet {
-    return StyleSheet().apply { init() }
+fun styleSheet(selector: CompoundSelector, init: StyleSheet.() -> Unit): StyleSheet {
+    return StyleSheet(selector).apply {
+        init()
+    }
 }

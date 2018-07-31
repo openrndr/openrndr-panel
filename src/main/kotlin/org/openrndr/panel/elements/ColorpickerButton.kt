@@ -76,7 +76,7 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
     class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, color:ColorRGBa, parent: Element) : Element(ElementType("slide-out")) {
 
         init {
-            style = StyleSheet().apply {
+            style = StyleSheet(CompoundSelector.DUMMY).apply {
                 position = Position.ABSOLUTE
                 left = LinearDimension.PX(x)
                 top = LinearDimension.PX(y)

@@ -7,6 +7,7 @@ import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
 import org.openrndr.panel.collections.ObservableCopyOnWriteArrayList
 import org.openrndr.panel.collections.ObservableHashSet
+import org.openrndr.panel.style.CompoundSelector
 import org.openrndr.panel.style.StyleSheet
 import org.openrndr.shape.Rectangle
 import rx.subjects.PublishSubject
@@ -92,7 +93,7 @@ open class Element(val type: ElementType) {
     val children: ObservableCopyOnWriteArrayList<Element> = ObservableCopyOnWriteArrayList()
         get() = field
 
-    var computedStyle: StyleSheet = StyleSheet()
+    var computedStyle: StyleSheet = StyleSheet(CompoundSelector.DUMMY)
     var style: StyleSheet? = null
 
     init {

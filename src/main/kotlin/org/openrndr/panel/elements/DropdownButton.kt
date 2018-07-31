@@ -132,7 +132,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                 dispose()
             }
 
-            style = StyleSheet().apply {
+            style = StyleSheet(CompoundSelector.DUMMY).apply {
                 position = Position.ABSOLUTE
                 left = LinearDimension.PX(x)
                 top = LinearDimension.PX(y)

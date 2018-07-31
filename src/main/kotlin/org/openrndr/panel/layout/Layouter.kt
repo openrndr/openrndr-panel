@@ -106,7 +106,7 @@ class Layouter {
         val matcher = Matcher()
 
         if (element is TextNode) {
-            element.computedStyle = element.parent?.computedStyle?.cascadeOnto(StyleSheet()) ?: StyleSheet()
+            element.computedStyle = element.parent?.computedStyle?.cascadeOnto(StyleSheet(CompoundSelector.DUMMY)) ?: StyleSheet(CompoundSelector.DUMMY)
         } else {
             element.computedStyle =
                     styleSheets
@@ -119,7 +119,7 @@ class Layouter {
                                     { it.precedence.component2() },
                                     { it.precedence.component3() },
                                     { it.precedence.component4() }))
-                            .fold(StyleSheet(), { a, b -> a.cascadeOnto(b) })
+                            .fold(StyleSheet(CompoundSelector.DUMMY), { a, b -> a.cascadeOnto(b) })
 
             element.style?.let {
                 element.computedStyle = it.cascadeOnto(element.computedStyle)
