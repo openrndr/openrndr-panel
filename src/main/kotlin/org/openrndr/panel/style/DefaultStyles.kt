@@ -14,10 +14,12 @@ fun defaultStyles(
             display = Display.NONE
         },
 
-        styleSheet(has type "textield") {
+        styleSheet(has type "textfield") {
             width = 100.percent
             height = 64.px
         },
+
+
 
         styleSheet(has type "dropdown-button") {
             width = LinearDimension.Auto
@@ -36,6 +38,11 @@ fun defaultStyles(
             descendant(has type "button") {
                 width = 100.percent
                 height = 24.px
+                marginBottom = 0.px
+                marginTop = 0.px
+                marginLeft = 0.px
+                marginRight = 0.px
+                background = Color.RGBa(ColorRGBa.BLUE)
             }
         },
 
@@ -134,7 +141,6 @@ fun defaultStyles(
             height = LinearDimension.Auto
             display = Display.BLOCK
         },
-
         styleSheet(has type "button") {
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
@@ -149,7 +155,10 @@ fun defaultStyles(
             fontSize = controlFontSize.px
 
             and(has state "hover") {
+                display = Display.BLOCK
                 background = Color.RGBa(controlHoverBackground)
             }
         }
+
+
 )

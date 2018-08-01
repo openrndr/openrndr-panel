@@ -205,19 +205,20 @@ val Number.percent: LinearDimension.Percent get() = LinearDimension.Percent(this
 
 fun StyleSheet.child(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
     val stylesheet = StyleSheet(selector).apply(init)
-    stylesheet.selector.previous = Pair(Combinator.CHILD, selector)
+    stylesheet.selector.previous = Pair(Combinator.CHILD, this.selector)
     children.add(stylesheet)
 }
 
 fun StyleSheet.descendant(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
     val stylesheet = StyleSheet(selector).apply(init)
-    stylesheet.selector.previous = Pair(Combinator.DESCENDANT, selector)
+    stylesheet.selector.previous = Pair(Combinator.DESCENDANT, this.selector)
     children.add(stylesheet)
 }
 
 fun StyleSheet.and(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
     val stylesheet = StyleSheet(this.selector and selector).apply(init)
-    children.add(stylesheet)
+    println("adding a child to ${this.selector}")
+    this.children.add(stylesheet)
 }
 
 fun StyleSheet.flatten(): List<StyleSheet> {

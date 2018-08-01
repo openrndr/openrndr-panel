@@ -211,10 +211,10 @@ class Layouter {
             return 0.0
         }
 
-        val widthHint = element.widthHint
-        if (widthHint != null) {
-            return (widthHint +  paddingLeft(element) + paddingRight(element)) + if (includeMargins) (marginLeft(element) + marginRight(element)) else 0.0
-        }
+        //val widthHint = element.widthHint
+//        if (widthHint != null) {
+//            return (widthHint +  paddingLeft(element) + paddingRight(element)) + if (includeMargins) (marginLeft(element) + marginRight(element)) else 0.0
+//        }
         val result =
                 it.width.let {
                     when (it) {
@@ -226,7 +226,7 @@ class Layouter {
                             val effectiveWidth = (parentWidth - parentPadding) * (it.value / 100.0) - margins
                             effectiveWidth
                         }
-                        is LinearDimension.Auto -> positionChildren(element).width
+                        is LinearDimension.Auto -> element.widthHint?: positionChildren(element).width
                         else -> throw RuntimeException("not supported")
                     }
                 } + if (includeMargins) marginLeft(element) + marginRight(element) else 0.0

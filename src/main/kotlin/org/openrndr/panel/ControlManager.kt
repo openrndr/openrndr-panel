@@ -13,7 +13,6 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.IntRectangle
 import org.openrndr.shape.Rectangle
 
-
 class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
 
     val cache = renderTarget(width, height, contentScale) {
@@ -36,8 +35,6 @@ class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
         val rectangle = atlas.getOrPut(element) {
             val r = packer.insert(root, IntRectangle(0, 0, Math.ceil(element.layout.screenWidth).toInt(),
                     Math.ceil(element.layout.screenHeight).toInt()))?.area?:throw RuntimeException("bork")
-
-
             draw(drawer, r, f)
             r
         }
@@ -51,7 +48,6 @@ class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
                     element.screenArea)
         }
         return rectangle
-
     }
 
     fun draw(drawer: Drawer, rectangle: IntRectangle, f: () -> Unit) {
@@ -118,7 +114,6 @@ class ControlManager : Extension {
                     current = current.parent
                 }
                 checkForManualRedraw()
-
             }
         }
 
@@ -134,7 +129,6 @@ class ControlManager : Extension {
             if (target != null) {
                 checkForManualRedraw()
             }
-
         }
 
         fun character(event: Program.CharacterEvent) {
@@ -142,7 +136,6 @@ class ControlManager : Extension {
             if (target != null) {
                 checkForManualRedraw()
             }
-
         }
     }
 
@@ -156,7 +149,6 @@ class ControlManager : Extension {
 
         fun scroll(event: Program.Mouse.MouseEvent) {
             fun traverse(element: Element) {
-
                 element.children.forEach(::traverse)
                 if (!event.propagationCancelled) {
                     if (event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
@@ -169,7 +161,6 @@ class ControlManager : Extension {
             }
             body?.let(::traverse)
             checkForManualRedraw()
-
         }
 
         fun click(event: Program.Mouse.MouseEvent) {
@@ -186,9 +177,7 @@ class ControlManager : Extension {
             }
             lastClick = ct
             checkForManualRedraw()
-
         }
-
 
         fun press(event: Program.Mouse.MouseEvent) {
             val candidates = mutableListOf<Pair<Element, Int>>()
@@ -230,14 +219,11 @@ class ControlManager : Extension {
                 clickTarget = null
             }
             checkForManualRedraw()
-
         }
 
         val insideElements = mutableSetOf<Element>()
         fun move(event: Program.Mouse.MouseEvent) {
             val hover = ElementPseudoClass("hover")
-
-
             val toRemove = insideElements.filter { (event.position !in it.screenArea) }
 
             toRemove.forEach {
@@ -247,7 +233,6 @@ class ControlManager : Extension {
             insideElements.removeAll(toRemove)
 
             fun traverse(element: Element) {
-
                 if (event.position in element.screenArea) {
                     if (element !in insideElements) {
                         element.mouse.entered.onNext(event)
@@ -266,7 +251,6 @@ class ControlManager : Extension {
             }
             body?.let(::traverse)
             checkForManualRedraw()
-
         }
     }
 
@@ -523,7 +507,7 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
 fun controlManager(builder: ControlManagerBuilder.() -> Unit): ControlManager {
     val cm = ControlManager()
     cm.fontManager.register("default", resourceUrl("/fonts/Roboto-Regular.ttf"))
-    cm.layouter.styleSheets.addAll(defaultStyles())
+    cm.layouter.styleSheets.addAll(defaultStyles().flatMap { it.flatten() })
     val cmb = ControlManagerBuilder(cm)
     cmb.builder()
     return cm

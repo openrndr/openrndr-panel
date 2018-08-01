@@ -20,7 +20,7 @@ class CompoundSelector {
 
     constructor() {
         previous = null
-        selectors = ArrayList()
+        selectors = mutableListOf()
     }
 
     constructor(previous: Pair<Combinator, CompoundSelector>?, selectors: List<Selector>) {
@@ -46,6 +46,11 @@ class CompoundSelector {
         }
         return r
     }
+
+    override fun toString(): String {
+        return "CompoundSelector(previous=$previous, selectors=$selectors)"
+    }
+
 }
 
 enum class Combinator {
@@ -58,40 +63,35 @@ class IdentitySelector(val id: String) : Selector() {
     } else {
         false
     }
+
+    override fun toString(): String {
+        return "IdentitySelector(id='$id')"
+    }
+
 }
 
 class ClassSelector(val c: ElementClass) : Selector() {
     override fun accept(element: Element): Boolean = c in element.classes
+    override fun toString(): String {
+        return "ClassSelector(c=$c)"
+    }
+
 }
 
 class TypeSelector(val type: ElementType) : Selector() {
     override fun accept(element: Element): Boolean = element.type == type
+    override fun toString(): String {
+        return "TypeSelector(type=$type)"
+    }
+
 }
 
 class PseudoClassSelector(val c: ElementPseudoClass) : Selector() {
     override fun accept(element: Element): Boolean = c in element.pseudoClasses
-}
-
-class SelectorBuilder {
-    var active = CompoundSelector()
-
-    fun id(query: String, pseudo: String? = null): CompoundSelector {
-        active.selectors.add(IdentitySelector(query))
-        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
-        return active
+    override fun toString(): String {
+        return "PseudoClassSelector(c=$c)"
     }
 
-    fun type(query: String, pseudo: String? = null): CompoundSelector {
-        active.selectors.add(TypeSelector(ElementType(query)))
-        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
-        return active
-    }
-
-    fun `class`(query: String, pseudo: String? = null): CompoundSelector {
-        active.selectors.add(ClassSelector(ElementClass(query)))
-        pseudo?.let { active.selectors.add(PseudoClassSelector(ElementPseudoClass(it))) }
-        return active
-    }
 }
 
 
@@ -104,7 +104,6 @@ object has {
         }
         return active
     }
-
 
     infix fun state(q:String):CompoundSelector {
         val active = CompoundSelector()
@@ -131,40 +130,4 @@ infix fun CompoundSelector.and(other:CompoundSelector):CompoundSelector {
     c.selectors.addAll(other.selectors)
     return c
 }
-
-fun test() {
-    (has class_ "bla") and (has type "kak")
-
-}
-
-
-
-infix fun CompoundSelector.followedBy(function: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
-    return selector(function).apply {
-        previous = Pair(Combinator.LATER_SIBLING, this@followedBy)
-    }
-}
-
-infix fun CompoundSelector.nextTo(function: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
-    return selector(function).apply {
-        previous = Pair(Combinator.NEXT_SIBLING, this@nextTo)
-    }
-}
-
-infix fun CompoundSelector.withChild(function: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
-    return selector(function).apply {
-        previous = Pair(Combinator.CHILD, this@withChild)
-    }
-}
-
-infix fun CompoundSelector.withDescendant(function: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
-    return selector(function).apply {
-        previous = Pair(Combinator.DESCENDANT, this@withDescendant)
-    }
-}
-
-fun selector(builder: SelectorBuilder.() -> CompoundSelector): CompoundSelector {
-    return SelectorBuilder().apply { builder() }.active
-}
-
 
