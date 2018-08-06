@@ -217,7 +217,6 @@ fun StyleSheet.descendant(selector: CompoundSelector, init: StyleSheet.() -> Uni
 
 fun StyleSheet.and(selector: CompoundSelector, init: StyleSheet.() -> Unit) {
     val stylesheet = StyleSheet(this.selector and selector).apply(init)
-    println("adding a child to ${this.selector}")
     this.children.add(stylesheet)
 }
 
