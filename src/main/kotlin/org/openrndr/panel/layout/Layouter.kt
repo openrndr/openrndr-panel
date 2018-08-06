@@ -52,10 +52,11 @@ class Layouter {
                             var ly = element.layout.screenY + element.computedStyle.effectivePaddingTop
                             val lx = element.layout.screenX + element.computedStyle.effectivePaddingLeft
 
+                            val verticalPadding = element.computedStyle.effectivePaddingTop + element.computedStyle.effectivePaddingBottom
                             val totalHeight = element.children
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
                                     .sumByDouble { height(it) }
-                            val remainder = (element.layout.screenHeight - totalHeight)
+                            val remainder = ((element.layout.screenHeight-verticalPadding) - totalHeight)
                             val totalGrow = element.children
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
                                     .sumByDouble { (it.computedStyle.flexGrow as FlexGrow.Ratio).value }
@@ -211,10 +212,6 @@ class Layouter {
             return 0.0
         }
 
-        //val widthHint = element.widthHint
-//        if (widthHint != null) {
-//            return (widthHint +  paddingLeft(element) + paddingRight(element)) + if (includeMargins) (marginLeft(element) + marginRight(element)) else 0.0
-//        }
         val result =
                 it.width.let {
                     when (it) {

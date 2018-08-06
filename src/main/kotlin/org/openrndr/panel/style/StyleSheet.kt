@@ -224,7 +224,7 @@ fun StyleSheet.flatten(): List<StyleSheet> {
     return listOf(this) + children.flatMap { it.flatten() }
 }
 
-fun styleSheet(selector: CompoundSelector, init: StyleSheet.() -> Unit): StyleSheet {
+fun styleSheet(selector: CompoundSelector = CompoundSelector.DUMMY, init: StyleSheet.() -> Unit): StyleSheet {
     return StyleSheet(selector).apply {
         init()
     }
