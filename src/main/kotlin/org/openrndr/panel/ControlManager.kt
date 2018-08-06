@@ -181,7 +181,6 @@ class ControlManager : Extension {
 
         fun press(event: Program.Mouse.MouseEvent) {
             val candidates = mutableListOf<Pair<Element, Int>>()
-
             fun traverse(element: Element, depth: Int = 0) {
                 if (element.computedStyle.display != Display.NONE) {
                     element.children.forEach { traverse(it, depth + 1) }
@@ -192,7 +191,8 @@ class ControlManager : Extension {
             }
 
             body?.let { traverse(it) }
-            candidates.sortByDescending { it.second }
+            //candidates.sortByDescending { it.second }
+            candidates.sortWith(compareBy({-it.first.layout.zIndex},{-it.second}))
             for (c in candidates) {
                 if (!event.propagationCancelled) {
                     c.first.mouse.pressed.onNext(event)
@@ -202,10 +202,8 @@ class ControlManager : Extension {
                         keyboardInput.target = c.first
                     }
                 }
-
             }
             checkForManualRedraw()
-
         }
 
         fun release(event: Program.Mouse.MouseEvent) {

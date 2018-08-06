@@ -144,7 +144,7 @@ fun defaultStyles(
         styleSheet(has type "button") {
             display = Display.BLOCK
             background = Color.RGBa(controlBackground)
-            width = 80.px
+            width = LinearDimension.Auto
             height = 32.px
             paddingLeft = 10.px
             paddingRight = 10.px

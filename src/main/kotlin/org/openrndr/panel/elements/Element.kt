@@ -59,6 +59,7 @@ open class Element(val type: ElementType) {
     val keyboard = KeyboardObservables()
 
     class Layout {
+        var zIndex = 0
         var screenX = 0.0
         var screenY = 0.0
         var screenWidth = 0.0
@@ -73,7 +74,7 @@ open class Element(val type: ElementType) {
     class Draw {
         var dirty = true
     }
-    val draw = Draw();
+    val draw = Draw()
     val layout = Layout()
 
     class ClassEvent(val source:Element, val `class`:ElementClass)
@@ -265,8 +266,6 @@ open class Element(val type: ElementType) {
 }
 
 fun Element.visit( function:Element.()->Unit) {
-
     this.function()
     children.forEach { it.visit(function) }
-
 }

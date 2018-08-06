@@ -117,7 +117,7 @@ sealed class FlexGrow(inherit: Boolean = false) : PropertyValue(inherit) {
 
 private val dummySelector = CompoundSelector()
 
-class StyleSheet(val selector: CompoundSelector) {
+class StyleSheet(val selector: CompoundSelector = CompoundSelector.DUMMY) {
     val children = mutableListOf<StyleSheet>()
     val properties = HashMap<String, Property>()
 

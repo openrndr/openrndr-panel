@@ -226,7 +226,8 @@ class Layouter {
                             val effectiveWidth = (parentWidth - parentPadding) * (it.value / 100.0) - margins
                             effectiveWidth
                         }
-                        is LinearDimension.Auto -> element.widthHint?: positionChildren(element).width
+                        is LinearDimension.Auto -> (element.widthHint?: positionChildren(element).width) +
+                                paddingRight(element) + paddingLeft(element)
                         else -> throw RuntimeException("not supported")
                     }
                 } + if (includeMargins) marginLeft(element) + marginRight(element) else 0.0
@@ -245,6 +246,14 @@ class Layouter {
                 else -> {
                 }
             }
+            val lzi = cs.zIndex
+            element.layout.zIndex = when(lzi) {
+                is ZIndex.Value -> lzi.value
+                is ZIndex.Auto -> element.parent?.layout?.zIndex?:0
+                is ZIndex.Inherit -> element.parent?.layout?.zIndex?:0
+            }
+
+
             element.layout.screenWidth = width(element, includeMargins = false)
             element.layout.screenHeight = height(element, includeMargins = false)
             element.layout.screenWidth += element.layout.growWidth
