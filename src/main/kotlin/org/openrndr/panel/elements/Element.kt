@@ -1,5 +1,6 @@
 package org.openrndr.panel.elements
 
+import io.reactivex.subjects.PublishSubject
 import org.openrndr.DropEvent
 import org.openrndr.KeyEvent
 import org.openrndr.Program
@@ -10,7 +11,6 @@ import org.openrndr.panel.collections.ObservableHashSet
 import org.openrndr.panel.style.CompoundSelector
 import org.openrndr.panel.style.StyleSheet
 import org.openrndr.shape.Rectangle
-import rx.subjects.PublishSubject
 
 import java.util.*
 

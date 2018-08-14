@@ -3,11 +3,11 @@ package org.openrndr.panel.elements
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.FontImageMap
-import org.openrndr.math.Vector2
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
+
 
 class Button : Element(ElementType("button")) {
 

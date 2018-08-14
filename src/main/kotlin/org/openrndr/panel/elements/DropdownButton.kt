@@ -6,7 +6,7 @@ import org.openrndr.draw.FontImageMap
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 
 class Item : Element(ElementType("item")) {
     var label: String = ""

@@ -1,14 +1,11 @@
 package org.openrndr.panel.elements
 
+import io.reactivex.subjects.PublishSubject
 import org.openrndr.Program
 import org.openrndr.color.ColorHSVa
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.ColorBuffer
 import org.openrndr.draw.Drawer
-import org.openrndr.draw.FontImageMap
-import org.openrndr.panel.style.fontFamily
-import org.openrndr.text.Writer
-import rx.subjects.PublishSubject
 
 class Colorpicker : Element {
 

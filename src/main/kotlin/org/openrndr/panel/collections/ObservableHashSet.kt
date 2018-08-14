@@ -1,6 +1,6 @@
 package org.openrndr.panel.collections
 
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 import java.util.*
 
 class ObservableHashSet<E>:HashSet<E>() {

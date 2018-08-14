@@ -1,13 +1,12 @@
 package org.openrndr.panel.elements
 
+import io.reactivex.disposables.Disposable
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
-import org.openrndr.draw.FontImageMap
 import org.openrndr.math.Vector2
 import org.openrndr.panel.style.*
 import org.openrndr.text.Cursor
 import org.openrndr.text.Writer
-import rx.Subscription
 
 class EnvelopeButton : Element(ElementType("envelope-button")) {
 
@@ -15,14 +14,14 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
     var envelope = Envelope()
     set(value) {
         field = value
-        envelopeSubscription?.unsubscribe()
+        envelopeSubscription?.dispose()
         envelopeSubscription = value.events.envelopeChanged.subscribe {
             draw.dirty = true
         }
     }
 
 
-    var envelopeSubscription:Subscription? = null
+    var envelopeSubscription: Disposable? = null
 
     init {
         mouse.clicked.subscribe {

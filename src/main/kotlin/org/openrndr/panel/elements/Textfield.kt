@@ -6,7 +6,7 @@ import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
 import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 
 class Textfield : Element(ElementType("textfield")) {
 

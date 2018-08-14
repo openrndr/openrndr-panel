@@ -1,14 +1,13 @@
 package org.openrndr.panel.elements
 
 import org.openrndr.*
-import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
 import org.openrndr.math.Vector2
 import org.openrndr.panel.style.*
 import org.openrndr.text.Cursor
 import org.openrndr.text.Writer
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 
 data class Range(val min: Double, val max: Double) {
     val span: Double get() = max - min

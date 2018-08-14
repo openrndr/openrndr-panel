@@ -37,10 +37,10 @@ junitPlatform {
 }
 
 dependencies {
-    compile ('io.reactivex:rxjava:1.3.8') {
+    compile ('io.reactivex.rxjava2:rxjava:2.2.0') {
         exclude group: 'org.jetbrains.kotlin'
     }
-    compile 'io.reactivex:rxkotlin:1.0.0'
+    compile 'io.reactivex.rxjava2:rxkotlin:2.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.openrndr:openrndr-svg:$openrndr_version"
     implementation "org.openrndr:openrndr-filter:$openrndr_version"

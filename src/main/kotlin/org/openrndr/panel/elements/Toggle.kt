@@ -7,7 +7,7 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 
 class Toggle : Element(ElementType("toggle")) {
     var label = ""

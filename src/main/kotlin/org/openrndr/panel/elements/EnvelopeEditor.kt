@@ -5,7 +5,7 @@ import org.openrndr.MouseButton
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
-import rx.subjects.PublishSubject
+import io.reactivex.subjects.PublishSubject
 
 class Envelope(constant:Double = 0.5) {
 
