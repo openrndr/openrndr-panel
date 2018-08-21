@@ -19,8 +19,6 @@ fun defaultStyles(
             height = 64.px
         },
 
-
-
         styleSheet(has type "dropdown-button") {
             width = LinearDimension.Auto
             height = 32.px
@@ -42,7 +40,6 @@ fun defaultStyles(
                 marginTop = 0.px
                 marginLeft = 0.px
                 marginRight = 0.px
-                background = Color.RGBa(ColorRGBa.BLUE)
             }
         },
 

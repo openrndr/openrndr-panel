@@ -42,7 +42,7 @@ class Toggle : Element(ElementType("toggle")) {
                 writer.newLine()
                 writer.text(label, visible = false)
 
-                return writer.cursor.x + layout.screenHeight - 8.0 + 5.0
+                return writer.cursor.x + (computedStyle.height as LinearDimension.PX).value - 8.0 + 5.0
             }
         }
 
