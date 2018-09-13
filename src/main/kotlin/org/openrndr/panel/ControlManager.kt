@@ -487,8 +487,10 @@ class ControlManager : Extension {
 }
 
 class ControlManagerBuilder(val controlManager: ControlManager) {
-    fun styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) {
-        controlManager.layouter.styleSheets.addAll(StyleSheet(selector).apply { init() }.flatten())
+    fun styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) : StyleSheet {
+        val styleSheet = StyleSheet(selector).apply { init() }
+        controlManager.layouter.styleSheets.addAll(styleSheet.flatten())
+        return styleSheet
     }
 
     fun styleSheets(styleSheets: List<StyleSheet>) {
