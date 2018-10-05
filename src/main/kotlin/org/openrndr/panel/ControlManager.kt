@@ -13,61 +13,59 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.IntRectangle
 import org.openrndr.shape.Rectangle
 
-class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
-
-    val cache = renderTarget(width, height, contentScale) {
-        colorBuffer()
-        depthBuffer()
-    }
-
-    private val atlas = mutableMapOf<Element, IntRectangle>()
-
-    private var root: PackNode = PackNode(IntRectangle(0, 0, width, height))
-    val packer = IntPacker()
-
-    fun flush() {
-        atlas.clear()
-        root = PackNode(IntRectangle(0, 0, width, height))
-    }
-
-    fun drawCached(drawer: Drawer, element: Element, f: () -> Unit): IntRectangle {
-
-        val rectangle = atlas.getOrPut(element) {
-            val r = packer.insert(root, IntRectangle(0, 0, Math.ceil(element.layout.screenWidth).toInt(),
-                    Math.ceil(element.layout.screenHeight).toInt()))?.area?:throw RuntimeException("bork")
-            draw(drawer, r, f)
-            r
-        }
-        if (element.draw.dirty) {
-            draw(drawer, rectangle, f)
-        }
-        drawer.ortho()
-        drawer.isolated {
-            drawer.model = Matrix44.IDENTITY
-            drawer.image(cache.colorBuffer(0), Rectangle(rectangle.corner.x * 1.0, rectangle.corner.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0),
-                    element.screenArea)
-        }
-        return rectangle
-    }
-
-    fun draw(drawer: Drawer, rectangle: IntRectangle, f: () -> Unit) {
-        drawer.isolatedWithTarget(cache) {
-            drawer.ortho(cache)
-            drawer.drawStyle.blendMode = BlendMode.REPLACE
-            drawer.drawStyle.fill = ColorRGBa.BLACK.opacify(0.0)
-            drawer.drawStyle.stroke = null
-            drawer.view = Matrix44.IDENTITY
-            drawer.model = Matrix44.IDENTITY
-            drawer.rectangle(Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0))
-
-            drawer.drawStyle.blendMode = BlendMode.OVER
-            drawer.drawStyle.clip = Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0)
-            drawer.view = Matrix44.IDENTITY
-            drawer.model = org.openrndr.math.transforms.translate(rectangle.x * 1.0, rectangle.y * 1.0, 0.0)
-            f()
-        }
-    }
-}
+//class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
+//    val cache = renderTarget(width, height, contentScale) {
+//        colorBuffer()
+//        depthBuffer()
+//    }
+//
+//    private val atlas = mutableMapOf<Element, IntRectangle>()
+//
+//    private var root: PackNode = PackNode(IntRectangle(0, 0, width, height))
+//    val packer = IntPacker()
+//
+//    fun flush() {
+//        atlas.clear()
+//        root = PackNode(IntRectangle(0, 0, width, height))
+//    }
+//
+//    fun drawCached(drawer: Drawer, element: Element, f: () -> Unit): IntRectangle {
+//        val rectangle = atlas.getOrPut(element) {
+//            val r = packer.insert(root, IntRectangle(0, 0, Math.ceil(element.layout.screenWidth).toInt(),
+//                    Math.ceil(element.layout.screenHeight).toInt()))?.area?:throw RuntimeException("bork")
+//            draw(drawer, r, f)
+//            r
+//        }
+//        if (element.draw.dirty) {
+//            draw(drawer, rectangle, f)
+//        }
+//        drawer.ortho()
+//        drawer.isolated {
+//            drawer.model = Matrix44.IDENTITY
+//            drawer.image(cache.colorBuffer(0), Rectangle(rectangle.corner.x * 1.0, rectangle.corner.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0),
+//                    element.screenArea)
+//        }
+//        return rectangle
+//    }
+//
+//    fun draw(drawer: Drawer, rectangle: IntRectangle, f: () -> Unit) {
+//        drawer.isolatedWithTarget(cache) {
+//            drawer.ortho(cache)
+//            drawer.drawStyle.blendMode = BlendMode.REPLACE
+//            drawer.drawStyle.fill = ColorRGBa.BLACK.opacify(0.0)
+//            drawer.drawStyle.stroke = null
+//            drawer.view = Matrix44.IDENTITY
+//            drawer.model = Matrix44.IDENTITY
+//            drawer.rectangle(Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0))
+//
+//            drawer.drawStyle.blendMode = BlendMode.OVER
+//            drawer.drawStyle.clip = Rectangle(rectangle.x * 1.0, rectangle.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0)
+//            drawer.view = Matrix44.IDENTITY
+//            drawer.model = org.openrndr.math.transforms.translate(rectangle.x * 1.0, rectangle.y * 1.0, 0.0)
+//            f()
+//        }
+//    }
+//}
 
 class ControlManager : Extension {
     var body: Element? = null
@@ -76,7 +74,7 @@ class ControlManager : Extension {
     lateinit var window: Program.Window
     private val renderTargetCache = HashMap<Element, RenderTarget>()
 
-    lateinit var surfaceCache: SurfaceCache
+    //lateinit var surfaceCache: SurfaceCache
     override var enabled: Boolean = true
 
     var contentScale = 1.0
@@ -88,7 +86,6 @@ class ControlManager : Extension {
             target?.drop?.dropped?.onNext(event)
         }
     }
-
 
     fun requestScrollInput(element: Element) {
 
@@ -142,7 +139,6 @@ class ControlManager : Extension {
     val keyboardInput = KeyboardInput()
 
     inner class MouseInput {
-
         var dragTarget: Element? = null
         var clickTarget: Element? = null
         var lastClick = System.currentTimeMillis()
@@ -265,11 +261,12 @@ class ControlManager : Extension {
 
     val mouseInput = MouseInput()
     override fun setup(program: Program) {
+
+
         contentScale = program.window.scale.x
         window = program.window
 
-
-        surfaceCache = SurfaceCache(4096, 4096, contentScale)
+        //surfaceCache = SurfaceCache(4096, 4096, contentScale)
         fontManager.contentScale = contentScale
         program.mouse.buttonUp.listen { mouseInput.release(it) }
         program.mouse.buttonUp.listen { mouseInput.click(it) }
@@ -284,8 +281,6 @@ class ControlManager : Extension {
         program.keyboard.character.listen { keyboardInput.character(it) }
 
         program.window.drop.listen { dropInput.drop(it) }
-
-
         program.window.sized.listen { resize(program, it.size.x.toInt(), it.size.y.toInt()) }
 
         width = program.width
@@ -300,9 +295,7 @@ class ControlManager : Extension {
     var width: Int = 0
     var height: Int = 0
 
-
     fun resize(program: Program, width: Int, height: Int) {
-
         this.width = width
         this.height = height
 
@@ -318,7 +311,6 @@ class ControlManager : Extension {
             println("that is strange. no color buffers")
         }
 
-
         renderTarget = renderTarget(program.width, program.height, contentScale) {
             colorBuffer()
             depthBuffer()
@@ -332,9 +324,7 @@ class ControlManager : Extension {
         renderTargetCache.clear()
     }
 
-
     private fun drawElement(element: Element, drawer: Drawer, zIndex: Int, zComp: Int) {
-
         val newZComp =
                 element.computedStyle.zIndex.let {
                     when (it) {
@@ -398,9 +388,7 @@ class ControlManager : Extension {
 
     }
 
-    class ProfileData(var hits: Int = 0, var time: Long = 0) {
-
-    }
+    class ProfileData(var hits: Int = 0, var time: Long = 0);
 
     val profiles = mutableMapOf<String, ProfileData>()
     fun profile(name: String, f: () -> Unit) {
@@ -420,8 +408,6 @@ class ControlManager : Extension {
 
     var drawCount = 0
     override fun afterDraw(drawer: Drawer, program: Program) {
-
-
         if (program.width > 0 && program.height > 0) {
             profile("after draw") {
 

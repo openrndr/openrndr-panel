@@ -22,7 +22,6 @@ class Textfield : Element(ElementType("textfield")) {
 
     init {
         keyboard.repeated.subscribe {
-            println("${it.key} ${KEY_BACKSPACE}")
             if (it.key == KEY_BACKSPACE) {
                 if (!value.isEmpty())
                     value = value.substring(0, value.length - 1)
@@ -42,6 +41,7 @@ class Textfield : Element(ElementType("textfield")) {
         }
 
         keyboard.character.subscribe {
+            println("I got this event")
             val oldValue = value
             value += it.character
             events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
@@ -60,7 +60,6 @@ class Textfield : Element(ElementType("textfield")) {
         drawer.fill = computedStyle.effectiveBackground
         drawer.stroke = null
         drawer.rectangle(0.0, 0.0, layout.screenWidth, layout.screenHeight)
-
 
         (root() as? Body)?.controlManager?.fontManager?.let {
             val font = it.font(computedStyle)

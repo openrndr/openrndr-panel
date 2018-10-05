@@ -75,7 +75,6 @@ class ClassSelector(val c: ElementClass) : Selector() {
     override fun toString(): String {
         return "ClassSelector(c=$c)"
     }
-
 }
 
 class TypeSelector(val type: ElementType) : Selector() {
@@ -83,7 +82,6 @@ class TypeSelector(val type: ElementType) : Selector() {
     override fun toString(): String {
         return "TypeSelector(type=$type)"
     }
-
 }
 
 class PseudoClassSelector(val c: ElementPseudoClass) : Selector() {
@@ -94,9 +92,7 @@ class PseudoClassSelector(val c: ElementPseudoClass) : Selector() {
 
 }
 
-
 object has {
-
     operator fun invoke (vararg selectors:CompoundSelector) : CompoundSelector {
         val active = CompoundSelector()
         selectors.forEach {
@@ -116,6 +112,7 @@ object has {
         active.selectors.add(ClassSelector(ElementClass(q)))
         return active
     }
+
     infix fun type(q:String):CompoundSelector {
         val active = CompoundSelector()
         active.selectors.add(TypeSelector(ElementType(q)))
@@ -130,4 +127,3 @@ infix fun CompoundSelector.and(other:CompoundSelector):CompoundSelector {
     c.selectors.addAll(other.selectors)
     return c
 }
-

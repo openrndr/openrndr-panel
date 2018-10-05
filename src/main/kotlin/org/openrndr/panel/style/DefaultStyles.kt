@@ -2,14 +2,12 @@ package org.openrndr.panel.style
 
 import org.openrndr.color.ColorRGBa
 
-
 fun defaultStyles(
         controlBackground: ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
         controlHoverBackground: ColorRGBa = controlBackground.shade(1.5),
         controlTextColor: Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
         controlFontSize: Double = 14.0
 ) = listOf(
-
         styleSheet(has type "item") {
             display = Display.NONE
         },
@@ -52,6 +50,7 @@ fun defaultStyles(
             marginTop = 5.px
             marginBottom = 5.px
         },
+
         styleSheet(has type "envelope-button") {
             width = 100.px
             height = 40.px
@@ -156,6 +155,4 @@ fun defaultStyles(
                 background = Color.RGBa(controlHoverBackground)
             }
         }
-
-
 )

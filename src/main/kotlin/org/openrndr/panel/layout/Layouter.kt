@@ -10,19 +10,16 @@ import kotlin.comparisons.compareBy
 
 class Layouter {
     val styleSheets = ArrayList<StyleSheet>()
-
     val blockLike = setOf(Display.BLOCK, Display.FLEX)
     val manualPosition = setOf(Position.FIXED, Position.ABSOLUTE)
-    fun positionChildren(element: Element): Rectangle {
 
+    fun positionChildren(element: Element): Rectangle {
         return element.computedStyle.let { cs ->
             var y = element.layout.screenY - element.scrollTop + element.computedStyle.effectivePaddingTop
 
             when (cs.display) {
                 Display.FLEX -> {
-
                     when (cs.flexDirection) {
-
                         FlexDirection.Row -> {
                             var maxHeight = 0.0
                             var x = element.layout.screenX + element.computedStyle.effectivePaddingLeft
@@ -156,14 +153,13 @@ class Layouter {
     }
 
     fun padding(element: Element?, f: (StyleSheet) -> LinearDimension): Double {
-
-        if (element != null) {
+        return if (element != null) {
             val value = f(element.computedStyle)
-            return when (value) {
+            when (value) {
                 is LinearDimension.PX -> value.value
                 else -> 0.0
             }
-        } else return 0.0
+        } else 0.0
     }
 
     fun marginTop(element: Element) = margin(element, StyleSheet::marginTop)

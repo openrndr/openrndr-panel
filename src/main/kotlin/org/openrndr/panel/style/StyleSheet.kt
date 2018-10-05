@@ -23,7 +23,6 @@ sealed class Color(inherit: Boolean = false) : PropertyValue(inherit) {
             return "RGBa(color=$color)"
         }
     }
-
     object Inherit : Color(inherit = true)
 }
 
@@ -33,16 +32,12 @@ sealed class LinearDimension(inherit: Boolean = false) : PropertyValue(inherit) 
             return "PX(value=$value)"
         }
     }
-
     class Percent(val value: Double) : LinearDimension()
     object Auto : LinearDimension()
     object Inherit : LinearDimension(inherit = true)
 }
 
-data class PropertyBehaviour(val inheritance: PropertyInheritance, val intitial: Any) {
-
-
-}
+data class PropertyBehaviour(val inheritance: PropertyInheritance, val intitial: Any)
 
 object PropertyBehaviours {
 

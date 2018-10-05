@@ -8,6 +8,7 @@ import org.openrndr.panel.style.*
 import org.openrndr.text.Cursor
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import org.openrndr.shape.Rectangle
 
 data class Range(val min: Double, val max: Double) {
     val span: Double get() = max - min
@@ -177,6 +178,7 @@ class Slider : Element(ElementType("slider")) {
             drawer.fontMap = (font)
             drawer.fill = computedStyle.effectiveColor
             writer.cursor = Cursor(0.0, 8.0)
+            writer.box = Rectangle(0.0, 8.0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY)
             writer.newLine()
             writer.text(label)
 
@@ -192,4 +194,9 @@ class Slider : Element(ElementType("slider")) {
             }
         }
     }
+}
+
+fun main(args: Array<String>) {
+    val valueFormatted = String.format("%.0${0}f", 9.0)
+    println(valueFormatted)
 }
