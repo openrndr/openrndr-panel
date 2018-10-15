@@ -74,7 +74,7 @@ class ControlManager : Extension {
     lateinit var window: Program.Window
     private val renderTargetCache = HashMap<Element, RenderTarget>()
 
-    //lateinit var surfaceCache: SurfaceCache
+    lateinit var program: Program
     override var enabled: Boolean = true
 
     var contentScale = 1.0
@@ -261,7 +261,7 @@ class ControlManager : Extension {
 
     val mouseInput = MouseInput()
     override fun setup(program: Program) {
-
+        this.program = program
 
         contentScale = program.window.scale.x
         window = program.window

@@ -7,6 +7,7 @@ import org.openrndr.draw.LineCap
 import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import org.openrndr.KeyboardModifier
 
 class Textfield : Element(ElementType("textfield")) {
 
@@ -26,12 +27,21 @@ class Textfield : Element(ElementType("textfield")) {
                 if (!value.isEmpty())
                     value = value.substring(0, value.length - 1)
             }
+
             draw.dirty = true
             it.cancelPropagation()
-
         }
+
         keyboard.pressed.subscribe {
-            println("${it.key} ${KEY_BACKSPACE}")
+            println("newest version..")
+            if (KeyboardModifier.CTRL in it.modifiers || KeyboardModifier.SUPER in it.modifiers) {
+                if (it.name == "v") {
+                    (root() as Body).controlManager.program.clipboard.contents?.let {
+                        value += it
+                    }
+
+                }
+            }
             if (it.key == KEY_BACKSPACE) {
                 if (!value.isEmpty())
                     value = value.substring(0, value.length - 1)
@@ -41,7 +51,6 @@ class Textfield : Element(ElementType("textfield")) {
         }
 
         keyboard.character.subscribe {
-            println("I got this event")
             val oldValue = value
             value += it.character
             events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
@@ -76,6 +85,9 @@ class Textfield : Element(ElementType("textfield")) {
             drawer.text("$label", 0.0 + offset, 0.0 + yOffset - textHeight * 1.5)
 
 
+            drawer.fill = (((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE).opacify (0.05))
+            drawer.rectangle(0.0 + offset, 0.0 + yOffset - (textHeight+2), layout.screenWidth - 10.0, textHeight + 8.0)
+
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
             drawer.text("$value", 0.0 + offset, 0.0 + yOffset)
             drawer.stroke = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
@@ -83,7 +95,7 @@ class Textfield : Element(ElementType("textfield")) {
 
             drawer.stroke = computedStyle.effectiveColor?.shade(0.25)
             drawer.lineCap = LineCap.ROUND
-            drawer.lineSegment(0.0, yOffset + 4.0, layout.screenWidth, yOffset + 4.0)
+            //drawer.lineSegment(0.0, yOffset + 4.0, layout.screenWidth, yOffset + 4.0)
         }
     }
 }

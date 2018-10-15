@@ -74,4 +74,11 @@ abstract class TextElement(et: ElementType) : Element(et) {
     fun text(text: String) {
         append(TextNode(text))
     }
+    fun replaceText(text : String) {
+        if (children.isEmpty()) {
+            text(text)
+        } else {
+            (children.first() as? TextNode)?.text = text
+        }
+    }
 }
