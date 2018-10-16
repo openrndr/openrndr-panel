@@ -33,12 +33,15 @@ class Textfield : Element(ElementType("textfield")) {
         }
 
         keyboard.pressed.subscribe {
-            println("newest version..")
             if (KeyboardModifier.CTRL in it.modifiers || KeyboardModifier.SUPER in it.modifiers) {
                 if (it.name == "v") {
+                    var oldValue = value
                     (root() as Body).controlManager.program.clipboard.contents?.let {
                         value += it
+
                     }
+                    events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
+                    it.cancelPropagation()
 
                 }
             }
