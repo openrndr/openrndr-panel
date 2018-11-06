@@ -19,6 +19,7 @@ class Div : TextElement(ElementType("div")) {
                     scrollTop -= it.rotation.y*10
                     scrollTop = Math.max(0.0, scrollTop)
                     draw.dirty = true
+                    it.cancelPropagation()
                 }
             }
         }
