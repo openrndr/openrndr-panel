@@ -1,11 +1,11 @@
 group 'org.openrndr.panel'
-version '0.3.6'
+version '0.3.7'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 
 buildscript {
-    ext.kotlin_version = "1.3.0"
-    ext.openrndr_version = "0.3.28"
+    ext.kotlin_version = "1.3.10"
+    ext.openrndr_version = "0.3.29-rc2"
     repositories {
         jcenter()
         mavenCentral()
