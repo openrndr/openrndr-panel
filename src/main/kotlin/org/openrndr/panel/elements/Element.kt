@@ -3,6 +3,7 @@ package org.openrndr.panel.elements
 import io.reactivex.subjects.PublishSubject
 import org.openrndr.DropEvent
 import org.openrndr.KeyEvent
+import org.openrndr.MouseEvent
 import org.openrndr.Program
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
@@ -29,14 +30,14 @@ open class Element(val type: ElementType) {
     get() { return null }
 
     class MouseObservables {
-        val clicked = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val doubleClicked = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val entered = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val exited = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val dragged = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val moved = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val scrolled = PublishSubject.create<Program.Mouse.MouseEvent>()
-        val pressed = PublishSubject.create<Program.Mouse.MouseEvent>()
+        val clicked = PublishSubject.create<MouseEvent>()
+        val doubleClicked = PublishSubject.create<MouseEvent>()
+        val entered = PublishSubject.create<MouseEvent>()
+        val exited = PublishSubject.create<MouseEvent>()
+        val dragged = PublishSubject.create<MouseEvent>()
+        val moved = PublishSubject.create<MouseEvent>()
+        val scrolled = PublishSubject.create<MouseEvent>()
+        val pressed = PublishSubject.create<MouseEvent>()
     }
 
     class DropObserverables {

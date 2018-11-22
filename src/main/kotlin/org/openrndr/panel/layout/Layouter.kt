@@ -109,9 +109,9 @@ class Layouter {
             element.computedStyle =
                     styleSheets
                             .filter {
-                                it.selector?.let {
+                                it.selector.let {
                                     matcher.matches(it, element)
-                                } ?: false
+                                }
                             }
                             .sortedWith(compareBy({ it.precedence.component1() },
                                     { it.precedence.component2() },

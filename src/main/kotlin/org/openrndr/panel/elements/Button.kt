@@ -40,27 +40,28 @@ class Button : Element(ElementType("button")) {
     }
 
 
-    override val widthHint:Double
-    get()  {
-        computedStyle.let { style ->
-            val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily)?:"broken"
-            val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 14.0
-            val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
+    override val widthHint: Double
+        get() {
+            computedStyle.let { style ->
+                val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily) ?: "broken"
+                val fontSize = (style.fontSize as? LinearDimension.PX)?.value ?: 14.0
+                val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
 
-            val writer = Writer(null)
+                val writer = Writer(null)
 
-            writer.box = Rectangle(0.0,
-                    0.0,
-                    Double.POSITIVE_INFINITY,
-                    Double.POSITIVE_INFINITY)
+                writer.box = Rectangle(0.0,
+                        0.0,
+                        Double.POSITIVE_INFINITY,
+                        Double.POSITIVE_INFINITY)
 
-            writer.drawStyle.fontMap = fontMap
-            writer.newLine()
-            writer.text(label, visible = false)
+                writer.drawStyle.fontMap = fontMap
+                writer.newLine()
+                writer.text(label, visible = false)
 
-            return writer.cursor.x
+                return writer.cursor.x
+            }
         }
-    }
+
     override fun draw(drawer: Drawer) {
 
         computedStyle.let {
@@ -90,11 +91,10 @@ class Button : Element(ElementType("button")) {
                 drawer.stroke = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
                 drawer.strokeWeight = 1.0
-                val dx = (layout.screenWidth - textWidth) / 2.0
-
+                //val dx = (layout.screenWidth - textWidth) / 2.0
                 //drawer.lineSegment(Vector2(dx, yOffset + 3.5), Vector2(dx + textWidth, yOffset + 3.5))
             }
-            //          drawer.smooth(true)
+
             drawer.popStyle()
             drawer.popTransforms()
         }

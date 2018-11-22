@@ -1,6 +1,7 @@
 package org.openrndr.panel.elements
 
 import io.reactivex.subjects.PublishSubject
+import org.openrndr.MouseEvent
 import org.openrndr.Program
 import org.openrndr.color.ColorHSVa
 import org.openrndr.color.ColorRGBa
@@ -60,7 +61,7 @@ class Colorpicker : Element {
             }
 
         }
-        fun pick(e: Program.Mouse.MouseEvent) {
+        fun pick(e: MouseEvent) {
             val dx = e.position.x - layout.screenX
             var dy = e.position.y - layout.screenY
 

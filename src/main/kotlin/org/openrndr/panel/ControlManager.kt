@@ -143,7 +143,7 @@ class ControlManager : Extension {
         var clickTarget: Element? = null
         var lastClick = System.currentTimeMillis()
 
-        fun scroll(event: Program.Mouse.MouseEvent) {
+        fun scroll(event: MouseEvent) {
             fun traverse(element: Element) {
                 element.children.forEach(::traverse)
                 if (!event.propagationCancelled) {
@@ -159,7 +159,7 @@ class ControlManager : Extension {
             checkForManualRedraw()
         }
 
-        fun click(event: Program.Mouse.MouseEvent) {
+        fun click(event: MouseEvent) {
             dragTarget = null
             val ct = System.currentTimeMillis()
             if (ct - lastClick > 500) {
@@ -175,7 +175,7 @@ class ControlManager : Extension {
             checkForManualRedraw()
         }
 
-        fun press(event: Program.Mouse.MouseEvent) {
+        fun press(event: MouseEvent) {
             val candidates = mutableListOf<Pair<Element, Int>>()
             fun traverse(element: Element, depth: Int = 0) {
                 if (element.computedStyle.display != Display.NONE) {
@@ -202,11 +202,11 @@ class ControlManager : Extension {
             checkForManualRedraw()
         }
 
-        fun release(event: Program.Mouse.MouseEvent) {
+        fun release(event: MouseEvent) {
 
         }
 
-        fun drag(event: Program.Mouse.MouseEvent) {
+        fun drag(event: MouseEvent) {
             dragTarget?.mouse?.dragged?.onNext(event)
 
             if (event.propagationCancelled) {
@@ -216,12 +216,12 @@ class ControlManager : Extension {
         }
 
         val insideElements = mutableSetOf<Element>()
-        fun move(event: Program.Mouse.MouseEvent) {
+        fun move(event: MouseEvent) {
             val hover = ElementPseudoClass("hover")
             val toRemove = insideElements.filter { (event.position !in it.screenArea) }
 
             toRemove.forEach {
-                it.mouse.exited.onNext(Program.Mouse.MouseEvent(event.position, Vector2.ZERO, Vector2.ZERO, MouseEventType.MOVED, MouseButton.NONE, event.modifiers, false))
+                it.mouse.exited.onNext(MouseEvent(event.position, Vector2.ZERO, Vector2.ZERO, MouseEventType.MOVED, MouseButton.NONE, event.modifiers, false))
             }
 
             insideElements.removeAll(toRemove)
