@@ -3,14 +3,15 @@ package org.openrndr.panel.collections
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
-class ObservableHashSet<E>:HashSet<E>() {
+class ObservableHashSet<E> : HashSet<E>() {
 
-    class ChangeEvent<E>(source:ObservableHashSet<E>, val added:Set<E>, val removed:Set<E>)
-    val changed : PublishSubject<ChangeEvent<E>> = PublishSubject.create()
+    class ChangeEvent<E>(val source: ObservableHashSet<E>, val added: Set<E>, val removed: Set<E>)
+
+    val changed: PublishSubject<ChangeEvent<E>> = PublishSubject.create()
 
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
-            changed.onNext( ChangeEvent(this, setOf(element), emptySet()))
+            changed.onNext(ChangeEvent(this, setOf(element), emptySet()))
             true
         } else {
             false
@@ -19,7 +20,7 @@ class ObservableHashSet<E>:HashSet<E>() {
 
     override fun remove(element: E): Boolean {
         return if (super.remove(element)) {
-            changed.onNext( ChangeEvent(this, emptySet(), setOf(element)))
+            changed.onNext(ChangeEvent(this, emptySet(), setOf(element)))
             true
         } else {
             false
@@ -29,7 +30,7 @@ class ObservableHashSet<E>:HashSet<E>() {
     override fun clear() {
         val old = this.toSet()
         super.clear()
-        changed.onNext(ChangeEvent(this, emptySet(),old))
+        changed.onNext(ChangeEvent(this, emptySet(), old))
     }
 
 }

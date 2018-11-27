@@ -2,20 +2,20 @@ package org.openrndr.panel.elements
 
 import io.reactivex.subjects.PublishSubject
 import org.openrndr.MouseEvent
-import org.openrndr.Program
 import org.openrndr.color.ColorHSVa
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.ColorBuffer
 import org.openrndr.draw.Drawer
+import org.openrndr.draw.colorBuffer
 
 class Colorpicker : Element {
 
-    internal var colorBuffer: ColorBuffer? = null
+    internal var colorMap: ColorBuffer? = null
 
     var label: String = "Color"
 
     var saturation = 0.5
-    var color:ColorRGBa
+    var color: ColorRGBa
         set(value) {
             realColor = value
             saturation = color.toHSVa().s
@@ -26,8 +26,8 @@ class Colorpicker : Element {
             return realColor
         }
 
-    var realColor = ColorRGBa.WHITE
-    var focussed = false
+    private var realColor = ColorRGBa.WHITE
+    private var focussed = false
 
     class ColorChangedEvent(val source: Colorpicker,
                             val oldColor: ColorRGBa,
@@ -43,24 +43,22 @@ class Colorpicker : Element {
     constructor() : super(ElementType("colorpicker")) {
         generateColorMap()
 
-
         mouse.exited.subscribe {
             focussed = false
         }
 
         mouse.scrolled.subscribe {
-
-            if (colorBuffer != null) {
+            if (colorMap != null) {
                 //if (focussed) {
-                    saturation = (saturation - it.rotation.y * 0.01).coerceIn(0.0, 1.0)
-                    generateColorMap()
-                    colorBuffer?.shadow?.upload()
-                    it.cancelPropagation()
-                    draw.dirty = true
+                saturation = (saturation - it.rotation.y * 0.01).coerceIn(0.0, 1.0)
+                generateColorMap()
+                colorMap?.shadow?.upload()
+                it.cancelPropagation()
+                draw.dirty = true
                 //}
             }
-
         }
+
         fun pick(e: MouseEvent) {
             val dx = e.position.x - layout.screenX
             var dy = e.position.y - layout.screenY
@@ -78,8 +76,8 @@ class Colorpicker : Element {
         mouse.dragged.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
     }
 
-    fun generateColorMap() {
-        colorBuffer?.shadow?.let {
+    private fun generateColorMap() {
+        colorMap?.shadow?.let {
             for (y in 0..49) {
                 for (x in 0 until it.colorBuffer.width) {
                     val hsv = ColorHSVa(360.0 / it.colorBuffer.width * x, saturation, (49 - y) / 49.0)
@@ -91,12 +89,12 @@ class Colorpicker : Element {
     }
 
     override fun draw(drawer: Drawer) {
-        if (colorBuffer == null) {
-            colorBuffer = ColorBuffer.create(layout.screenWidth.toInt(), 50, 1.0)
+        if (colorMap == null) {
+            colorMap = colorBuffer(layout.screenWidth.toInt(), 50, 1.0)
             generateColorMap()
         }
 
-        drawer.image(colorBuffer!!, 0.0, 0.0)
+        drawer.image(colorMap!!, 0.0, 0.0)
         drawer.fill = (color)
         drawer.stroke = null
         drawer.shadeStyle = null

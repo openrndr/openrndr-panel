@@ -15,7 +15,7 @@ import org.openrndr.shape.Rectangle
 
 //class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
 //    val cache = renderTarget(width, height, contentScale) {
-//        colorBuffer()
+//        colorMap()
 //        depthBuffer()
 //    }
 //
@@ -42,7 +42,7 @@ import org.openrndr.shape.Rectangle
 //        drawer.ortho()
 //        drawer.isolated {
 //            drawer.model = Matrix44.IDENTITY
-//            drawer.image(cache.colorBuffer(0), Rectangle(rectangle.corner.x * 1.0, rectangle.corner.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0),
+//            drawer.image(cache.colorMap(0), Rectangle(rectangle.corner.x * 1.0, rectangle.corner.y * 1.0, rectangle.width * 1.0, rectangle.height * 1.0),
 //                    element.screenArea)
 //        }
 //        return rectangle
@@ -85,10 +85,6 @@ class ControlManager : Extension {
         fun drop(event: DropEvent) {
             target?.drop?.dropped?.onNext(event)
         }
-    }
-
-    fun requestScrollInput(element: Element) {
-
     }
 
     val dropInput = DropInput()
@@ -202,9 +198,9 @@ class ControlManager : Extension {
             checkForManualRedraw()
         }
 
-        fun release(event: MouseEvent) {
-
-        }
+//        fun release(_event: MouseEvent) {
+//
+//        }
 
         fun drag(event: MouseEvent) {
             dragTarget?.mouse?.dragged?.onNext(event)
@@ -268,7 +264,7 @@ class ControlManager : Extension {
 
         //surfaceCache = SurfaceCache(4096, 4096, contentScale)
         fontManager.contentScale = contentScale
-        program.mouse.buttonUp.listen { mouseInput.release(it) }
+//        program.mouse.buttonUp.listen { mouseInput.release(it) }
         program.mouse.buttonUp.listen { mouseInput.click(it) }
         program.mouse.moved.listen { mouseInput.move(it) }
         program.mouse.scrolled.listen { mouseInput.scroll(it) }
@@ -295,7 +291,7 @@ class ControlManager : Extension {
     var width: Int = 0
     var height: Int = 0
 
-    fun resize(program: Program, width: Int, height: Int) {
+    private fun resize(program: Program, width: Int, height: Int) {
         this.width = width
         this.height = height
 
@@ -337,7 +333,9 @@ class ControlManager : Extension {
             if (element.computedStyle.overflow == Overflow.Visible) {
                 drawer.isolated {
                     drawer.translate(element.screenPosition)
-                    element.draw(drawer)
+                    if (newZComp == zIndex) {
+                        element.draw(drawer)
+                    }
 //                    if (newZComp == zIndex) {
 //                        surfaceCache.drawCached(drawer, element) {
 //                            element.draw(drawer)
@@ -379,7 +377,7 @@ class ControlManager : Extension {
                 drawer.popTransforms()
 
                 drawer.drawStyle.blendMode = BlendMode.OVER
-                //drawer.image(rt.colorBuffer(0))
+                //drawer.image(rt.colorMap(0))
                 drawer.image(rt.colorBuffer(0), Rectangle(Vector2(area.x, area.y), area.width, area.height),
                         Rectangle(Vector2(area.x, area.y), area.width, area.height))
             }
@@ -388,10 +386,10 @@ class ControlManager : Extension {
 
     }
 
-    class ProfileData(var hits: Int = 0, var time: Long = 0);
+    class ProfileData(var hits: Int = 0, var time: Long = 0)
 
-    val profiles = mutableMapOf<String, ProfileData>()
-    fun profile(name: String, f: () -> Unit) {
+    private val profiles = mutableMapOf<String, ProfileData>()
+    private fun profile(name: String, f: () -> Unit) {
         val start = System.currentTimeMillis()
         f()
         val end = System.currentTimeMillis()
@@ -463,7 +461,6 @@ class ControlManager : Extension {
                     drawer.view = Matrix44.IDENTITY
                     drawer.reset()
                     program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
-
                 }
                 drawCount++
 
