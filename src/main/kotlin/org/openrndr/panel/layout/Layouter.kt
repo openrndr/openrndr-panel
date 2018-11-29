@@ -235,7 +235,6 @@ class Layouter {
                 Position.FIXED -> {
                     element.layout.screenX = (cs.left as? LinearDimension.PX)?.value ?: 0.0
                     element.layout.screenY = (cs.top as? LinearDimension.PX)?.value ?: 0.0
-                    println("xy ${element.layout.screenX} ${element.layout.screenY}")
                 }
                 else -> {
                 }

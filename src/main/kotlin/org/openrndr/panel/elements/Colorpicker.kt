@@ -1,12 +1,17 @@
 package org.openrndr.panel.elements
 
 import io.reactivex.subjects.PublishSubject
+import org.openrndr.KEY_BACKSPACE
+import org.openrndr.KEY_ENTER
+import org.openrndr.KEY_ESCAPE
 import org.openrndr.MouseEvent
 import org.openrndr.color.ColorHSVa
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.ColorBuffer
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.colorBuffer
+import org.openrndr.panel.style.Color
+import org.openrndr.panel.style.color
 
 class Colorpicker : Element {
 
@@ -39,6 +44,7 @@ class Colorpicker : Element {
 
     val events = Events()
 
+    private var keyboardInput = ""
 
     constructor() : super(ElementType("colorpicker")) {
         generateColorMap()
@@ -56,6 +62,52 @@ class Colorpicker : Element {
                 it.cancelPropagation()
                 draw.dirty = true
                 //}
+            }
+        }
+
+        keyboard.focusLost.subscribe {
+            keyboardInput = ""
+            draw.dirty = true
+        }
+
+        keyboard.character.subscribe {
+            keyboardInput += it.character
+            draw.dirty = true
+            it.cancelPropagation()
+        }
+
+        keyboard.pressed.subscribe {
+            if (it.key == KEY_BACKSPACE) {
+                if (!keyboardInput.isEmpty()) {
+                    keyboardInput = keyboardInput.substring(0, keyboardInput.length - 1)
+                    draw.dirty = true
+
+                }
+                it.cancelPropagation()
+            }
+
+            if (it.key == KEY_ESCAPE) {
+                keyboardInput = ""
+                draw.dirty = true
+                it.cancelPropagation()
+            }
+
+
+            if (it.key == KEY_ENTER) {
+                val number = if (keyboardInput.length == 6) keyboardInput.toIntOrNull(16) else null
+
+                number?.let {
+                    val r = (number shr 16) and 0xff
+                    val g = (number shr 8) and 0xff
+                    val b = number and 0xff
+                    val oldColor = color
+                    color = ColorRGBa(r / 255.0, g / 255.0, b / 255.0)
+                    events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
+                    keyboardInput = ""
+                    draw.dirty = true
+
+                }
+                it.cancelPropagation()
             }
         }
 
@@ -100,5 +152,12 @@ class Colorpicker : Element {
         drawer.shadeStyle = null
         drawer.rectangle(0.0, 50.0, layout.screenWidth, 20.0)
 
+        val f = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!
+        drawer.fontMap = f
+        drawer.fill = ((computedStyle.color as Color.RGBa).color)
+
+        if (keyboardInput.isNotBlank()) {
+            drawer.text("input: $keyboardInput", 0.0, layout.screenHeight)
+        }
     }
 }

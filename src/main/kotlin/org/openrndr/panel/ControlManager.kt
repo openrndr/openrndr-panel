@@ -92,9 +92,11 @@ class ControlManager : Extension {
     inner class KeyboardInput {
         var target: Element? = null
             set(value) {
-                field?.keyboard?.focusLost?.onNext(FocusEvent())
-                value?.keyboard?.focusGained?.onNext(FocusEvent())
-                field = value
+                if (value != field) {
+                    field?.keyboard?.focusLost?.onNext(FocusEvent())
+                    value?.keyboard?.focusGained?.onNext(FocusEvent())
+                    field = value
+                }
             }
 
         fun press(event: KeyEvent) {
@@ -130,7 +132,14 @@ class ControlManager : Extension {
                 checkForManualRedraw()
             }
         }
+
+
+        fun requestFocus(element: Element) {
+            target = element
+        }
     }
+
+
 
     val keyboardInput = KeyboardInput()
 

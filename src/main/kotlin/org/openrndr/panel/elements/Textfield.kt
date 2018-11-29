@@ -78,7 +78,7 @@ class Textfield : Element(ElementType("textfield")) {
 
             val writer = Writer(drawer)
             drawer.fontMap = (font)
-            val textWidth = writer.textWidth(value)
+            //val textWidth = writer.textWidth(value)
             val textHeight = font.ascenderLength
 
             val offset = 5.0

@@ -87,20 +87,23 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
                 background = Color.RGBa(ColorRGBa(0.3, 0.3, 0.3))
             }
 
-            append(Colorpicker().apply {
+            val colorPicker = Colorpicker().apply {
                 this.color = color
                 label = (parent as ColorpickerButton).label
                 events.colorChanged.subscribe {
                     parent.color = it.newColor
                     parent.events.valueChanged.onNext(ColorChangedEvent(parent, parent.color))
                 }
-            })
+            }
+            append(colorPicker)
+
             mouse.exited.subscribe {
                 dispose()
             }
         }
 
         override fun draw(drawer: Drawer) {
+            (root() as Body).controlManager.keyboardInput.requestFocus(children[0])
             drawer.fill = ((computedStyle.background as? Color.RGBa)?.color ?: ColorRGBa.PINK)
             drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
         }
