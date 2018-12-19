@@ -1,5 +1,6 @@
 package org.openrndr.panel
 
+import mu.KotlinLogging
 import org.openrndr.*
 import org.openrndr.binpack.IntPacker
 import org.openrndr.binpack.PackNode
@@ -67,6 +68,8 @@ import org.openrndr.shape.Rectangle
 //    }
 //}
 
+private val logger = KotlinLogging.logger {}
+
 class ControlManager : Extension {
     var body: Element? = null
     val layouter = Layouter()
@@ -79,6 +82,11 @@ class ControlManager : Extension {
 
     var contentScale = 1.0
     lateinit var renderTarget: RenderTarget
+
+    init {
+        fontManager.register("default", resourceUrl("/fonts/Roboto-Regular.ttf"))
+        layouter.styleSheets.addAll(defaultStyles().flatMap { it.flatten() })
+    }
 
     inner class DropInput {
         var target: Element? = null
@@ -139,8 +147,6 @@ class ControlManager : Extension {
         }
     }
 
-
-
     val keyboardInput = KeyboardInput()
 
     inner class MouseInput {
@@ -165,14 +171,18 @@ class ControlManager : Extension {
         }
 
         fun click(event: MouseEvent) {
+            logger.debug { "click event: $event" }
             dragTarget = null
             val ct = System.currentTimeMillis()
+            logger.debug { "click target: $clickTarget" }
             if (ct - lastClick > 500) {
+                logger.debug { "normal click on $clickTarget"}
                 if (clickTarget != null) {
                     clickTarget?.mouse?.clicked?.onNext(event)
                 }
             } else {
                 if (clickTarget != null) {
+                    logger.debug { "double-click on $clickTarget"}
                     clickTarget?.mouse?.doubleClicked?.onNext(event)
                 }
             }
@@ -181,6 +191,7 @@ class ControlManager : Extension {
         }
 
         fun press(event: MouseEvent) {
+            logger.debug { "press event: $event" }
             val candidates = mutableListOf<Pair<Element, Int>>()
             fun traverse(element: Element, depth: Int = 0) {
                 if (element.computedStyle.display != Display.NONE) {
@@ -198,6 +209,7 @@ class ControlManager : Extension {
                 if (!event.propagationCancelled) {
                     c.first.mouse.pressed.onNext(event)
                     if (event.propagationCancelled) {
+                        logger.debug { "propagation cancelled by ${c.first}" }
                         dragTarget = c.first
                         clickTarget = c.first
                         keyboardInput.target = c.first
@@ -207,14 +219,11 @@ class ControlManager : Extension {
             checkForManualRedraw()
         }
 
-//        fun release(_event: MouseEvent) {
-//
-//        }
-
         fun drag(event: MouseEvent) {
+            logger.debug { "drag event $event" }
             dragTarget?.mouse?.dragged?.onNext(event)
-
             if (event.propagationCancelled) {
+                logger.debug { "propagation cancelled by $dragTarget setting clickTarget to null" }
                 clickTarget = null
             }
             checkForManualRedraw()
@@ -313,7 +322,7 @@ class ControlManager : Extension {
             renderTarget.detachDepthBuffer()
             renderTarget.destroy()
         } else {
-            println("that is strange. no color buffers")
+            logger.error { "that is strange. no color buffers" }
         }
 
         renderTarget = renderTarget(program.width, program.height, contentScale) {
@@ -477,7 +486,7 @@ class ControlManager : Extension {
         }
     }
 }
-
+@Deprecated("use new style extend")
 class ControlManagerBuilder(val controlManager: ControlManager) {
     fun styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) : StyleSheet {
         val styleSheet = StyleSheet(selector).apply { init() }
@@ -494,6 +503,23 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
         body.init()
         controlManager.body = body
     }
+}
+
+
+fun ControlManager.styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) : StyleSheet {
+    val styleSheet = StyleSheet(selector).apply { init() }
+    layouter.styleSheets.addAll(styleSheet.flatten())
+    return styleSheet
+}
+
+fun ControlManager.styleSheets(styleSheets: List<StyleSheet>) {
+    layouter.styleSheets.addAll(styleSheets.flatMap { it.flatten() })
+}
+
+fun ControlManager.layout(init: Body.() -> Unit) {
+    val body = Body(this)
+    body.init()
+    this.body = body
 }
 
 fun controlManager(builder: ControlManagerBuilder.() -> Unit): ControlManager {

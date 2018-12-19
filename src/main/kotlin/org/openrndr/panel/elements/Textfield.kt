@@ -7,7 +7,10 @@ import org.openrndr.draw.LineCap
 import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
 import org.openrndr.KeyboardModifier
+import org.openrndr.launch
+import kotlin.reflect.KMutableProperty0
 
 class Textfield : Element(ElementType("textfield")) {
 
@@ -99,6 +102,26 @@ class Textfield : Element(ElementType("textfield")) {
             drawer.stroke = computedStyle.effectiveColor?.shade(0.25)
             drawer.lineCap = LineCap.ROUND
             //drawer.lineSegment(0.0, yOffset + 4.0, layout.screenWidth, yOffset + 4.0)
+        }
+    }
+}
+
+fun Textfield.bind(property: KMutableProperty0<String>) {
+    var currentValue = property.get()
+
+    events.valueChanged.subscribe {
+        currentValue = it.newValue
+        property.set(it.newValue)
+    }
+
+    (root() as Body).controlManager.program.launch {
+        while (true) {
+            val cval = property.get()
+            if (cval != currentValue) {
+                currentValue = cval
+                value = cval
+            }
+            yield()
         }
     }
 }

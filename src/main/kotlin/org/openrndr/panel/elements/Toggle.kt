@@ -8,6 +8,9 @@ import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
+import org.openrndr.launch
+import kotlin.reflect.KMutableProperty0
 
 class Toggle : Element(ElementType("toggle")) {
     var label = ""
@@ -22,7 +25,6 @@ class Toggle : Element(ElementType("toggle")) {
     }
 
     val events = Events()
-
 
     override val widthHint: Double?
         get() {
@@ -66,7 +68,6 @@ class Toggle : Element(ElementType("toggle")) {
     }
 
     override fun draw(drawer: Drawer) {
-
         drawer.pushModel()
         val checkBoxSize = layout.screenHeight - 8.0
         drawer.translate(0.0, (layout.screenHeight - checkBoxSize) / 2.0)
@@ -83,19 +84,33 @@ class Toggle : Element(ElementType("toggle")) {
             drawer.lineSegment(5.0, 5.0, checkBoxSize / 2.0 - 2.0, checkBoxSize / 2.0 - 2.0)
             drawer.lineSegment(checkBoxSize / 2.0 + 2.0, checkBoxSize / 2.0 + 2.0, checkBoxSize - 5.0, checkBoxSize - 5.0)
             drawer.lineSegment(checkBoxSize - 5.0, 5.0, checkBoxSize / 2.0 + 2.0, checkBoxSize / 2.0 - 2.0)
-            drawer.lineSegment(checkBoxSize/2.0 -2.0, checkBoxSize/2.0 + 2.0, 5.0, checkBoxSize - 5.0)
+            drawer.lineSegment(checkBoxSize / 2.0 - 2.0, checkBoxSize / 2.0 + 2.0, 5.0, checkBoxSize - 5.0)
         }
 
-
         drawer.popModel()
-
         drawer.fontMap = (root() as? Body)?.controlManager?.fontManager?.font(computedStyle)!!
         drawer.translate(5.0 + checkBoxSize, (layout.screenHeight / 2.0) + drawer.fontMap!!.height / 2.0)
         drawer.stroke = null
         drawer.fill = computedStyle.effectiveColor
-
         drawer.text(label, 0.0, 0.0)
+    }
+}
 
+fun Toggle.bind(property: KMutableProperty0<Boolean>) {
+    var currentValue = property.get()
+    events.valueChanged.subscribe {
+        currentValue = it.newValue
+        property.set(it.newValue)
     }
 
+    (root() as Body).controlManager.program.launch {
+        while (true) {
+            val cval = property.get()
+            if (cval != currentValue) {
+                currentValue = cval
+                value = cval
+            }
+            yield()
+        }
+    }
 }

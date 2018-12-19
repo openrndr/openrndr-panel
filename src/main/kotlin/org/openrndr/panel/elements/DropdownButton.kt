@@ -7,13 +7,15 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
+import org.openrndr.launch
+import kotlin.reflect.KMutableProperty0
 
 class Item : Element(ElementType("item")) {
     var label: String = ""
     var data: Any? = null
 
     class PickedEvent(val source: Item)
-
 
     class Events {
         val picked = PublishSubject.create<Item.PickedEvent>()
@@ -168,6 +170,31 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             parent?.remove(this)
         }
     }
+}
 
+fun <E:Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map:Map<E, String>) {
+    val options = mutableMapOf<E, Item>()
+    map.forEach { k,v ->
+        options[k] = item {
+            label = v
+            events.picked.subscribe {
+                property.set(k)
+            }
+        }
+    }
+    var currentValue = property.get()
+    value = options[currentValue]
+    draw.dirty = true
 
+    (root() as? Body)?.controlManager?.program?.launch {
+        while(true) {
+            val cval = property.get()
+            if (cval != currentValue) {
+                currentValue = cval
+                value = options[cval]
+                draw.dirty = true
+            }
+            yield()
+        }
+    }
 }

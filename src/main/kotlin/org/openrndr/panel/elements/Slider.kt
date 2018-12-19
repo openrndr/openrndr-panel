@@ -8,16 +8,19 @@ import org.openrndr.panel.style.*
 import org.openrndr.text.Cursor
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
 import org.openrndr.shape.Rectangle
+import kotlin.reflect.KMutableProperty0
 
 data class Range(val min: Double, val max: Double) {
     val span: Double get() = max - min
 }
 
+
 class Slider : Element(ElementType("slider")) {
     var label = ""
     var precision = 3
-    var value:Double
+    var value: Double
         set(v) {
             val oldV = realValue
             realValue = clean(v)
@@ -28,7 +31,7 @@ class Slider : Element(ElementType("slider")) {
         }
         get() = realValue
 
-    private var interactiveValue:Double
+    private var interactiveValue: Double
         set(v) {
             val oldV = realValue
             realValue = clean(v)
@@ -41,13 +44,13 @@ class Slider : Element(ElementType("slider")) {
 
 
     var range = Range(0.0, 10.0)
-    set(value) {
-        field = value
-        this.value = this.value
-    }
+        set(value) {
+            field = value
+            this.value = this.value
+        }
     private var realValue = 0.0
 
-    fun clean(value:Double):Double {
+    fun clean(value: Double): Double {
         val cleanV = value.coerceIn(range.min, range.max)
         val quantized = String.format("%.0${precision}f", cleanV).replace(",", ".").toDouble()
         return quantized
@@ -117,7 +120,7 @@ class Slider : Element(ElementType("slider")) {
             if (it.key == KEY_BACKSPACE) {
                 if (!keyboardInput.isEmpty()) {
                     keyboardInput = keyboardInput.substring(0, keyboardInput.length - 1)
-                    draw.dirty= true
+                    draw.dirty = true
 
                 }
                 it.cancelPropagation()
@@ -196,7 +199,24 @@ class Slider : Element(ElementType("slider")) {
     }
 }
 
-fun main(args: Array<String>) {
-    val valueFormatted = String.format("%.0${0}f", 9.0)
-    println(valueFormatted)
+fun Slider.bind(property: KMutableProperty0<Double>) {
+    var currentValue: Double? = null
+
+    events.valueChanged.subscribe {
+        currentValue = it.newValue
+        property.set(it.newValue)
+    }
+    if (root() as? Body == null) {
+        throw RuntimeException("no body")
+    }
+    (root() as? Body)?.controlManager?.program?.launch {
+        while (true) {
+            if (property.get() != currentValue) {
+                val lcur = property.get()
+                currentValue = lcur
+                value = lcur
+            }
+            yield()
+        }
+    }
 }

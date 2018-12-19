@@ -14,9 +14,9 @@ fun layout(controlManager: ControlManager, init: Body.() -> Unit): Body {
 }
 
 fun <T : Element> Element.initElement(classes: Array<out String>, element: T, init: T.() -> Unit): Element {
+    append(element)
     element.classes.addAll(classes.map { ElementClass(it) })
     element.init()
-    append(element)
     return element
 }
 
