@@ -4,8 +4,8 @@ apply plugin: 'kotlin'
 apply plugin: 'maven'
 
 buildscript {
-    ext.kotlin_version = "1.3.11"
-    ext.openrndr_version = "0.3.31"
+    ext.kotlin_version = "1.3.21"
+    ext.openrndr_version = "0.3.32"
     repositories {
         jcenter()
         mavenCentral()

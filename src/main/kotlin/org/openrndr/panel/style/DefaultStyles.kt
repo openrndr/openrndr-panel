@@ -6,7 +6,8 @@ fun defaultStyles(
         controlBackground: ColorRGBa = ColorRGBa(0.5, 0.5, 0.5),
         controlHoverBackground: ColorRGBa = controlBackground.shade(1.5),
         controlTextColor: Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
-        controlFontSize: Double = 14.0
+        controlActiveColor : Color = Color.RGBa(ColorRGBa.fromHex(0xf88379 )),
+        controlFontSize: Double = 18.0
 ) = listOf(
         styleSheet(has type "item") {
             display = Display.NONE
@@ -75,7 +76,15 @@ fun defaultStyles(
             marginRight = 5.px
             fontSize = controlFontSize.px
             color = controlTextColor
+
+            and(has state "active") {
+                color = controlActiveColor
+            }
+
         },
+
+
+
 
         styleSheet(has type "envelope-editor") {
             height = 60.px

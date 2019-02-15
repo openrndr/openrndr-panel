@@ -10,11 +10,8 @@ import org.openrndr.text.Writer
 
 class TextNode(var text: String) : Element(ElementType("text")) {
 
-
     override fun draw(drawer: Drawer) {
-
         computedStyle.let { style ->
-
             style.color.let {
                 val fill = (it as? Color.RGBa)?.color ?: ColorRGBa.WHITE
                 drawer.fill = (fill)
@@ -27,7 +24,6 @@ class TextNode(var text: String) : Element(ElementType("text")) {
             writer.newLine()
             writer.text(text)
         }
-
     }
 
     fun sizeHint(): Rectangle {

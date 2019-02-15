@@ -101,9 +101,11 @@ class ControlManager : Extension {
         var target: Element? = null
             set(value) {
                 if (value != field) {
+                    field?.pseudoClasses?.remove(ElementPseudoClass("active"))
                     field?.keyboard?.focusLost?.onNext(FocusEvent())
                     value?.keyboard?.focusGained?.onNext(FocusEvent())
                     field = value
+                    field?.pseudoClasses?.add(ElementPseudoClass("active"))
                 }
             }
 
@@ -140,7 +142,6 @@ class ControlManager : Extension {
                 checkForManualRedraw()
             }
         }
-
 
         fun requestFocus(element: Element) {
             target = element
@@ -481,7 +482,6 @@ class ControlManager : Extension {
                     program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
                 }
                 drawCount++
-
             }
         }
     }
