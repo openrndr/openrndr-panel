@@ -1,12 +1,15 @@
 package org.openrndr.panel.elements
 
+import kotlinx.coroutines.yield
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.FontImageMap
+import org.openrndr.launch
 import org.openrndr.math.Vector2
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
+import kotlin.reflect.KMutableProperty0
 
 class TextNode(var text: String) : Element(ElementType("text")) {
 
@@ -54,8 +57,6 @@ class TextNode(var text: String) : Element(ElementType("text")) {
     override fun toString(): String {
         return "TextNode(id='$id',text='$text')"
     }
-
-
 }
 
 class H1 : TextElement(ElementType("h1"))
@@ -75,6 +76,25 @@ abstract class TextElement(et: ElementType) : Element(et) {
             text(text)
         } else {
             (children.first() as? TextNode)?.text = text
+        }
+    }
+}
+
+fun TextElement.bind(property: KMutableProperty0<String>) {
+    var currentValue: Double? = null
+
+
+    if (root() as? Body == null) {
+        throw RuntimeException("no body")
+    }
+    (root() as? Body)?.controlManager?.program?.launch {
+        var lastText = ""
+        while (true) {
+            if (property.get() != lastText) {
+                replaceText(property.get())
+                lastText = property.get()
+            }
+            yield()
         }
     }
 }
