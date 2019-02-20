@@ -47,13 +47,19 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
         }
 
         mouse.clicked.subscribe {
-            if (children.none { it is SlideOut })
-                if (screenPosition.y < root().layout.screenHeight-200.0 ) {
-                    append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
+            val itemCount = items().size
+
+
+
+            if (children.none { it is SlideOut }) {
+                val height = items().size * 20.0 + (items().size - 1) * 10
+                if (screenPosition.y < root().layout.screenHeight - height) {
+                    append(SlideOut(0.0, screenArea.height, screenArea.width, height, this))
                 } else {
-                    val height = items().size * 50.0 + (items().size-1) * 10
-                    append(SlideOut(0.0, screenArea.height-height, screenArea.width, height, this))
+
+                    append(SlideOut(0.0, screenArea.height - height, screenArea.width, height, this))
                 }
+            }
             else {
                 (children.first { it is SlideOut } as SlideOut?)?.dispose()
             }
