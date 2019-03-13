@@ -22,7 +22,7 @@ class Canvas : Element(ElementType("canvas")) {
 
         if (screenArea.width >= 1 && screenArea.height >= 1) {
             if (renderTarget == null) {
-                renderTarget = renderTarget(screenArea.width.toInt(), screenArea.height.toInt(),1.0) {
+                renderTarget = renderTarget(screenArea.width.toInt(), screenArea.height.toInt(), drawer.context.contentScale) {
                     colorBuffer()
                     depthBuffer()
                 }
