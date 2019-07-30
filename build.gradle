@@ -1,11 +1,11 @@
 group 'org.openrndr.panel'
-version '0.3.15'
+version '0.3.16'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 
 buildscript {
-    ext.kotlin_version = "1.3.31"
-    ext.openrndr_version = "0.3.34-rc2"
+    ext.kotlin_version = "1.3.41"
+    ext.openrndr_version = "0.3.35-rc1"
     repositories {
         jcenter()
         mavenCentral()
@@ -40,7 +40,7 @@ dependencies {
     compile ('io.reactivex.rxjava2:rxjava:2.2.0') {
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation 'io.github.microutils:kotlin-logging:1.6.22'
+    implementation 'io.github.microutils:kotlin-logging:1.7.2'
 
     compile 'io.reactivex.rxjava2:rxkotlin:2.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

@@ -19,8 +19,9 @@ data class ElementClass(val name: String)
 data class ElementPseudoClass(val name: String)
 data class ElementType(val name: String)
 
-class FocusEvent
+val disabled = ElementPseudoClass("disabled")
 
+class FocusEvent
 
 open class Element(val type: ElementType) {
 
@@ -116,6 +117,7 @@ open class Element(val type: ElementType) {
             draw.dirty = true
         }
     }
+
 
     fun root(): Element {
         return parent?.root() ?: this
@@ -264,7 +266,24 @@ open class Element(val type: ElementType) {
                           layout.screenHeight)
 
 
+
+
 }
+
+fun Element.requestRedraw() {
+    draw.dirty = true
+}
+
+fun Element.disable() {
+    pseudoClasses.add(disabled)
+    requestRedraw()
+}
+fun Element.enable() {
+    pseudoClasses.remove(disabled)
+    requestRedraw()
+}
+
+fun Element.isDisabled(): Boolean = disabled in pseudoClasses
 
 fun Element.visit( function:Element.()->Unit) {
     this.function()

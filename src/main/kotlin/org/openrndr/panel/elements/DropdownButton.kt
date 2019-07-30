@@ -8,6 +8,9 @@ import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
+import org.openrndr.KEY_ARROW_DOWN
+import org.openrndr.KEY_ARROW_UP
+import org.openrndr.KEY_ENTER
 import org.openrndr.launch
 import kotlin.reflect.KMutableProperty0
 
@@ -49,28 +52,28 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
         mouse.clicked.subscribe {
             val itemCount = items().size
 
-
-
             if (children.none { it is SlideOut }) {
-                val height = items().size * 20.0 + (items().size - 1) * 10
+                val height = Math.min(240.0, itemCount * 24.0)
                 if (screenPosition.y < root().layout.screenHeight - height) {
-                    append(SlideOut(0.0, screenArea.height, screenArea.width, height, this))
+                    val so = SlideOut(0.0, screenArea.height, screenArea.width, height, this, value)
+                    append(so)
+                    (root() as Body).controlManager.keyboardInput.requestFocus(so)
                 } else {
-
-                    append(SlideOut(0.0, screenArea.height - height, screenArea.width, height, this))
+                    val so = SlideOut(0.0, screenArea.height - height, screenArea.width, height, this, value)
+                    append(so)
+                    (root() as Body).controlManager.keyboardInput.requestFocus(so)
                 }
-            }
-            else {
+            } else {
                 (children.first { it is SlideOut } as SlideOut?)?.dispose()
             }
         }
     }
 
-    override val widthHint:Double?
-        get()  {
+    override val widthHint: Double?
+        get() {
             computedStyle.let { style ->
-                val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily)?:"broken"
-                val fontSize = (style.fontSize as? LinearDimension.PX)?.value?: 16.0
+                val fontUrl = (root() as? Body)?.controlManager?.fontManager?.resolve(style.fontFamily) ?: "broken"
+                val fontSize = (style.fontSize as? LinearDimension.PX)?.value ?: 16.0
                 val fontMap = FontImageMap.fromUrl(fontUrl, fontSize)
                 val writer = Writer(null)
 
@@ -126,8 +129,74 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
         }
     }
 
-    class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element) : Element(ElementType("slide-out")) {
+    class SlideOut(val x: Double, val y: Double, val width: Double, val height: Double, parent: Element, active: Item?) : Element(ElementType("slide-out")) {
         init {
+
+            val itemButtons = mutableMapOf<Item, Button>()
+
+            var activeIndex =
+                    if (active != null) {
+                        (parent as DropdownButton).items().indexOf(active)
+                    } else {
+                        -1
+                    }
+
+            keyboard.pressed.subscribe {
+
+                if (it.key == KEY_ENTER) {
+                    it.cancelPropagation()
+                    dispose()
+                }
+
+                if (it.key == KEY_ARROW_DOWN) {
+                    activeIndex = (activeIndex+1).coerceAtMost((parent as DropdownButton).items().size-1)
+                    it.cancelPropagation()
+                    val newValue =  parent.items()[activeIndex]
+
+                    parent.value?.let {
+                        itemButtons[it]?.pseudoClasses?.remove(ElementPseudoClass("selected"))
+                    }
+                    parent.value?.let {
+                        itemButtons[newValue]?.pseudoClasses?.add(ElementPseudoClass("selected"))
+                    }
+
+                    parent.value = newValue
+                    parent.events.valueChanged.onNext(ValueChangedEvent(parent, newValue))
+                    newValue.picked()
+                    draw.dirty = true
+
+                    val ypos = 24.0 * activeIndex
+                    if (ypos  >= scrollTop + 10 * 24.0) {
+                        scrollTop += 24.0
+                    }
+
+                }
+
+                if (it.key == KEY_ARROW_UP) {
+                    activeIndex = (activeIndex-1).coerceAtLeast(0)
+
+
+                    val newValue =  (parent as DropdownButton).items()[activeIndex]
+
+                    val ypos = 24.0 * activeIndex
+                    if (ypos  < scrollTop) {
+                        scrollTop -= 24.0
+                    }
+
+                    parent.value?.let {
+                        itemButtons[it]?.pseudoClasses?.remove(ElementPseudoClass("selected"))
+                    }
+                    parent.value?.let {
+                        itemButtons[newValue]?.pseudoClasses?.add(ElementPseudoClass("selected"))
+                    }
+
+                    parent.value = newValue
+                    parent.events.valueChanged.onNext(ValueChangedEvent(parent, newValue))
+                    newValue.picked()
+                    draw.dirty = true
+                }
+            }
+
             mouse.scrolled.subscribe {
                 scrollTop -= it.rotation.y
                 scrollTop = Math.max(0.0, scrollTop)
@@ -155,6 +224,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                 append(Button().apply {
                     data = it
                     label = it.label
+                    itemButtons[it] = this
                     events.clicked.subscribe {
                         parent.value = it.source.data as Item
                         parent.events.valueChanged.onNext(ValueChangedEvent(parent, it.source.data as Item))
@@ -162,6 +232,9 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                         dispose()
                     }
                 })
+            }
+            active?.let {
+                itemButtons[active]?.pseudoClasses?.add(ElementPseudoClass("selected"))
             }
         }
 
@@ -172,15 +245,16 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             drawer.rectangle(0.0, 0.0, screenArea.width, screenArea.height)
             drawer.strokeWeight = 1.0
         }
+
         fun dispose() {
             parent?.remove(this)
         }
     }
 }
 
-fun <E:Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map:Map<E, String>) {
+fun <E : Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map: Map<E, String>) {
     val options = mutableMapOf<E, Item>()
-    map.forEach { k,v ->
+    map.forEach { k, v ->
         options[k] = item {
             label = v
             events.picked.subscribe {
@@ -193,7 +267,7 @@ fun <E:Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map:Map<E, S
     draw.dirty = true
 
     (root() as? Body)?.controlManager?.program?.launch {
-        while(true) {
+        while (true) {
             val cval = property.get()
             if (cval != currentValue) {
                 currentValue = cval

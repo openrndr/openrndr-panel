@@ -7,6 +7,7 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
+import kotlin.math.round
 
 
 class Button : Element(ElementType("button")) {
@@ -21,24 +22,26 @@ class Button : Element(ElementType("button")) {
     val events = Events()
 
     init {
-
         mouse.pressed.subscribe {
             it.cancelPropagation()
         }
 
         mouse.clicked.subscribe {
-            events.clicked.onNext(ButtonEvent(this))
+            if (disabled !in pseudoClasses) {
+                events.clicked.onNext(ButtonEvent(this))
+            }
             it.cancelPropagation()
         }
 
         keyboard.pressed.subscribe {
             if (it.key == 32) {
                 it.cancelPropagation()
-                events.clicked.onNext(ButtonEvent(this))
+                if (disabled !in pseudoClasses) {
+                    events.clicked.onNext(ButtonEvent(this))
+                }
             }
         }
     }
-
 
     override val widthHint: Double
         get() {
@@ -76,23 +79,18 @@ class Button : Element(ElementType("button")) {
 
             (root() as? Body)?.controlManager?.fontManager?.let {
                 val font = it.font(computedStyle)
-
-
                 val writer = Writer(drawer)
                 drawer.fontMap = (font)
                 val textWidth = writer.textWidth(label)
                 val textHeight = font.ascenderLength
 
-                val offset = Math.round((layout.screenWidth - textWidth) / 2.0)
-                val yOffset = Math.round((layout.screenHeight / 2) + textHeight / 2.0 - 2.0) * 1.0
+                val offset = round((layout.screenWidth - textWidth) / 2.0)
+                val yOffset = round((layout.screenHeight / 2) + textHeight / 2.0 - 2.0) * 1.0
 
-                drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
+                drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE).opacify(
+                        if (disabled in pseudoClasses) 0.25 else 1.0
+                )
                 drawer.text(label, 0.0 + offset, 0.0 + yOffset)
-                drawer.stroke = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
-
-                drawer.strokeWeight = 1.0
-                //val dx = (layout.screenWidth - textWidth) / 2.0
-                //drawer.lineSegment(Vector2(dx, yOffset + 3.5), Vector2(dx + textWidth, yOffset + 3.5))
             }
 
             drawer.popStyle()

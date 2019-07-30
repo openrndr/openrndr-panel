@@ -98,6 +98,8 @@ class Toggle : Element(ElementType("toggle")) {
 
 fun Toggle.bind(property: KMutableProperty0<Boolean>) {
     var currentValue = property.get()
+    value = currentValue
+
     events.valueChanged.subscribe {
         currentValue = it.newValue
         property.set(it.newValue)

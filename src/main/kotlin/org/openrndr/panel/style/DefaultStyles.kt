@@ -7,7 +7,7 @@ fun defaultStyles(
         controlHoverBackground: ColorRGBa = controlBackground.shade(1.5),
         controlTextColor: Color = Color.RGBa(ColorRGBa.WHITE.shade(0.8)),
         controlActiveColor : Color = Color.RGBa(ColorRGBa.fromHex(0xf88379 )),
-        controlFontSize: Double = 18.0
+        controlFontSize: Double = 14.0
 ) = listOf(
         styleSheet(has type "item") {
             display = Display.NONE
@@ -40,6 +40,9 @@ fun defaultStyles(
                 marginLeft = 0.px
                 marginRight = 0.px
             }
+
+
+
         },
 
         styleSheet(has type "colorpicker-button") {
@@ -159,9 +162,15 @@ fun defaultStyles(
             marginBottom = 5.px
             fontSize = controlFontSize.px
 
+
+            and(has state "selected") {
+                display = Display.BLOCK
+                background = controlActiveColor
+            }
             and(has state "hover") {
                 display = Display.BLOCK
                 background = Color.RGBa(controlHoverBackground)
             }
+
         }
 )
