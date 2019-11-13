@@ -1,5 +1,6 @@
 package org.openrndr.panel.elements
 
+import mu.KotlinLogging
 import org.openrndr.*
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
@@ -11,6 +12,8 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
 import org.openrndr.shape.Rectangle
 import kotlin.reflect.KMutableProperty0
+
+private val logger = KotlinLogging.logger {}
 
 data class Range(val min: Double, val max: Double) {
     val span: Double get() = max - min
@@ -98,8 +101,14 @@ class Slider : Element(ElementType("slider")) {
         }
 
         keyboard.character.subscribe {
-            keyboardInput += it.character
-            draw.dirty = true
+            val allowedChars: MutableList<String> = (0..9).map { toString() }.toMutableList()
+            allowedChars.add(".")
+
+            if (allowedChars.contains(it.character.toString())) {
+                keyboardInput += it.character
+                draw.dirty = true
+            }
+
             it.cancelPropagation()
         }
 
