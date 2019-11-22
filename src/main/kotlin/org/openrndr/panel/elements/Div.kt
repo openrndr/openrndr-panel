@@ -7,7 +7,7 @@ import org.openrndr.panel.style.Overflow
 import org.openrndr.panel.style.background
 import org.openrndr.panel.style.overflow
 
-class Div : TextElement(ElementType("div")) {
+open class Div : TextElement(ElementType("div")) {
 
     init {
         mouse.pressed.subscribe {
