@@ -128,8 +128,9 @@ class StyleSheet(val selector: CompoundSelector = CompoundSelector.DUMMY) {
 
     fun cascadeOnto(onto: StyleSheet): StyleSheet {
         val cascaded = StyleSheet(dummySelector)
-        cascaded.properties.putAll(properties)
+
         cascaded.properties.putAll(onto.properties)
+        cascaded.properties.putAll(properties)
         return cascaded
     }
 
