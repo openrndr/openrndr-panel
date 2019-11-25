@@ -128,7 +128,7 @@ class Layouter {
         element.computedStyle.let { cs ->
 
             element.parent?.let { p ->
-                cs.properties.forEach { k, v ->
+                cs.properties.forEach { (k, v) ->
                     if ((v.value as? PropertyValue)?.inherit == true) {
                         cs.properties.put(k, p.computedStyle.getProperty(k) ?: v)
                     }
