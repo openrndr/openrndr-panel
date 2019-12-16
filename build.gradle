@@ -1,5 +1,5 @@
 buildscript {
-    ext.openrndr_version = "0.3.36"
+    ext.openrndr_version = "0.3.37"
     repositories {
         jcenter()
         mavenCentral()
@@ -70,7 +70,6 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
         exclude group: 'com.fasterxml.jackson.module'
     }
-
 
     testRuntime ('org.jetbrains.spek:spek-junit-platform-engine:1.1.5') {
         exclude group: 'org.junit.platform'
