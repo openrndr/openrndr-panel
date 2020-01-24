@@ -7,21 +7,19 @@ import org.openrndr.panel.style.fontFamily
 import org.openrndr.panel.style.fontSize
 
 class FontManager {
+    val registry: MutableMap<String, String> = mutableMapOf()
+    var contentScale: Double = 1.0
 
-    val registry:MutableMap<String, String> = mutableMapOf()
-    var contentScale:Double = 1.0
+    fun resolve(name: String): String? = registry[name]
 
-    fun resolve(name:String) : String? = registry[name]
-
-    fun font(cs: StyleSheet) : FontImageMap {
+    fun font(cs: StyleSheet): FontImageMap {
         val fontUrl = resolve(cs.fontFamily) ?: "cp:fonts/Roboto-Medium.ttf"
         val fontSize = (cs.fontSize as? LinearDimension.PX)?.value ?: 16.0
-        val font = FontImageMap.fromUrl(fontUrl, fontSize, contentScale)
-        return font
+        return FontImageMap.fromUrl(fontUrl, fontSize, contentScale)
     }
 
-    fun register(name:String, url:String) {
-        registry.put(name, url)
+    fun register(name: String, url: String) {
+        registry[name] = url
     }
 
 }

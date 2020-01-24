@@ -40,9 +40,6 @@ fun defaultStyles(
                 marginLeft = 0.px
                 marginRight = 0.px
             }
-
-
-
         },
 
         styleSheet(has type "colorpicker-button") {
@@ -83,11 +80,7 @@ fun defaultStyles(
             and(has state "active") {
                 color = controlActiveColor
             }
-
         },
-
-
-
 
         styleSheet(has type "envelope-editor") {
             height = 60.px
@@ -162,7 +155,6 @@ fun defaultStyles(
             marginBottom = 5.px
             fontSize = controlFontSize.px
 
-
             and(has state "selected") {
                 display = Display.BLOCK
                 background = controlActiveColor
@@ -171,6 +163,5 @@ fun defaultStyles(
                 display = Display.BLOCK
                 background = Color.RGBa(controlHoverBackground)
             }
-
         }
 )

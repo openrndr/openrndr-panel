@@ -1,5 +1,5 @@
 buildscript {
-    ext.openrndr_version = "0.3.38-rc.4"
+    ext.openrndr_version = "0.3.38-rc.5"
     repositories {
         jcenter()
         mavenCentral()
@@ -42,14 +42,12 @@ apply plugin: 'nebula.maven-publish'
 apply plugin: 'nebula.nebula-bintray-publishing'
 apply plugin: 'nebula.source-jar'
 
-
 group 'org.openrndr.panel'
 
 repositories {
     jcenter()
     maven { url="https://dl.bintray.com/openrndr/openrndr"}
 }
-
 
 dependencies {
     compile ('io.reactivex.rxjava2:rxjava:2.2.0') {
