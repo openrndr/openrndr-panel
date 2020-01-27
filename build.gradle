@@ -1,5 +1,5 @@
 buildscript {
-    ext.openrndr_version = "0.3.38-rc.5"
+    ext.openrndr_version = "0.3.38"
     repositories {
         jcenter()
         mavenCentral()
