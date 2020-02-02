@@ -16,6 +16,14 @@ fun defaultStyles(
         styleSheet(has type "textfield") {
             width = 100.percent
             height = 64.px
+
+//            and(has state "hover") {
+//                background = Color.RGBa(controlHoverBackground)
+//            }
+
+            and(has state "active") {
+                color = controlActiveColor
+            }
         },
 
         styleSheet(has type "dropdown-button") {
