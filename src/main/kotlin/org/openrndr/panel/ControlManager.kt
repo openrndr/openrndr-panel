@@ -451,7 +451,7 @@ class ControlManager : Extension {
                 if (redraw) {
                     drawer.ortho()
                     drawer.view = Matrix44.IDENTITY
-                    drawer.reset()
+                    drawer.defaults()
 
                     profile("redraw") {
                         renderTarget.bind()
@@ -478,7 +478,7 @@ class ControlManager : Extension {
                     drawer.size(program.width, program.height)
                     drawer.ortho()
                     drawer.view = Matrix44.IDENTITY
-                    drawer.reset()
+                    drawer.defaults()
                     program.drawer.image(renderTarget.colorBuffer(0), 0.0, 0.0)
                 }
                 drawCount++
