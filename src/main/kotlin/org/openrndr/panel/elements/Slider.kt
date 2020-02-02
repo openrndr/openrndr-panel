@@ -1,16 +1,20 @@
 package org.openrndr.panel.elements
 
+import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
 import mu.KotlinLogging
 import org.openrndr.*
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
 import org.openrndr.math.Vector2
-import org.openrndr.panel.style.*
+import org.openrndr.panel.style.Color
+import org.openrndr.panel.style.color
+import org.openrndr.panel.style.effectiveColor
+import org.openrndr.shape.Rectangle
 import org.openrndr.text.Cursor
 import org.openrndr.text.Writer
-import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.yield
-import org.openrndr.shape.Rectangle
+import java.text.NumberFormat
+import java.text.ParseException
 import kotlin.reflect.KMutableProperty0
 
 private val logger = KotlinLogging.logger {}
@@ -101,17 +105,19 @@ class Slider : Element(ElementType("slider")) {
         }
 
         keyboard.character.subscribe {
-            val allowedChars: MutableList<String> = (0..9).map { toString() }.toMutableList()
-            allowedChars.add(".")
-
-            if (allowedChars.contains(it.character.toString())) {
-                keyboardInput += it.character
-                draw.dirty = true
+            if (it.character in setOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '-')) {
+                try {
+                    val candidate = keyboardInput + it.character.toString()
+                    if (candidate.length > 1) {
+                        NumberFormat.getInstance().parse(candidate).toDouble()
+                    }
+                    keyboardInput = candidate
+                    requestRedraw()
+                } catch (e: ParseException) {
+                }
             }
-
             it.cancelPropagation()
         }
-
 
         keyboard.pressed.subscribe {
             val delta = Math.pow(10.0, -(precision - 0.0))
@@ -130,7 +136,6 @@ class Slider : Element(ElementType("slider")) {
                 if (!keyboardInput.isEmpty()) {
                     keyboardInput = keyboardInput.substring(0, keyboardInput.length - 1)
                     draw.dirty = true
-
                 }
                 it.cancelPropagation()
             }
@@ -142,7 +147,7 @@ class Slider : Element(ElementType("slider")) {
             }
 
             if (it.key == KEY_ENTER) {
-                val number = keyboardInput.toDoubleOrNull()
+                val number = NumberFormat.getInstance().parse(keyboardInput).toDouble()
                 if (number != null) {
                     interactiveValue = number.coerceIn(range.min, range.max)
                 }
@@ -151,13 +156,13 @@ class Slider : Element(ElementType("slider")) {
                 it.cancelPropagation()
             }
 
-            if (it.key == 268) { // home
+            if (it.key == KEY_HOME) {
                 interactiveValue = range.min
                 keyboardInput = ""
                 it.cancelPropagation()
             }
 
-            if (it.key == 269) { // end
+            if (it.key == KEY_END) {
                 interactiveValue = range.max
                 keyboardInput = ""
                 it.cancelPropagation()
