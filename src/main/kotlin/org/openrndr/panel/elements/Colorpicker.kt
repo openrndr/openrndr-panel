@@ -45,7 +45,18 @@ class Colorpicker : Element {
     val events = Events()
 
     private var keyboardInput = ""
+    private fun pick(e: MouseEvent) {
+        val dx = e.position.x - layout.screenX
+        var dy = e.position.y - layout.screenY
 
+        dy = 50.0 - dy
+        val oldColor = color
+        val hsv = ColorHSVa(360.0 / layout.screenWidth * dx, saturation, dy / 50.0)
+        realColor = hsv.toRGBa()
+        draw.dirty = true
+        events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
+        e.cancelPropagation()
+    }
     constructor() : super(ElementType("colorpicker")) {
         generateColorMap()
 
@@ -60,7 +71,8 @@ class Colorpicker : Element {
                 generateColorMap()
                 colorMap?.shadow?.upload()
                 it.cancelPropagation()
-                draw.dirty = true
+                pick(it)
+                requestRedraw()
                 //}
             }
         }
@@ -111,18 +123,7 @@ class Colorpicker : Element {
             }
         }
 
-        fun pick(e: MouseEvent) {
-            val dx = e.position.x - layout.screenX
-            var dy = e.position.y - layout.screenY
 
-            dy = 50.0 - dy
-            val oldColor = color
-            val hsv = ColorHSVa(360.0 / layout.screenWidth * dx, saturation, dy / 50.0)
-            realColor = hsv.toRGBa()
-            draw.dirty = true
-            events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
-            e.cancelPropagation()
-        }
         mouse.pressed.subscribe { it.cancelPropagation(); focussed = true }
         mouse.clicked.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
         mouse.dragged.subscribe { it.cancelPropagation(); pick(it); focussed = true; }

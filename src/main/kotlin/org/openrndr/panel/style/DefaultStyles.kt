@@ -58,6 +58,10 @@ fun defaultStyles(
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
+
+            and(has state "hover") {
+                background = Color.RGBa(controlHoverBackground)
+            }
         },
 
         styleSheet(has type "envelope-button") {
