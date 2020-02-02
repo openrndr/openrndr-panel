@@ -23,7 +23,6 @@ data class Range(val min: Double, val max: Double) {
     val span: Double get() = max - min
 }
 
-
 class Slider : Element(ElementType("slider")) {
     var label = ""
     var precision = 3
@@ -79,6 +78,8 @@ class Slider : Element(ElementType("slider")) {
 
     init {
         mouse.pressed.subscribe {
+            val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
+            interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
         mouse.clicked.subscribe {
