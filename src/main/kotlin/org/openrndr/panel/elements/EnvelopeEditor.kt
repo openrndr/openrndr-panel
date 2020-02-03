@@ -146,16 +146,13 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
             if (it.button == MouseButton.LEFT && !it.modifiers.contains(KeyboardModifier.CTRL) ) {
                 when {
                     distance == null -> {
-                        println("distance is null, creating point")
                         envelope.insertPoint(query)
                         draw.dirty = true
                     }
                     distance < 0.05 -> {
-                        println("distance is ${distance}, < 0.05 setting active point")
                         envelope.activePoint = nearest
                     }
                     else -> {
-                        println("distance is ${distance}, >= 0.05 creating point")
                         envelope.insertPoint(query)
                         draw.dirty = true
                     }
