@@ -1,11 +1,11 @@
 package org.openrndr.panel.elements
 
-import org.openrndr.KeyboardModifier
 import org.openrndr.MouseButton
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
 import io.reactivex.subjects.PublishSubject
+import org.openrndr.KeyModifier
 
 class Envelope(constant:Double = 0.5) {
 
@@ -143,7 +143,7 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
             val nearest = envelope.findNearestPoint(query)
             val distance = nearest?.let { (it - query).length }
 
-            if (it.button == MouseButton.LEFT && !it.modifiers.contains(KeyboardModifier.CTRL) ) {
+            if (it.button == MouseButton.LEFT && !it.modifiers.contains(KeyModifier.CTRL)) {
                 when {
                     distance == null -> {
                         envelope.insertPoint(query)
@@ -185,7 +185,7 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
         mouse.dragged.subscribe {
             envelope.activePoint?.let { activePoint ->
                 val query = query(it.position)
-                if (!it.modifiers.contains(KeyboardModifier.SHIFT)) {
+                if (!it.modifiers.contains(KeyModifier.SHIFT)) {
                     envelope.updatePoint(activePoint, query)
                 } else {
                     envelope.updatePoint(activePoint, Vector2(activePoint.x, query.y))

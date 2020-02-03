@@ -8,7 +8,7 @@ import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
-import org.openrndr.KeyboardModifier
+import org.openrndr.KeyModifier
 import org.openrndr.launch
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Cursor
@@ -42,7 +42,7 @@ class Textfield : Element(ElementType("textfield")) {
         }
 
         keyboard.pressed.subscribe {
-            if (KeyboardModifier.CTRL in it.modifiers || KeyboardModifier.SUPER in it.modifiers) {
+            if (KeyModifier.CTRL in it.modifiers || KeyModifier.SUPER in it.modifiers) {
                 if (it.name == "v") {
                     val oldValue = value
                     (root() as Body).controlManager.program.clipboard.contents?.let {
