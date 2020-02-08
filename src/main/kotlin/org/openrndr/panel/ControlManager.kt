@@ -2,8 +2,6 @@ package org.openrndr.panel
 
 import mu.KotlinLogging
 import org.openrndr.*
-import org.openrndr.binpack.IntPacker
-import org.openrndr.binpack.PackNode
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.math.Matrix44
@@ -11,7 +9,6 @@ import org.openrndr.math.Vector2
 import org.openrndr.panel.elements.*
 import org.openrndr.panel.layout.Layouter
 import org.openrndr.panel.style.*
-import org.openrndr.shape.IntRectangle
 import org.openrndr.shape.Rectangle
 
 //class SurfaceCache(val width: Int, val height: Int, val contentScale:Double) {
@@ -176,18 +173,24 @@ class ControlManager : Extension {
             dragTarget = null
             val ct = System.currentTimeMillis()
             logger.debug { "click target: $clickTarget" }
-            if (ct - lastClick > 500) {
-                logger.debug { "normal click on $clickTarget"}
-                if (clickTarget != null) {
-                    clickTarget?.mouse?.clicked?.onNext(event)
-                }
-            } else {
-                if (clickTarget != null) {
-                    logger.debug { "double-click on $clickTarget"}
-                    clickTarget?.mouse?.doubleClicked?.onNext(event)
+
+            clickTarget?.let {
+                if (it.handlesDoubleClick) {
+                    if (ct - lastClick > 500) {
+                        logger.debug { "normal click on $clickTarget" }
+                        it.mouse.clicked.onNext(event)
+                    } else {
+                        if (clickTarget != null) {
+                            logger.debug { "double-click on $clickTarget" }
+                            it.mouse.doubleClicked.onNext(event)
+                        }
+                    }
+                    lastClick = ct
+                } else {
+                    logger.debug { "normal click on $clickTarget" }
+                    it.mouse.clicked.onNext(event)
                 }
             }
-            lastClick = ct
             checkForManualRedraw()
         }
 

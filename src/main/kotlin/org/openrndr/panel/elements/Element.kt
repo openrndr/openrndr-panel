@@ -26,6 +26,7 @@ class FocusEvent
 open class Element(val type: ElementType) {
 
     var scrollTop = 0.0
+    open val handlesDoubleClick = false
 
     open val widthHint:Double?
     get() { return null }
