@@ -11,6 +11,12 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
 
     var label: String = "OK"
     var color: ColorRGBa = ColorRGBa(0.5, 0.5, 0.5)
+            set(value)  {
+                if (value != field) {
+                    field = value
+                    events.valueChanged.onNext(ColorChangedEvent(this, value))
+                }
+            }
 
     class ColorChangedEvent(val source: ColorpickerButton, val color: ColorRGBa)
 
