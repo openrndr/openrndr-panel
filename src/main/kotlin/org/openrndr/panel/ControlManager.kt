@@ -199,19 +199,19 @@ class ControlManager : Extension {
             logger.debug { "press event: $event" }
             val candidates = mutableListOf<Pair<Element, Int>>()
             fun traverse(element: Element, depth: Int = 0) {
+
+                if (element.computedStyle.overflow == Overflow.Scroll) {
+                    if (event.position !in element.screenArea) {
+                        return
+                    }
+                }
+
                 if (element.computedStyle.display != Display.NONE) {
                     element.children.forEach { traverse(it, depth + 1) }
                 }
 
-                val inParent = element.parent?.let { parent ->
-                    if (parent.computedStyle.overflow == Overflow.Scroll) {
-                        event.position in parent.screenArea
-                    } else {
-                        true
-                    }
-                } ?: true
 
-                if (inParent && !event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
+                if (!event.propagationCancelled && event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
                     candidates.add(Pair(element, depth))
                 }
             }
