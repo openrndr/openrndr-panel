@@ -120,6 +120,20 @@ class Slider : Element(ElementType("slider")) {
             it.cancelPropagation()
         }
 
+
+        keyboard.repeated.subscribe {
+            val delta = Math.pow(10.0, -(precision - 0.0))
+            if (it.key == KEY_ARROW_RIGHT) {
+                interactiveValue += delta
+                it.cancelPropagation()
+            }
+
+            if (it.key == KEY_ARROW_LEFT) {
+                interactiveValue -= delta
+                it.cancelPropagation()
+            }
+
+        }
         keyboard.pressed.subscribe {
             val delta = Math.pow(10.0, -(precision - 0.0))
 
