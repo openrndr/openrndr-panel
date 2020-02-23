@@ -1,5 +1,6 @@
 package org.openrndr.panel.elements
 
+import io.lacuna.artifex.Vec
 import org.openrndr.draw.Drawer
 import org.openrndr.panel.ControlManager
 
@@ -87,3 +88,5 @@ fun Element.p(vararg classes: String, init: P.() -> String): P = textElement(cla
 fun Element.h1(vararg classes: String, init: H1.() -> String): H1 = textElement(classes, init)
 fun Element.h2(vararg classes: String, init: H2.() -> String): H2 = textElement(classes, init)
 fun Element.h3(vararg classes: String, init: H3.() -> String): H3 = textElement(classes, init)
+
+fun Element.vector2DPad(vararg classes: String, init: Vector2DPad.() -> Unit) = initElement(classes, Vector2DPad(), init) as Vector2DPad

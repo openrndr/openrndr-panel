@@ -60,6 +60,10 @@ fun main() = application {
             colorpicker {
 
             }
+
+            vector2DPad {
+
+            }
         }
 
         extend(cm)
