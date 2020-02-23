@@ -56,6 +56,10 @@ dependencies {
     implementation 'io.github.microutils:kotlin-logging:1.7.8'
 
     compile 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+
+    compile "org.openrndr:openrndr-gl3:$openrndr_version"
+    compile "org.lwjgl:lwjgl-opengl:3.2.3"
+    compile "org.openrndr:openrndr-gl3-natives-macos:$openrndr_version"
     implementation "org.openrndr:openrndr-svg:$openrndr_version"
     implementation "org.openrndr:openrndr-filter:$openrndr_version"
     implementation "org.openrndr:openrndr-animatable:$openrndr_version"
