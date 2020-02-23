@@ -10,10 +10,11 @@ class Vector2DPad : Element(ElementType("vector-2d-pad")) {
 
     init {
         mouse.pressed.subscribe {
+            println("press///")
             expanded = !expanded
             it.cancelPropagation()
         }
-        
+
         mouse.scrolled.subscribe {
             computedStyle.let { cs ->
                 if (cs.overflow != Overflow.Visible) {
