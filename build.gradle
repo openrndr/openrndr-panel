@@ -50,6 +50,11 @@ dependencies {
 
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 bintray {
     user = findProperty('bintrayUser') ?: System.getenv('BINTRAY_USER')
     apiKey = findProperty('bintrayKey') ?: System.getenv('BINTRAY_KEY')
