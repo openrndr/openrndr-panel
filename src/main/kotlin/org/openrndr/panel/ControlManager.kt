@@ -218,6 +218,7 @@ class ControlManager : Extension {
 
             body?.let { traverse(it) }
             //candidates.sortByDescending { it.second }
+            clickTarget = null
             candidates.sortWith(compareBy({-it.first.layout.zIndex},{-it.second}))
             for (c in candidates) {
                 if (!event.propagationCancelled) {
@@ -230,6 +231,12 @@ class ControlManager : Extension {
                     }
                 }
             }
+
+            if (clickTarget == null) {
+                dragTarget = null
+                keyboardInput.target = null
+            }
+
             checkForManualRedraw()
         }
 
