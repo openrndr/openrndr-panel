@@ -7,6 +7,7 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import java.util.*
 import kotlin.comparisons.compareBy
+import kotlin.math.max
 
 class Layouter {
     val styleSheets = ArrayList<StyleSheet>()
@@ -40,7 +41,7 @@ class Layouter {
 
                                 it.layout.growWidth = growWidth
                                 x += width(it) + growWidth
-                                maxHeight = Math.max(height(it), maxHeight)
+                                maxHeight = max(height(it), maxHeight)
                             }
                             Rectangle(Vector2(x, y), x - element.layout.screenX, maxHeight)
                         }
@@ -53,7 +54,7 @@ class Layouter {
                             val totalHeight = element.children
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
                                     .sumByDouble { height(it) }
-                            val remainder = ((element.layout.screenHeight-verticalPadding) - totalHeight)
+                            val remainder = ((element.layout.screenHeight - verticalPadding) - totalHeight)
                             val totalGrow = element.children
                                     .filter { it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition }
                                     .sumByDouble { (it.computedStyle.flexGrow as FlexGrow.Ratio).value }
@@ -69,7 +70,7 @@ class Layouter {
 
                                 it.layout.growHeight = growHeight
                                 ly += height(it) + growHeight
-                                maxWidth = Math.max(height(it), maxWidth)
+                                maxWidth = max(height(it), maxWidth)
 
                             }
 
@@ -79,13 +80,13 @@ class Layouter {
                     }
                 }
                 else -> {
-                    var x = element.layout.screenX + element.computedStyle.effectivePaddingLeft
+                    val x = element.layout.screenX + element.computedStyle.effectivePaddingLeft
                     var maxWidth = 0.0
                     element.children.forEach {
                         if (it.computedStyle.display in blockLike && it.computedStyle.position !in manualPosition) {
                             it.layout.screenY = y + ((it.computedStyle.marginTop as? LinearDimension.PX)?.value ?: 0.0)
                             it.layout.screenX = x + ((it.computedStyle.marginLeft as? LinearDimension.PX)?.value ?: 0.0)
-                            maxWidth = Math.max(0.0, width(it))
+                            maxWidth = max(0.0, width(it))
                             y += height(it)
                         } else if (it.computedStyle.position == Position.ABSOLUTE) {
                             it.layout.screenX = element.layout.screenX + ((it.computedStyle.left as? LinearDimension.PX)?.value
@@ -105,7 +106,8 @@ class Layouter {
 
         if (element is TextNode) {
             // TODO: figure out why this is needed
-            element.computedStyle = element.parent?.computedStyle?.cascadeOnto(StyleSheet(CompoundSelector.DUMMY)) ?: StyleSheet(CompoundSelector.DUMMY)
+            element.computedStyle = element.parent?.computedStyle?.cascadeOnto(StyleSheet(CompoundSelector.DUMMY))
+                    ?: StyleSheet(CompoundSelector.DUMMY)
         } else {
             element.computedStyle =
                     styleSheets
@@ -130,13 +132,13 @@ class Layouter {
             element.parent?.let { p ->
                 cs.properties.forEach { (k, v) ->
                     if ((v.value as? PropertyValue)?.inherit == true) {
-                        cs.properties.put(k, p.computedStyle.getProperty(k) ?: v)
+                        cs.properties[k] = p.computedStyle.getProperty(k) ?: v
                     }
                 }
-                PropertyBehaviours.behaviours.forEach { k, v ->
+                PropertyBehaviours.behaviours.forEach { (k, v) ->
                     if (v.inheritance == PropertyInheritance.INHERIT && k !in cs.properties) {
                         if (k in p.computedStyle.properties) {
-                            cs.properties.put(k, p.computedStyle.getProperty(k)!!)
+                            cs.properties[k] = p.computedStyle.getProperty(k)!!
                         }
                     }
                 }
@@ -221,7 +223,7 @@ class Layouter {
                             val effectiveWidth = (parentWidth - parentPadding) * (it.value / 100.0) - margins
                             effectiveWidth
                         }
-                        is LinearDimension.Auto -> (element.widthHint?: positionChildren(element).width) +
+                        is LinearDimension.Auto -> (element.widthHint ?: positionChildren(element).width) +
                                 paddingRight(element) + paddingLeft(element)
                         else -> throw RuntimeException("not supported")
                     }
@@ -242,10 +244,10 @@ class Layouter {
                 }
             }
             val lzi = cs.zIndex
-            element.layout.zIndex = when(lzi) {
+            element.layout.zIndex = when (lzi) {
                 is ZIndex.Value -> lzi.value
-                is ZIndex.Auto -> element.parent?.layout?.zIndex?:0
-                is ZIndex.Inherit -> element.parent?.layout?.zIndex?:0
+                is ZIndex.Auto -> element.parent?.layout?.zIndex ?: 0
+                is ZIndex.Inherit -> element.parent?.layout?.zIndex ?: 0
             }
 
             element.layout.screenWidth = width(element, includeMargins = false)

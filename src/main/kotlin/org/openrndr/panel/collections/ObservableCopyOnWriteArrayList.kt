@@ -1,27 +1,26 @@
 package org.openrndr.panel.collections
 
-
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
 
-    val changed : PublishSubject<ObservableCopyOnWriteArrayList<E>> = PublishSubject.create()
+    val changed: PublishSubject<ObservableCopyOnWriteArrayList<E>> = PublishSubject.create()
     override fun add(element: E): Boolean {
-        if (super.add(element)) {
+        return if (super.add(element)) {
             changed.onNext(this)
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 
     override fun remove(element: E): Boolean {
-        if (super.remove(element)) {
+        return if (super.remove(element)) {
             changed.onNext(this)
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 
@@ -29,5 +28,4 @@ class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
         super.clear()
         changed.onNext(this)
     }
-
 }

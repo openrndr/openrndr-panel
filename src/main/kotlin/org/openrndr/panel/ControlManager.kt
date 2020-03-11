@@ -219,7 +219,7 @@ class ControlManager : Extension {
             body?.let { traverse(it) }
             //candidates.sortByDescending { it.second }
             clickTarget = null
-            candidates.sortWith(compareBy({-it.first.layout.zIndex},{-it.second}))
+            candidates.sortWith(compareBy({ -it.first.layout.zIndex }, { -it.second }))
             for (c in candidates) {
                 if (!event.propagationCancelled) {
                     c.first.mouse.pressed.onNext(event)
@@ -355,7 +355,7 @@ class ControlManager : Extension {
         program.drawer.background(ColorRGBa.BLACK.opacify(0.0))
         renderTarget.unbind()
 
-        renderTargetCache.forEach { _, u -> u.destroy() }
+        renderTargetCache.forEach { (_, u) -> u.destroy() }
         renderTargetCache.clear()
     }
 
@@ -506,9 +506,10 @@ class ControlManager : Extension {
         }
     }
 }
+
 @Deprecated("use new style extend")
 class ControlManagerBuilder(val controlManager: ControlManager) {
-    fun styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) : StyleSheet {
+    fun styleSheet(selector: CompoundSelector, init: StyleSheet.() -> Unit): StyleSheet {
         val styleSheet = StyleSheet(selector).apply { init() }
         controlManager.layouter.styleSheets.addAll(styleSheet.flatten())
         return styleSheet
@@ -526,7 +527,7 @@ class ControlManagerBuilder(val controlManager: ControlManager) {
 }
 
 
-fun ControlManager.styleSheet(selector:CompoundSelector, init: StyleSheet.() -> Unit) : StyleSheet {
+fun ControlManager.styleSheet(selector: CompoundSelector, init: StyleSheet.() -> Unit): StyleSheet {
     val styleSheet = StyleSheet(selector).apply { init() }
     layouter.styleSheets.addAll(styleSheet.flatten())
     return styleSheet

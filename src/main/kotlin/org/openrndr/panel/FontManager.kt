@@ -21,5 +21,4 @@ class FontManager {
     fun register(name: String, url: String) {
         registry[name] = url
     }
-
 }

@@ -12,6 +12,7 @@ import org.openrndr.KEY_ARROW_DOWN
 import org.openrndr.KEY_ARROW_UP
 import org.openrndr.KEY_ENTER
 import org.openrndr.launch
+import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
 
 class Item : Element(ElementType("item")) {
@@ -53,7 +54,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             val itemCount = items().size
 
             if (children.none { it is SlideOut }) {
-                val height = Math.min(240.0, itemCount * 24.0)
+                val height = min(240.0, itemCount * 24.0)
                 if (screenPosition.y < root().layout.screenHeight - height) {
                     val so = SlideOut(0.0, screenArea.height, screenArea.width, height, this, value)
                     append(so)
@@ -100,7 +101,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
         super.append(element)
     }
 
-    fun items(): List<Item> = children.filter { it is Item }.map { it as Item }
+    fun items(): List<Item> = children.filterIsInstance<Item>().map { it }
 
     override fun draw(drawer: Drawer) {
 
@@ -114,7 +115,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
             val writer = Writer(drawer)
             drawer.fontMap = (font)
 
-            val text = "${(value?.label) ?: "<choose>"}"
+            val text = (value?.label) ?: "<choose>"
 
             val textWidth = writer.textWidth(text)
             val textHeight = font.ascenderLength
@@ -124,7 +125,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
 
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
-            drawer.text("$label", 5.0, 0.0 + yOffset)
+            drawer.text(label, 5.0, 0.0 + yOffset)
             drawer.text(text, -5.0 + offset, 0.0 + yOffset)
         }
     }
@@ -149,9 +150,9 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                 }
 
                 if (it.key == KEY_ARROW_DOWN) {
-                    activeIndex = (activeIndex+1).coerceAtMost((parent as DropdownButton).items().size-1)
+                    activeIndex = (activeIndex + 1).coerceAtMost((parent as DropdownButton).items().size - 1)
                     it.cancelPropagation()
-                    val newValue =  parent.items()[activeIndex]
+                    val newValue = parent.items()[activeIndex]
 
                     parent.value?.let {
                         itemButtons[it]?.pseudoClasses?.remove(ElementPseudoClass("selected"))
@@ -166,20 +167,20 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                     draw.dirty = true
 
                     val ypos = 24.0 * activeIndex
-                    if (ypos  >= scrollTop + 10 * 24.0) {
+                    if (ypos >= scrollTop + 10 * 24.0) {
                         scrollTop += 24.0
                     }
 
                 }
 
                 if (it.key == KEY_ARROW_UP) {
-                    activeIndex = (activeIndex-1).coerceAtLeast(0)
+                    activeIndex = (activeIndex - 1).coerceAtLeast(0)
 
 
-                    val newValue =  (parent as DropdownButton).items()[activeIndex]
+                    val newValue = (parent as DropdownButton).items()[activeIndex]
 
                     val ypos = 24.0 * activeIndex
-                    if (ypos  < scrollTop) {
+                    if (ypos < scrollTop) {
                         scrollTop -= 24.0
                     }
 
@@ -254,7 +255,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
 
 fun <E : Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map: Map<E, String>) {
     val options = mutableMapOf<E, Item>()
-    map.forEach { k, v ->
+    map.forEach { (k, v) ->
         options[k] = item {
             label = v
             events.picked.subscribe {

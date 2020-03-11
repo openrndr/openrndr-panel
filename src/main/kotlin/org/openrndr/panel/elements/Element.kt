@@ -28,8 +28,10 @@ open class Element(val type: ElementType) {
     var scrollTop = 0.0
     open val handlesDoubleClick = false
 
-    open val widthHint:Double?
-    get() { return null }
+    open val widthHint: Double?
+        get() {
+            return null
+        }
 
     class MouseObservables {
         val clicked = PublishSubject.create<MouseEvent>()
@@ -77,10 +79,11 @@ open class Element(val type: ElementType) {
     class Draw {
         var dirty = true
     }
+
     val draw = Draw()
     val layout = Layout()
 
-    class ClassEvent(val source:Element, val `class`:ElementClass)
+    class ClassEvent(val source: Element, val `class`: ElementClass)
     class ClassObserverables {
         val classAdded = PublishSubject.create<ClassEvent>()
         val classRemoved = PublishSubject.create<ClassEvent>()
@@ -102,7 +105,8 @@ open class Element(val type: ElementType) {
 
     init {
         pseudoClasses.changed.subscribe {
-            draw.dirty = true }
+            draw.dirty = true
+        }
         classes.changed.subscribe {
             draw.dirty = true
             it.added.forEach {
@@ -149,7 +153,6 @@ open class Element(val type: ElementType) {
         stack.add(this)
         while (!stack.isEmpty()) {
             val node = stack.pop()
-
             if (f(node)) {
                 result.add(node)
                 stack.addAll(node.children)
@@ -192,7 +195,6 @@ open class Element(val type: ElementType) {
     }
 
     fun ancestors(): List<Element> {
-
         var c = this
         val result = ArrayList<Element>()
 
@@ -203,7 +205,6 @@ open class Element(val type: ElementType) {
             }
         }
         return result
-
     }
 
     fun previous(): Element? {
@@ -211,38 +212,36 @@ open class Element(val type: ElementType) {
             val index = p.children.indexOf(this)
             when (index) {
                 -1, 0 -> null
-                else  -> p.children[index - 1]
+                else -> p.children[index - 1]
             }
         }
     }
 
     fun next(): Element? {
         return parent?.let { p ->
-            val index = p.children.indexOf(this)
-            when (index) {
+            when (val index = p.children.indexOf(this)) {
                 -1, p.children.size - 1 -> null
-                else                    -> p.children[index + 1]
+                else -> p.children[index + 1]
             }
         }
 
     }
 
-    fun move(steps:Int) {
-        parent?.let { p->
+    fun move(steps: Int) {
+        parent?.let { p ->
             if (steps != 0) {
                 val index = p.children.indexOf(this)
                 p.children.add(index + steps, this)
                 if (steps > 0) {
                     p.children.removeAt(index)
                 } else {
-                    p.children.removeAt(index+1)
+                    p.children.removeAt(index + 1)
                 }
             }
         }
     }
 
     fun findFirst(element: Element, matches: (Element) -> Boolean): Element? {
-
         if (matches.invoke(element)) {
             return element
         } else {
@@ -262,11 +261,9 @@ open class Element(val type: ElementType) {
 
     val screenArea: Rectangle
         get() = Rectangle(Vector2(layout.screenX,
-                          layout.screenY),
-                          layout.screenWidth,
-                          layout.screenHeight)
-
-
+                layout.screenY),
+                layout.screenWidth,
+                layout.screenHeight)
 
 
 }
@@ -279,6 +276,7 @@ fun Element.disable() {
     pseudoClasses.add(disabled)
     requestRedraw()
 }
+
 fun Element.enable() {
     pseudoClasses.remove(disabled)
     requestRedraw()
@@ -286,7 +284,7 @@ fun Element.enable() {
 
 fun Element.isDisabled(): Boolean = disabled in pseudoClasses
 
-fun Element.visit( function:Element.()->Unit) {
+fun Element.visit(function: Element.() -> Unit) {
     this.function()
     children.forEach { it.visit(function) }
 }

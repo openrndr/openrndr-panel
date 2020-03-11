@@ -6,9 +6,9 @@ import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.Overflow
 import org.openrndr.panel.style.background
 import org.openrndr.panel.style.overflow
+import kotlin.math.max
 
 open class Div : TextElement(ElementType("div")) {
-
     init {
         mouse.pressed.subscribe {
             it.cancelPropagation()
@@ -16,8 +16,8 @@ open class Div : TextElement(ElementType("div")) {
         mouse.scrolled.subscribe {
             computedStyle.let { cs ->
                 if (cs.overflow != Overflow.Visible) {
-                    scrollTop -= it.rotation.y*10
-                    scrollTop = Math.max(0.0, scrollTop)
+                    scrollTop -= it.rotation.y * 10
+                    scrollTop = max(0.0, scrollTop)
                     draw.dirty = true
                     it.cancelPropagation()
                 }
@@ -41,6 +41,4 @@ open class Div : TextElement(ElementType("div")) {
     override fun toString(): String {
         return "Div(id=${id})"
     }
-
-
 }

@@ -96,10 +96,10 @@ class Textfield : Element(ElementType("textfield")) {
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
             drawer.text("$label", 0.0 + offset, 0.0 + yOffset - textHeight * 1.5)
 
-            drawer.fill = (((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE).opacify (0.05))
-            drawer.rectangle(0.0 + offset, 0.0 + yOffset - (textHeight+2), layout.screenWidth - 10.0, textHeight + 8.0)
+            drawer.fill = (((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE).opacify(0.05))
+            drawer.rectangle(0.0 + offset, 0.0 + yOffset - (textHeight + 2), layout.screenWidth - 10.0, textHeight + 8.0)
 
-            drawer.drawStyle.clip = Rectangle(screenPosition.x + offset, screenPosition.y + yOffset - (textHeight+2), layout.screenWidth - 10.0, textHeight + 8.0)
+            drawer.drawStyle.clip = Rectangle(screenPosition.x + offset, screenPosition.y + yOffset - (textHeight + 2), layout.screenWidth - 10.0, textHeight + 8.0)
 
             drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE)
 
@@ -110,11 +110,11 @@ class Textfield : Element(ElementType("textfield")) {
                 text(value, visible = false)
                 val width = cursor.x - offset
                 val scroll =
-                if (width > screenArea.width - emWidth) {
-                    screenArea.width - emWidth - width
-                } else {
-                    0.0
-                }
+                        if (width > screenArea.width - emWidth) {
+                            screenArea.width - emWidth - width
+                        } else {
+                            0.0
+                        }
                 cursor = Cursor(offset + scroll, yOffset)
                 text(value)
                 cursorX = cursor.x
