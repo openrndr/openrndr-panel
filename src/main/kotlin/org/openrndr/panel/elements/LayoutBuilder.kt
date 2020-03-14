@@ -40,6 +40,9 @@ fun Element.toggle(vararg classes: String, init: Toggle.() -> Unit) = initElemen
 fun Element.colorpicker(vararg classes: String, init: Colorpicker.() -> Unit) = initElement(classes, Colorpicker(), init)
 fun Element.colorpickerButton(vararg classes: String, init: ColorpickerButton.() -> Unit) = initElement(classes, ColorpickerButton(), init)
 
+fun Element.vector2(vararg classes: String, init: Vector2Control.() -> Unit) =
+        initElement(classes, Vector2Control(), init) as Vector2Control
+
 fun Canvas.draw(f: (Drawer) -> Unit) {
     this.userDraw = f
 }
@@ -87,3 +90,4 @@ fun Element.p(vararg classes: String, init: P.() -> String): P = textElement(cla
 fun Element.h1(vararg classes: String, init: H1.() -> String): H1 = textElement(classes, init)
 fun Element.h2(vararg classes: String, init: H2.() -> String): H2 = textElement(classes, init)
 fun Element.h3(vararg classes: String, init: H3.() -> String): H3 = textElement(classes, init)
+
