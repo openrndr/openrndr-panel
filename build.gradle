@@ -47,7 +47,6 @@ dependencies {
     implementation "org.openrndr:openrndr-filter:$openrndr_version"
     implementation "org.openrndr:openrndr-animatable:$openrndr_version"
     implementation "org.openrndr:openrndr-binpack:$openrndr_version"
-
 }
 
 java {

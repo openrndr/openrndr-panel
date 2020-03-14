@@ -112,6 +112,23 @@ fun defaultStyles(
             marginRight = 5.px
         },
 
+        styleSheet(has type "xy-pad") {
+            display = Display.BLOCK
+            background = Color.RGBa(ColorRGBa.GRAY)
+            width = 175.px
+            height = 175.px
+            marginLeft = 5.px
+            marginRight = 5.px
+            marginTop = 5.px
+            marginBottom = 5.px
+            fontFamily = "default"
+
+            and(has state "hover") {
+                display = Display.BLOCK
+                background = Color.RGBa(ColorRGBa.GRAY.shade(1.5))
+            }
+        },
+
         styleSheet(has type "overlay") {
             zIndex = ZIndex.Value(1)
         },
