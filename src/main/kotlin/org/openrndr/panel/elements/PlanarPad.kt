@@ -72,6 +72,8 @@ class PlanarPad : Element(ElementType("planar-pad")) {
 
     private fun handleKeyEvent(keyEvent: KeyEvent) {
         val delta = 10.0.pow(-precision + 2) // +2, otherwise it's way too freaking small of a change
+        val old = value
+
         if (keyEvent.key == KEY_ARROW_RIGHT) {
             value = Vector2(value.x + delta, value.y)
         }
@@ -89,6 +91,7 @@ class PlanarPad : Element(ElementType("planar-pad")) {
         }
 
         draw.dirty = true
+        events.valueChanged.onNext(ValueChangedEvent(this, old, value))
         keyEvent.cancelPropagation()
     }
 
