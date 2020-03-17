@@ -7,15 +7,9 @@ import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
 import org.openrndr.math.clamp
 import org.openrndr.math.map
-import org.openrndr.panel.elements.Button
-import org.openrndr.panel.elements.Element
-import org.openrndr.panel.elements.ElementType
-import org.openrndr.panel.elements.initElement
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
-import java.util.*
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 
