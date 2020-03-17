@@ -117,8 +117,6 @@ fun defaultStyles(
             background = Color.RGBa(ColorRGBa.GRAY)
             width = 175.px
             height = 175.px
-            paddingLeft = 10.px
-            paddingRight = 10.px
             marginLeft = 5.px
             marginRight = 5.px
             marginTop = 5.px
