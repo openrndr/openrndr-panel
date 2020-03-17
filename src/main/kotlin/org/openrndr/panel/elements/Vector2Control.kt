@@ -19,6 +19,7 @@ class Vector2Control : Element(ElementType("vector2")) {
     var maxX = 1.0
     var maxY = 1.0
 
+    // What to call this? The normalized value?
     var v = Vector2(-0.0, 0.0)
 
     val value: Vector2
