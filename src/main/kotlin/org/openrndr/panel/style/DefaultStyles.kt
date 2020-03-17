@@ -123,6 +123,7 @@ fun defaultStyles(
             marginRight = 5.px
             marginTop = 5.px
             marginBottom = 5.px
+            fontFamily = "default"
 
             and(has state "hover") {
                 display = Display.BLOCK

@@ -11,13 +11,15 @@ import org.openrndr.panel.elements.Button
 import org.openrndr.panel.elements.Element
 import org.openrndr.panel.elements.ElementType
 import org.openrndr.panel.elements.initElement
+import org.openrndr.panel.style.Color
+import org.openrndr.panel.style.color
+import org.openrndr.text.Writer
 import java.util.*
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 
 class Vector2Control : Element(ElementType("vector2")) {
-    class VectorControlEvent(val source: Vector2Control)
-
-
     var minX = -1.0
     var minY = -1.0
     var maxX = 1.0
@@ -105,7 +107,7 @@ class Vector2Control : Element(ElementType("vector2")) {
             drawer.stroke = ColorRGBa.GRAY.shade(1.2)
             drawer.strokeWeight = 1.0
 
-            for (y in 0 until 20) {
+            for (y in 0 until 21) {
                 drawer.lineSegment(
                         0.0,
                         layout.screenHeight / 20 * y,
@@ -114,7 +116,7 @@ class Vector2Control : Element(ElementType("vector2")) {
                 )
             }
 
-            for (x in 0 until 20) {
+            for (x in 0 until 21) {
                 drawer.lineSegment(
                         layout.screenWidth / 20 * x,
                         0.0,
@@ -125,13 +127,29 @@ class Vector2Control : Element(ElementType("vector2")) {
 
             // cross
             drawer.stroke = ColorRGBa.GRAY.shade(1.6)
-            drawer.lineSegment(0.0, layout.screenHeight / 2.0, layout.screenWidth, layout.screenHeight / 2.0)
-            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
+//            drawer.lineSegment(0.0, layout.screenHeight / 2.0, layout.screenWidth, layout.screenHeight / 2.0)
+//            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
 
             // ball
             drawer.fill = ColorRGBa.PINK
             drawer.stroke = ColorRGBa.WHITE
             drawer.circle(ballPosition, 8.0)
+
+            val label = "${value.x.roundToInt()}, ${value.y.roundToInt()}"
+            (root() as? Body)?.controlManager?.fontManager?.let {
+                val font = it.font(computedStyle)
+                val writer = Writer(drawer)
+                drawer.fontMap = (font)
+                val textWidth = writer.textWidth(label)
+                val textHeight = font.ascenderLength
+
+                drawer.fill = ((computedStyle.color as? Color.RGBa)?.color ?: ColorRGBa.WHITE).opacify(
+                        if (disabled in pseudoClasses) 0.25 else 1.0
+                )
+
+
+                drawer.text(label, Vector2(layout.screenWidth - textWidth - 4.0, layout.screenHeight - textHeight + 6.0))
+            }
 
             drawer.popStyle()
             drawer.popTransforms()
