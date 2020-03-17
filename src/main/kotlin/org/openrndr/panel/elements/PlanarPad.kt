@@ -1,7 +1,7 @@
 package org.openrndr.panel.elements
 
 import io.reactivex.subjects.PublishSubject
-import org.openrndr.MouseEvent
+import org.openrndr.*
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
@@ -10,6 +10,7 @@ import org.openrndr.math.map
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
+import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -47,6 +48,9 @@ class PlanarPad : Element(ElementType("planar-pad")) {
         mouse.pressed.subscribe {
             it.cancelPropagation()
         }
+
+        keyboard.pressed.subscribe { handleKeyEvent(it) }
+        keyboard.repeated.subscribe { handleKeyEvent(it) }
     }
 
     class ValueChangedEvent(val source: PlanarPad,
@@ -58,6 +62,29 @@ class PlanarPad : Element(ElementType("planar-pad")) {
 
     class Events {
         val valueChanged = PublishSubject.create<ValueChangedEvent>()
+    }
+
+
+    private fun handleKeyEvent(keyEvent: KeyEvent) {
+        val delta = 10.0.pow(-precision)
+        if (keyEvent.key == KEY_ARROW_RIGHT) {
+            v = Vector2(v.x + delta, v.y)
+        }
+
+        if (keyEvent.key == KEY_ARROW_LEFT) {
+            v = Vector2(v.x - delta, v.y)
+        }
+
+        if (keyEvent.key == KEY_ARROW_UP) {
+            v = Vector2(v.x, v.y - delta)
+        }
+
+        if (keyEvent.key == KEY_ARROW_DOWN) {
+            v = Vector2(v.x, v.y + delta)
+        }
+
+        draw.dirty = true
+        keyEvent.cancelPropagation()
     }
 
     private fun pick(e: MouseEvent) {
@@ -126,7 +153,6 @@ class PlanarPad : Element(ElementType("planar-pad")) {
 //            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
 
             // angle line from center
-            println(v)
             drawer.lineSegment(Vector2(layout.screenHeight / 2.0, layout.screenWidth / 2.0), ballPosition)
 
             // ball
