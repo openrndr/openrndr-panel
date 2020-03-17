@@ -112,7 +112,7 @@ fun defaultStyles(
             marginRight = 5.px
         },
 
-        styleSheet(has type "vector2") {
+        styleSheet(has type "planar-pad") {
             display = Display.BLOCK
             background = Color.RGBa(ColorRGBa.GRAY)
             width = 175.px

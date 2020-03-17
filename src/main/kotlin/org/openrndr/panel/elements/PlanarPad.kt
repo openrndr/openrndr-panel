@@ -10,24 +10,28 @@ import org.openrndr.math.map
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
+import kotlin.math.round
 import kotlin.math.roundToInt
 
 
-class Vector2Control : Element(ElementType("vector2")) {
+class PlanarPad : Element(ElementType("planar-pad")) {
     var minX = -1.0
     var minY = -1.0
     var maxX = 1.0
     var maxY = 1.0
+
+    // A smaller number so it doesn't clutter the UI by default
+    var precision = 1
+
 
     // What to call this? The normalized value?
     var v = Vector2(-0.0, 0.0)
 
     val value: Vector2
         get() = Vector2(
-                map(-1.0, 1.0, minX, maxX, v.x),
-                map(-1.0, 1.0, minY, maxY, v.y)
+                map(-1.0, 1.0, minX, maxX, v.x).round(precision),
+                map(-1.0, 1.0, minY, maxY, v.y).round(precision)
         )
-
 
     init {
         mouse.clicked.subscribe {
@@ -45,7 +49,7 @@ class Vector2Control : Element(ElementType("vector2")) {
         }
     }
 
-    class ValueChangedEvent(val source: Vector2Control,
+    class ValueChangedEvent(val source: PlanarPad,
                             val oldValue: Vector2,
                             val newValue: Vector2)
 
@@ -69,11 +73,7 @@ class Vector2Control : Element(ElementType("vector2")) {
 
         v = Vector2(nx, ny)
 
-        events.valueChanged.onNext(ValueChangedEvent(this, old, Vector2(
-                map(-1.0, 1.0, minX, maxX, nx),
-                map(-1.0, 1.0, minY, maxY, ny)
-        )))
-
+        events.valueChanged.onNext(ValueChangedEvent(this, old, value))
         draw.dirty = true
     }
 
@@ -125,12 +125,16 @@ class Vector2Control : Element(ElementType("vector2")) {
 //            drawer.lineSegment(0.0, layout.screenHeight / 2.0, layout.screenWidth, layout.screenHeight / 2.0)
 //            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
 
+            // angle line from center
+            println(v)
+            drawer.lineSegment(Vector2(layout.screenHeight / 2.0, layout.screenWidth / 2.0), ballPosition)
+
             // ball
             drawer.fill = ColorRGBa.PINK
             drawer.stroke = ColorRGBa.WHITE
             drawer.circle(ballPosition, 8.0)
 
-            val label = "${value.x.roundToInt()}, ${value.y.roundToInt()}"
+            val label = "${value.x.round(precision)}, ${value.y.round(precision)}"
             (root() as? Body)?.controlManager?.fontManager?.let {
                 val font = it.font(computedStyle)
                 val writer = Writer(drawer)
@@ -150,4 +154,11 @@ class Vector2Control : Element(ElementType("vector2")) {
             drawer.popTransforms()
         }
     }
+}
+
+
+fun Double.round(decimals: Int): Double {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
 }
