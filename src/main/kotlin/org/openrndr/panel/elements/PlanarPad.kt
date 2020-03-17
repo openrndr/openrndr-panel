@@ -12,7 +12,6 @@ import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
 import kotlin.math.pow
 import kotlin.math.round
-import kotlin.math.roundToInt
 
 
 class PlanarPad : Element(ElementType("planar-pad")) {
@@ -25,14 +24,20 @@ class PlanarPad : Element(ElementType("planar-pad")) {
     var precision = 1
 
 
-    // What to call this? The normalized value?
-    var v = Vector2(-0.0, 0.0)
+    // The value is derived from the normalized value...
+    var normalizedValue = Vector2(-0.0, 0.0)
 
-    val value: Vector2
+    var value: Vector2
         get() = Vector2(
-                map(-1.0, 1.0, minX, maxX, v.x).round(precision),
-                map(-1.0, 1.0, minY, maxY, v.y).round(precision)
+                map(-1.0, 1.0, minX, maxX, normalizedValue.x).round(precision),
+                map(-1.0, 1.0, minY, maxY, normalizedValue.y).round(precision)
         )
+        set(newValue) {
+            normalizedValue = Vector2(
+                map(minX, maxX, -1.0, 1.0, newValue.x),
+                map(minY, maxY, -1.0, 1.0, newValue.y)
+            )
+        }
 
     init {
         mouse.clicked.subscribe {
@@ -66,21 +71,21 @@ class PlanarPad : Element(ElementType("planar-pad")) {
 
 
     private fun handleKeyEvent(keyEvent: KeyEvent) {
-        val delta = 10.0.pow(-precision)
+        val delta = 10.0.pow(-precision + 2) // +2, otherwise it's way too freaking small of a change
         if (keyEvent.key == KEY_ARROW_RIGHT) {
-            v = Vector2(v.x + delta, v.y)
+            value = Vector2(value.x + delta, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_LEFT) {
-            v = Vector2(v.x - delta, v.y)
+            value = Vector2(value.x - delta, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_UP) {
-            v = Vector2(v.x, v.y - delta)
+            value = Vector2(value.x, value.y - delta)
         }
 
         if (keyEvent.key == KEY_ARROW_DOWN) {
-            v = Vector2(v.x, v.y + delta)
+            value = Vector2(value.x, value.y + delta)
         }
 
         draw.dirty = true
@@ -98,7 +103,7 @@ class PlanarPad : Element(ElementType("planar-pad")) {
         val nx = clamp(dx / layout.screenWidth * 2.0 - 1.0, -1.0, 1.0)
         val ny = clamp(dy / layout.screenHeight * 2.0 - 1.0, -1.0, 1.0)
 
-        v = Vector2(nx, ny)
+        normalizedValue = Vector2(nx, ny)
 
         events.valueChanged.onNext(ValueChangedEvent(this, old, value))
         draw.dirty = true
@@ -110,8 +115,8 @@ class PlanarPad : Element(ElementType("planar-pad")) {
 
     private val ballPosition: Vector2
         get() = Vector2(
-                map(-1.0, 1.0, 0.0, layout.screenWidth, v.x),
-                map(-1.0, 1.0, 0.0, layout.screenHeight, v.y)
+                map(-1.0, 1.0, 0.0, layout.screenWidth, normalizedValue.x),
+                map(-1.0, 1.0, 0.0, layout.screenHeight, normalizedValue.y)
         )
 
     override fun draw(drawer: Drawer) {
