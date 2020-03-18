@@ -26,7 +26,7 @@ class XYPad : Element(ElementType("xy-pad")) {
 
 
     // The value is derived from the normalized value...
-    var normalizedValue = Vector2(-0.0, 0.0)
+    var normalizedValue = Vector2(0.0, 0.0)
 
     var value: Vector2
         get() = Vector2(
