@@ -23,6 +23,8 @@ class XYPad : Element(ElementType("xy-pad")) {
     // A smaller number so it doesn't clutter the UI by default
     var precision = 1
 
+    var keyboardDelta = 100.0
+
 
     // The value is derived from the normalized value...
     var normalizedValue = Vector2(-0.0, 0.0)
@@ -71,23 +73,23 @@ class XYPad : Element(ElementType("xy-pad")) {
 
 
     private fun handleKeyEvent(keyEvent: KeyEvent) {
-        val delta = 10.0.pow(-precision + 2) // +2, otherwise it's way too freaking small of a change
+         // +2, otherwise it's way too freaking small of a change
         val old = value
 
         if (keyEvent.key == KEY_ARROW_RIGHT) {
-            value = Vector2(value.x + delta, value.y)
+            value = Vector2(value.x + keyboardDelta, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_LEFT) {
-            value = Vector2(value.x - delta, value.y)
+            value = Vector2(value.x - keyboardDelta, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_UP) {
-            value = Vector2(value.x, value.y - delta)
+            value = Vector2(value.x, value.y - keyboardDelta)
         }
 
         if (keyEvent.key == KEY_ARROW_DOWN) {
-            value = Vector2(value.x, value.y + delta)
+            value = Vector2(value.x, value.y + keyboardDelta)
         }
 
         draw.dirty = true
