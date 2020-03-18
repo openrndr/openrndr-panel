@@ -10,7 +10,6 @@ import org.openrndr.math.map
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
-import kotlin.math.pow
 import kotlin.math.round
 
 
@@ -23,7 +22,7 @@ class XYPad : Element(ElementType("xy-pad")) {
     // A smaller number so it doesn't clutter the UI by default
     var precision = 1
 
-    var keyboardDelta = 100.0
+    var keyboardIncrement = 100.0
 
 
     // The value is derived from the normalized value...
@@ -36,8 +35,8 @@ class XYPad : Element(ElementType("xy-pad")) {
         )
         set(newValue) {
             normalizedValue = Vector2(
-                map(minX, maxX, -1.0, 1.0, newValue.x),
-                map(minY, maxY, -1.0, 1.0, newValue.y)
+                clamp(map(minX, maxX, -1.0, 1.0, newValue.x), -1.0, 1.0),
+                clamp(map(minY, maxY, -1.0, 1.0, newValue.y), -1.0, 1.0)
             )
         }
 
@@ -77,19 +76,19 @@ class XYPad : Element(ElementType("xy-pad")) {
         val old = value
 
         if (keyEvent.key == KEY_ARROW_RIGHT) {
-            value = Vector2(value.x + keyboardDelta, value.y)
+            value = Vector2(value.x + keyboardIncrement, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_LEFT) {
-            value = Vector2(value.x - keyboardDelta, value.y)
+            value = Vector2(value.x - keyboardIncrement, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_UP) {
-            value = Vector2(value.x, value.y - keyboardDelta)
+            value = Vector2(value.x, value.y - keyboardIncrement)
         }
 
         if (keyEvent.key == KEY_ARROW_DOWN) {
-            value = Vector2(value.x, value.y + keyboardDelta)
+            value = Vector2(value.x, value.y + keyboardIncrement)
         }
 
         draw.dirty = true
