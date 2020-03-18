@@ -24,6 +24,7 @@ class XYPad : Element(ElementType("xy-pad")) {
 
     var keyboardIncrement = 100.0
 
+    var showAngle = false
 
     // The value is derived from the normalized value...
     var normalizedValue = Vector2(0.0, 0.0)
@@ -162,7 +163,9 @@ class XYPad : Element(ElementType("xy-pad")) {
 //            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
 
             // angle line from center
-            drawer.lineSegment(Vector2(layout.screenHeight / 2.0, layout.screenWidth / 2.0), ballPosition)
+            if (showAngle) {
+                drawer.lineSegment(Vector2(layout.screenHeight / 2.0, layout.screenWidth / 2.0), ballPosition)
+            }
 
             // ball
             drawer.fill = ColorRGBa.PINK
