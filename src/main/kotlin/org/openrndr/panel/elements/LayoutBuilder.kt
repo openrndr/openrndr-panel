@@ -40,7 +40,7 @@ fun Element.toggle(vararg classes: String, init: Toggle.() -> Unit) = initElemen
 fun Element.colorpicker(vararg classes: String, init: Colorpicker.() -> Unit) = initElement(classes, Colorpicker(), init)
 fun Element.colorpickerButton(vararg classes: String, init: ColorpickerButton.() -> Unit) = initElement(classes, ColorpickerButton(), init)
 
-fun Element.planarPad(vararg classes: String, init: PlanarPad.() -> Unit) = initElement(classes, PlanarPad(), init) as PlanarPad
+fun Element.xyPad(vararg classes: String, init: XYPad.() -> Unit) = initElement(classes, XYPad(), init) as XYPad
 
 fun Canvas.draw(f: (Drawer) -> Unit) {
     this.userDraw = f

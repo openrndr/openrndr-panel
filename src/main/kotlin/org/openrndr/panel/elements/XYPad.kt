@@ -14,7 +14,7 @@ import kotlin.math.pow
 import kotlin.math.round
 
 
-class PlanarPad : Element(ElementType("planar-pad")) {
+class XYPad : Element(ElementType("xy-pad")) {
     var minX = -1.0
     var minY = -1.0
     var maxX = 1.0
@@ -58,7 +58,7 @@ class PlanarPad : Element(ElementType("planar-pad")) {
         keyboard.repeated.subscribe { handleKeyEvent(it) }
     }
 
-    class ValueChangedEvent(val source: PlanarPad,
+    class ValueChangedEvent(val source: XYPad,
                             val oldValue: Vector2,
                             val newValue: Vector2)
 
