@@ -1,6 +1,7 @@
 package org.openrndr.panel.elements
 
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.yield
 import org.openrndr.*
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
@@ -10,7 +11,9 @@ import org.openrndr.math.map
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 import org.openrndr.text.Writer
+import kotlin.math.pow
 import kotlin.math.round
+import kotlin.reflect.KMutableProperty0
 
 
 class XYPad : Element(ElementType("xy-pad")) {
@@ -19,12 +22,20 @@ class XYPad : Element(ElementType("xy-pad")) {
     var maxX = 1.0
     var maxY = 1.0
 
-    // A smaller number so it doesn't clutter the UI by default
-    var precision = 1
+    /**
+     * The precision of the control, default is 2
+     */
+    var precision = 2
 
-    var keyboardIncrement = 100.0
+    /**
+     * Should the control visualize the value as a vector?, default is false
+     */
+    var showVector = false
 
-    var showAngle = false
+    /**
+     * Should the control invert the Y-axis?, default is true
+     */
+    var invertY = true
 
     // The value is derived from the normalized value...
     var normalizedValue = Vector2(0.0, 0.0)
@@ -36,8 +47,8 @@ class XYPad : Element(ElementType("xy-pad")) {
         )
         set(newValue) {
             normalizedValue = Vector2(
-                clamp(map(minX, maxX, -1.0, 1.0, newValue.x), -1.0, 1.0),
-                clamp(map(minY, maxY, -1.0, 1.0, newValue.y), -1.0, 1.0)
+                    clamp(map(minX, maxX, -1.0, 1.0, newValue.x), -1.0, 1.0),
+                    clamp(map(minY, maxY, -1.0, 1.0, newValue.y), -1.0, 1.0)
             )
         }
 
@@ -73,26 +84,37 @@ class XYPad : Element(ElementType("xy-pad")) {
 
 
     private fun handleKeyEvent(keyEvent: KeyEvent) {
-         // +2, otherwise it's way too freaking small of a change
+        val keyboardIncrementX = if (KeyModifier.SHIFT in keyEvent.modifiers) {
+            (maxX - minX) / 10.0
+        } else {
+            10.0.pow(-(precision - 0.0))
+        }
+
+        val keyboardIncrementY = if (KeyModifier.SHIFT in keyEvent.modifiers) {
+            (maxY - minY) / 10.0
+        } else {
+            10.0.pow(-(precision - 0.0))
+        }
+
         val old = value
 
         if (keyEvent.key == KEY_ARROW_RIGHT) {
-            value = Vector2(value.x + keyboardIncrement, value.y)
+            value = Vector2(value.x + keyboardIncrementX, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_LEFT) {
-            value = Vector2(value.x - keyboardIncrement, value.y)
+            value = Vector2(value.x - keyboardIncrementX, value.y)
         }
 
         if (keyEvent.key == KEY_ARROW_UP) {
-            value = Vector2(value.x, value.y - keyboardIncrement)
+            value = Vector2(value.x, value.y - keyboardIncrementY * if (invertY) -1.0 else 1.0)
         }
 
         if (keyEvent.key == KEY_ARROW_DOWN) {
-            value = Vector2(value.x, value.y + keyboardIncrement)
+            value = Vector2(value.x, value.y + keyboardIncrementY * if (invertY) -1.0 else 1.0)
         }
 
-        draw.dirty = true
+        requestRedraw()
         events.valueChanged.onNext(ValueChangedEvent(this, old, value))
         keyEvent.cancelPropagation()
     }
@@ -102,16 +124,16 @@ class XYPad : Element(ElementType("xy-pad")) {
 
         // Difference
         val dx = e.position.x - layout.screenX
-        var dy = e.position.y - layout.screenY
+        val dy = e.position.y - layout.screenY
 
         // Normalize to -1 - 1
         val nx = clamp(dx / layout.screenWidth * 2.0 - 1.0, -1.0, 1.0)
-        val ny = clamp(dy / layout.screenHeight * 2.0 - 1.0, -1.0, 1.0)
+        val ny = clamp(dy / layout.screenHeight * 2.0 - 1.0, -1.0, 1.0) * if (invertY) -1.0 else 1.0
 
         normalizedValue = Vector2(nx, ny)
 
         events.valueChanged.onNext(ValueChangedEvent(this, old, value))
-        draw.dirty = true
+        requestRedraw()
     }
 
     override val widthHint: Double?
@@ -121,7 +143,11 @@ class XYPad : Element(ElementType("xy-pad")) {
     private val ballPosition: Vector2
         get() = Vector2(
                 map(-1.0, 1.0, 0.0, layout.screenWidth, normalizedValue.x),
-                map(-1.0, 1.0, 0.0, layout.screenHeight, normalizedValue.y)
+                if (invertY) {
+                    map(1.0, -1.0, 0.0, layout.screenHeight, normalizedValue.y)
+                } else {
+                    map(-1.0, 1.0, 0.0, layout.screenHeight, normalizedValue.y)
+                }
         )
 
     override fun draw(drawer: Drawer) {
@@ -163,7 +189,7 @@ class XYPad : Element(ElementType("xy-pad")) {
 //            drawer.lineSegment(layout.screenWidth / 2.0, 0.0, layout.screenWidth / 2.0, layout.screenHeight)
 
             // angle line from center
-            if (showAngle) {
+            if (showVector) {
                 drawer.lineSegment(Vector2(layout.screenHeight / 2.0, layout.screenWidth / 2.0), ballPosition)
             }
 
@@ -172,7 +198,7 @@ class XYPad : Element(ElementType("xy-pad")) {
             drawer.stroke = ColorRGBa.WHITE
             drawer.circle(ballPosition, 8.0)
 
-            val label = "${value.x.round(precision)}, ${value.y.round(precision)}"
+            val label = "${String.format("%.0${precision}f", value.x)}, ${String.format("%.0${precision}f", value.y)}"
             (root() as? Body)?.controlManager?.fontManager?.let {
                 val font = it.font(computedStyle)
                 val writer = Writer(drawer)
@@ -190,6 +216,28 @@ class XYPad : Element(ElementType("xy-pad")) {
 
             drawer.popStyle()
             drawer.popTransforms()
+        }
+    }
+}
+
+fun XYPad.bind(property: KMutableProperty0<Vector2>) {
+    var currentValue: Vector2? = null
+
+    events.valueChanged.subscribe {
+        currentValue = it.newValue
+        property.set(it.newValue)
+    }
+    if (root() as? Body == null) {
+        throw RuntimeException("no body")
+    }
+    (root() as? Body)?.controlManager?.program?.launch {
+        while (true) {
+            if (property.get() != currentValue) {
+                val lcur = property.get()
+                currentValue = lcur
+                value = lcur
+            }
+            yield()
         }
     }
 }
