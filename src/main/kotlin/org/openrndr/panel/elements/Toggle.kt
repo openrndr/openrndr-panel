@@ -49,13 +49,13 @@ class Toggle : Element(ElementType("toggle")) {
         }
 
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             value = !value
             draw.dirty = true
-            events.valueChanged.onNext(Toggle.ValueChangedEvent(this, !value, value))
+            events.valueChanged.trigger(Toggle.ValueChangedEvent(this, !value, value))
             it.cancelPropagation()
         }
     }
@@ -64,7 +64,7 @@ class Toggle : Element(ElementType("toggle")) {
      * Emits the current value through the valueChanged event
      */
     fun emit() {
-        events.valueChanged.onNext(Toggle.ValueChangedEvent(this, value, value))
+        events.valueChanged.trigger(Toggle.ValueChangedEvent(this, value, value))
     }
 
     override fun draw(drawer: Drawer) {
@@ -100,7 +100,7 @@ fun Toggle.bind(property: KMutableProperty0<Boolean>) {
     var currentValue = property.get()
     value = currentValue
 
-    events.valueChanged.subscribe {
+    events.valueChanged.listen {
         currentValue = it.newValue
         property.set(it.newValue)
     }

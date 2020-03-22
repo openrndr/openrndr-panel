@@ -103,21 +103,21 @@ open class Element(val type: ElementType) {
     var style: StyleSheet? = null
 
     init {
-        pseudoClasses.changed.subscribe {
+        pseudoClasses.changed.listen {
             draw.dirty = true
         }
-        classes.changed.subscribe {
+        classes.changed.listen {
             draw.dirty = true
             it.added.forEach {
-                classEvents.classAdded.onNext(ClassEvent(this, it))
+                classEvents.classAdded.trigger(ClassEvent(this, it))
             }
             it.removed.forEach {
-                classEvents.classRemoved.onNext(ClassEvent(this, it))
+                classEvents.classRemoved.trigger(ClassEvent(this, it))
             }
 
         }
 
-        children.changed.subscribe {
+        children.changed.listen {
             draw.dirty = true
         }
     }

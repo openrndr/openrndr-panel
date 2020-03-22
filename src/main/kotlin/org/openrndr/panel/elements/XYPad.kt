@@ -53,22 +53,22 @@ class XYPad : Element(ElementType("xy-pad")) {
         }
 
     init {
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             it.cancelPropagation()
             pick(it)
         }
 
-        mouse.dragged.subscribe {
+        mouse.dragged.listen {
             it.cancelPropagation()
             pick(it)
         }
 
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
 
-        keyboard.pressed.subscribe { handleKeyEvent(it) }
-        keyboard.repeated.subscribe { handleKeyEvent(it) }
+        keyboard.pressed.listen { handleKeyEvent(it) }
+        keyboard.repeated.listen { handleKeyEvent(it) }
     }
 
     class ValueChangedEvent(val source: XYPad,
@@ -115,7 +115,7 @@ class XYPad : Element(ElementType("xy-pad")) {
         }
 
         requestRedraw()
-        events.valueChanged.onNext(ValueChangedEvent(this, old, value))
+        events.valueChanged.trigger(ValueChangedEvent(this, old, value))
         keyEvent.cancelPropagation()
     }
 
@@ -132,7 +132,7 @@ class XYPad : Element(ElementType("xy-pad")) {
 
         normalizedValue = Vector2(nx, ny)
 
-        events.valueChanged.onNext(ValueChangedEvent(this, old, value))
+        events.valueChanged.trigger(ValueChangedEvent(this, old, value))
         requestRedraw()
     }
 
@@ -223,7 +223,7 @@ class XYPad : Element(ElementType("xy-pad")) {
 fun XYPad.bind(property: KMutableProperty0<Vector2>) {
     var currentValue: Vector2? = null
 
-    events.valueChanged.subscribe {
+    events.valueChanged.listen {
         currentValue = it.newValue
         property.set(it.newValue)
     }

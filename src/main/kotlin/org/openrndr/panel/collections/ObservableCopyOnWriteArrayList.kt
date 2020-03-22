@@ -8,7 +8,7 @@ class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
     val changed = Event<ObservableCopyOnWriteArrayList<E>>()
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
-            changed.onNext(this)
+            changed.trigger(this)
             true
         } else {
             false
@@ -17,7 +17,7 @@ class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
 
     override fun remove(element: E): Boolean {
         return if (super.remove(element)) {
-            changed.onNext(this)
+            changed.trigger(this)
             true
         } else {
             false
@@ -26,6 +26,6 @@ class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
 
     override fun clear() {
         super.clear()
-        changed.onNext(this)
+        changed.trigger(this)
     }
 }

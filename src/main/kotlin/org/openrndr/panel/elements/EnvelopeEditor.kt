@@ -13,7 +13,7 @@ class Envelope(constant:Double = 0.5) {
     var activePoint: Vector2? = null
 
     var offset:Double = 0.0
-        set(value) { field = value; events.envelopeChanged.onNext(EnvelopeChangedEvent(this))}
+        set(value) { field = value; events.envelopeChanged.trigger(EnvelopeChangedEvent(this))}
 
     class EnvelopeChangedEvent(val envelope: Envelope)
 
@@ -27,14 +27,14 @@ class Envelope(constant:Double = 0.5) {
             if (points[i].x > v.x) {
                 points.add(i, v)
                 activePoint = v
-                events.envelopeChanged.onNext(EnvelopeChangedEvent(this))
+                events.envelopeChanged.trigger(EnvelopeChangedEvent(this))
                 return
             }
         }
         points.add(v)
         activePoint = v
         fixBounds()
-        events.envelopeChanged.onNext(EnvelopeChangedEvent(this))
+        events.envelopeChanged.trigger(EnvelopeChangedEvent(this))
     }
 
     fun findNearestPoint(v: Vector2) = points.minBy { (it - v).length }
@@ -45,7 +45,7 @@ class Envelope(constant:Double = 0.5) {
             activePoint = null
         }
         fixBounds()
-        events.envelopeChanged.onNext(EnvelopeChangedEvent(this))
+        events.envelopeChanged.trigger(EnvelopeChangedEvent(this))
     }
 
     private fun fixBounds() {
@@ -80,7 +80,7 @@ class Envelope(constant:Double = 0.5) {
         points.sortBy { it.x }
 
         fixBounds()
-        events.envelopeChanged.onNext(EnvelopeChangedEvent(this))
+        events.envelopeChanged.trigger(EnvelopeChangedEvent(this))
     }
 
     fun value(t: Double): Double {
@@ -138,7 +138,7 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
             return Vector2(x, y)
         }
 
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             val query = query(it.position)
             val nearest = envelope.findNearestPoint(query)
             val distance = nearest?.let { (it - query).length }
@@ -166,7 +166,7 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
             it.cancelPropagation()
         }
 
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             val query = query(it.position)
             val nearest = envelope.findNearestPoint(query)
             val distance = nearest?.let { it - query }?.length
@@ -182,7 +182,7 @@ class EnvelopeEditor : Element(ElementType("envelope-editor")) {
             it.cancelPropagation()
         }
 
-        mouse.dragged.subscribe {
+        mouse.dragged.listen {
             envelope.activePoint?.let { activePoint ->
                 val query = query(it.position)
                 if (!it.modifiers.contains(KeyModifier.SHIFT)) {

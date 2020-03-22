@@ -4,7 +4,6 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.panel.style.PropertyInheritance.INHERIT
 import org.openrndr.panel.style.PropertyInheritance.RESET
 import java.util.*
-import javax.sound.sampled.Line
 import kotlin.reflect.KProperty
 
 enum class PropertyInheritance {
@@ -49,17 +48,13 @@ class PropertyHandler<T>(
 ) {
 
     init {
-        PropertyBehaviours.behaviours.set(name, PropertyBehaviour(inheritance, initial as Any))
+        PropertyBehaviours.behaviours[name] = PropertyBehaviour(inheritance, initial as Any)
     }
 
     @Suppress("USELESS_CAST", "UNCHECKED_CAST")
     operator fun getValue(stylesheet: StyleSheet, property: KProperty<*>): T {
         val value: T? = stylesheet.getProperty(name)?.value as T?
-        return if (value != null) {
-            value
-        } else {
-            PropertyBehaviours.behaviours[name]!!.intitial as T
-        }
+        return value ?: PropertyBehaviours.behaviours[name]!!.intitial as T
 
     }
 
@@ -73,7 +68,6 @@ enum class Display {
     BLOCK,
     FLEX,
     NONE
-
 }
 
 enum class Position {

@@ -10,10 +10,10 @@ import kotlin.math.max
 
 open class Div : TextElement(ElementType("div")) {
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
-        mouse.scrolled.subscribe {
+        mouse.scrolled.listen {
             computedStyle.let { cs ->
                 if (cs.overflow != Overflow.Visible) {
                     scrollTop -= it.rotation.y * 10

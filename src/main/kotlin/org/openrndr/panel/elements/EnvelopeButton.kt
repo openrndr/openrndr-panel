@@ -17,7 +17,7 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
         envelopeSubscription?.let {
             value.events.envelopeChanged.cancel(it)
         }
-        envelopeSubscription = value.events.envelopeChanged.subscribe {
+        envelopeSubscription = value.events.envelopeChanged.listen {
             draw.dirty = true
         }
     }
@@ -26,10 +26,10 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
     var envelopeSubscription: ((Envelope.EnvelopeChangedEvent)->Unit)? = null
 
     init {
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, this))
         }
-        envelopeSubscription = envelope.events.envelopeChanged.subscribe {
+        envelopeSubscription = envelope.events.envelopeChanged.listen {
             draw.dirty = true
         }
     }
@@ -100,7 +100,7 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
 
         init {
 
-            mouse.clicked.subscribe {
+            mouse.clicked.listen {
                 it.cancelPropagation()
             }
             style = StyleSheet(CompoundSelector.DUMMY).apply {
@@ -120,7 +120,7 @@ class EnvelopeButton : Element(ElementType("envelope-button")) {
 
             append(Button().apply {
                 label = "done"
-                events.clicked.subscribe {
+                events.clicked.listen {
                     //parent.value = it.source.data as Item
                     //parent.events.valueChanged.onNext(ValueChangedEvent(parent, it.source.data as Item))
                     dispose()

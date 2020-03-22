@@ -28,7 +28,7 @@ class Item : Element(ElementType("item")) {
     val events = Events()
 
     fun picked() {
-        events.picked.onNext(PickedEvent(this))
+        events.picked.trigger(PickedEvent(this))
     }
 }
 
@@ -46,11 +46,11 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
     val events = Events()
 
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
 
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             val itemCount = items().size
 
             if (children.none { it is SlideOut }) {
@@ -142,7 +142,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                         -1
                     }
 
-            keyboard.pressed.subscribe {
+            keyboard.pressed.listen {
 
                 if (it.key == KEY_ENTER) {
                     it.cancelPropagation()
@@ -162,7 +162,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                     }
 
                     parent.value = newValue
-                    parent.events.valueChanged.onNext(ValueChangedEvent(parent, newValue))
+                    parent.events.valueChanged.trigger(ValueChangedEvent(parent, newValue))
                     newValue.picked()
                     draw.dirty = true
 
@@ -192,20 +192,20 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                     }
 
                     parent.value = newValue
-                    parent.events.valueChanged.onNext(ValueChangedEvent(parent, newValue))
+                    parent.events.valueChanged.trigger(ValueChangedEvent(parent, newValue))
                     newValue.picked()
                     draw.dirty = true
                 }
             }
 
-            mouse.scrolled.subscribe {
+            mouse.scrolled.listen {
                 scrollTop -= it.rotation.y
                 scrollTop = Math.max(0.0, scrollTop)
                 draw.dirty = true
                 it.cancelPropagation()
             }
 
-            mouse.exited.subscribe {
+            mouse.exited.listen {
                 it.cancelPropagation()
                 dispose()
             }
@@ -226,9 +226,9 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
                     data = it
                     label = it.label
                     itemButtons[it] = this
-                    events.clicked.subscribe {
+                    events.clicked.listen {
                         parent.value = it.source.data as Item
-                        parent.events.valueChanged.onNext(ValueChangedEvent(parent, it.source.data as Item))
+                        parent.events.valueChanged.trigger(ValueChangedEvent(parent, it.source.data as Item))
                         (data as Item).picked()
                         dispose()
                     }
@@ -258,7 +258,7 @@ fun <E : Enum<E>> DropdownButton.bind(property: KMutableProperty0<E>, map: Map<E
     map.forEach { (k, v) ->
         options[k] = item {
             label = v
-            events.picked.subscribe {
+            events.picked.listen {
                 property.set(k)
             }
         }

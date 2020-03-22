@@ -31,7 +31,7 @@ fun Element.button(vararg classes: String, label: String = "button", init: Butto
 }
 
 fun Button.clicked(listener: (Button.ButtonEvent) -> Unit) {
-    events.clicked.subscribe(listener)
+    events.clicked.listen(listener)
 }
 
 fun Element.slider(vararg classes: String, init: Slider.() -> Unit) = initElement(classes, Slider(), init) as Slider

@@ -22,22 +22,22 @@ class Button : Element(ElementType("button")) {
     val events = Events()
 
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
 
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             if (disabled !in pseudoClasses) {
-                events.clicked.onNext(ButtonEvent(this))
+                events.clicked.trigger(ButtonEvent(this))
             }
             it.cancelPropagation()
         }
 
-        keyboard.pressed.subscribe {
+        keyboard.pressed.listen {
             if (it.key == 32) {
                 it.cancelPropagation()
                 if (disabled !in pseudoClasses) {
-                    events.clicked.onNext(ButtonEvent(this))
+                    events.clicked.trigger(ButtonEvent(this))
                 }
             }
         }

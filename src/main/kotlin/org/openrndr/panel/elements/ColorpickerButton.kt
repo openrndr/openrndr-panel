@@ -14,7 +14,7 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             set(value)  {
                 if (value != field) {
                     field = value
-                    events.valueChanged.onNext(ColorChangedEvent(this, value))
+                    events.valueChanged.trigger(ColorChangedEvent(this, value))
                 }
             }
 
@@ -27,10 +27,10 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
     val events = Events()
 
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             append(SlideOut(0.0, screenArea.height, screenArea.width, 200.0, color, this))
             it.cancelPropagation()
         }
@@ -96,14 +96,14 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
             val colorPicker = Colorpicker().apply {
                 this.color = color
                 label = (parent as ColorpickerButton).label
-                events.colorChanged.subscribe {
+                events.colorChanged.listen {
                     parent.color = it.newColor
-                    parent.events.valueChanged.onNext(ColorChangedEvent(parent, parent.color))
+                    parent.events.valueChanged.trigger(ColorChangedEvent(parent, parent.color))
                 }
             }
             append(colorPicker)
 
-            mouse.exited.subscribe {
+            mouse.exited.listen {
                 dispose()
             }
         }

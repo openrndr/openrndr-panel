@@ -89,7 +89,7 @@ class ControlManager : Extension {
     inner class DropInput {
         var target: Element? = null
         fun drop(event: DropEvent) {
-            target?.drop?.dropped?.onNext(event)
+            target?.drop?.dropped?.trigger(event)
         }
     }
 
@@ -100,8 +100,8 @@ class ControlManager : Extension {
             set(value) {
                 if (value != field) {
                     field?.pseudoClasses?.remove(ElementPseudoClass("active"))
-                    field?.keyboard?.focusLost?.onNext(FocusEvent())
-                    value?.keyboard?.focusGained?.onNext(FocusEvent())
+                    field?.keyboard?.focusLost?.trigger(FocusEvent())
+                    value?.keyboard?.focusGained?.trigger(FocusEvent())
                     field = value
                     field?.pseudoClasses?.add(ElementPseudoClass("active"))
                 }
@@ -112,7 +112,7 @@ class ControlManager : Extension {
                 var current: Element? = it
                 while (current != null) {
                     if (!event.propagationCancelled) {
-                        current.keyboard.pressed.onNext(event)
+                        current.keyboard.pressed.trigger(event)
                     }
                     current = current.parent
                 }
@@ -121,21 +121,21 @@ class ControlManager : Extension {
         }
 
         fun release(event: KeyEvent) {
-            target?.keyboard?.released?.onNext(event)
+            target?.keyboard?.released?.trigger(event)
             if (target != null) {
                 checkForManualRedraw()
             }
         }
 
         fun repeat(event: KeyEvent) {
-            target?.keyboard?.repeated?.onNext(event)
+            target?.keyboard?.repeated?.trigger(event)
             if (target != null) {
                 checkForManualRedraw()
             }
         }
 
         fun character(event: Program.CharacterEvent) {
-            target?.keyboard?.character?.onNext(event)
+            target?.keyboard?.character?.trigger(event)
             if (target != null) {
                 checkForManualRedraw()
             }
@@ -158,7 +158,7 @@ class ControlManager : Extension {
                 element.children.forEach(::traverse)
                 if (!event.propagationCancelled) {
                     if (event.position in element.screenArea && element.computedStyle.display != Display.NONE) {
-                        element.mouse.scrolled.onNext(event)
+                        element.mouse.scrolled.trigger(event)
                         if (event.propagationCancelled) {
                             keyboardInput.target = element
                         }
@@ -179,17 +179,17 @@ class ControlManager : Extension {
                 if (it.handlesDoubleClick) {
                     if (ct - lastClick > 500) {
                         logger.debug { "normal click on $clickTarget" }
-                        it.mouse.clicked.onNext(event)
+                        it.mouse.clicked.trigger(event)
                     } else {
                         if (clickTarget != null) {
                             logger.debug { "double-click on $clickTarget" }
-                            it.mouse.doubleClicked.onNext(event)
+                            it.mouse.doubleClicked.trigger(event)
                         }
                     }
                     lastClick = ct
                 } else {
                     logger.debug { "normal click on $clickTarget" }
-                    it.mouse.clicked.onNext(event)
+                    it.mouse.clicked.trigger(event)
                 }
             }
             checkForManualRedraw()
@@ -222,7 +222,7 @@ class ControlManager : Extension {
             candidates.sortWith(compareBy({ -it.first.layout.zIndex }, { -it.second }))
             for (c in candidates) {
                 if (!event.propagationCancelled) {
-                    c.first.mouse.pressed.onNext(event)
+                    c.first.mouse.pressed.trigger(event)
                     if (event.propagationCancelled) {
                         logger.debug { "propagation cancelled by ${c.first}" }
                         dragTarget = c.first
@@ -242,7 +242,7 @@ class ControlManager : Extension {
 
         fun drag(event: MouseEvent) {
             logger.debug { "drag event $event" }
-            dragTarget?.mouse?.dragged?.onNext(event)
+            dragTarget?.mouse?.dragged?.trigger(event)
             if (event.propagationCancelled) {
                 logger.debug { "propagation cancelled by $dragTarget setting clickTarget to null" }
                 clickTarget = null
@@ -256,7 +256,7 @@ class ControlManager : Extension {
             val toRemove = insideElements.filter { (event.position !in it.screenArea) }
 
             toRemove.forEach {
-                it.mouse.exited.onNext(MouseEvent(event.position, Vector2.ZERO, Vector2.ZERO, MouseEventType.MOVED, MouseButton.NONE, event.modifiers, false))
+                it.mouse.exited.trigger(MouseEvent(event.position, Vector2.ZERO, Vector2.ZERO, MouseEventType.MOVED, MouseButton.NONE, event.modifiers, false))
             }
 
             insideElements.removeAll(toRemove)
@@ -264,13 +264,13 @@ class ControlManager : Extension {
             fun traverse(element: Element) {
                 if (event.position in element.screenArea) {
                     if (element !in insideElements) {
-                        element.mouse.entered.onNext(event)
+                        element.mouse.entered.trigger(event)
                     }
                     insideElements.add(element)
                     if (hover !in element.pseudoClasses) {
                         element.pseudoClasses.add(hover)
                     }
-                    element.mouse.moved.onNext(event)
+                    element.mouse.moved.trigger(event)
                 } else {
                     if (hover in element.pseudoClasses) {
                         element.pseudoClasses.remove(hover)

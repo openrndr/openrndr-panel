@@ -32,7 +32,7 @@ class Slider : Element(ElementType("slider")) {
             realValue = clean(v)
             if (realValue != oldV) {
                 draw.dirty = true
-                events.valueChanged.onNext(ValueChangedEvent(this, false, oldV, realValue))
+                events.valueChanged.trigger(ValueChangedEvent(this, false, oldV, realValue))
             }
         }
         get() = realValue
@@ -43,7 +43,7 @@ class Slider : Element(ElementType("slider")) {
             realValue = clean(v)
             if (realValue != oldV) {
                 draw.dirty = true
-                events.valueChanged.onNext(ValueChangedEvent(this, true, oldV, realValue))
+                events.valueChanged.trigger(ValueChangedEvent(this, true, oldV, realValue))
             }
         }
         get() = realValue
@@ -77,35 +77,35 @@ class Slider : Element(ElementType("slider")) {
     private var keyboardInput = ""
 
     init {
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
             interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
             interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
-        mouse.dragged.subscribe {
+        mouse.dragged.listen {
             val t = (it.position.x - layout.screenX - margin) / (layout.screenWidth - 2.0 * margin)
             interactiveValue = t * range.span + range.min
             it.cancelPropagation()
         }
 
-        mouse.scrolled.subscribe {
+        mouse.scrolled.listen {
             if (Math.abs(it.rotation.y) < 0.001) {
                 interactiveValue += range.span * 0.001 * it.rotation.x
                 it.cancelPropagation()
             }
         }
 
-        keyboard.focusLost.subscribe {
+        keyboard.focusLost.listen {
             keyboardInput = ""
             draw.dirty = true
         }
 
-        keyboard.character.subscribe {
+        keyboard.character.listen {
             if (it.character in setOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '-')) {
                 try {
                     val candidate = keyboardInput + it.character.toString()
@@ -121,7 +121,7 @@ class Slider : Element(ElementType("slider")) {
         }
 
 
-        keyboard.repeated.subscribe {
+        keyboard.repeated.listen {
             val delta = Math.pow(10.0, -(precision - 0.0))
             if (it.key == KEY_ARROW_RIGHT) {
                 interactiveValue += delta
@@ -134,7 +134,7 @@ class Slider : Element(ElementType("slider")) {
             }
 
         }
-        keyboard.pressed.subscribe {
+        keyboard.pressed.listen {
             val delta = Math.pow(10.0, -(precision - 0.0))
 
             if (it.key == KEY_ARROW_RIGHT) {
@@ -231,7 +231,7 @@ class Slider : Element(ElementType("slider")) {
 fun Slider.bind(property: KMutableProperty0<Double>) {
     var currentValue: Double? = null
 
-    events.valueChanged.subscribe {
+    events.valueChanged.listen {
         currentValue = it.newValue
         property.set(it.newValue)
     }

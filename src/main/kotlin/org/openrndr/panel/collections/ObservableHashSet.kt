@@ -11,7 +11,7 @@ class ObservableHashSet<E> : HashSet<E>() {
 
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
-            changed.onNext(ChangeEvent(this, setOf(element), emptySet()))
+            changed.trigger(ChangeEvent(this, setOf(element), emptySet()))
             true
         } else {
             false
@@ -20,7 +20,7 @@ class ObservableHashSet<E> : HashSet<E>() {
 
     override fun remove(element: E): Boolean {
         return if (super.remove(element)) {
-            changed.onNext(ChangeEvent(this, emptySet(), setOf(element)))
+            changed.trigger(ChangeEvent(this, emptySet(), setOf(element)))
             true
         } else {
             false
@@ -30,7 +30,7 @@ class ObservableHashSet<E> : HashSet<E>() {
     override fun clear() {
         val old = this.toSet()
         super.clear()
-        changed.onNext(ChangeEvent(this, emptySet(), old))
+        changed.trigger(ChangeEvent(this, emptySet(), old))
     }
 
 }

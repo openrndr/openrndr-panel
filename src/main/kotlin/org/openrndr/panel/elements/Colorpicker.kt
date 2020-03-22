@@ -54,17 +54,17 @@ class Colorpicker : Element {
         val hsv = ColorHSVa(360.0 / layout.screenWidth * dx, saturation, dy / 50.0)
         realColor = hsv.toRGBa()
         draw.dirty = true
-        events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
+        events.colorChanged.trigger(ColorChangedEvent(this, oldColor, realColor))
         e.cancelPropagation()
     }
     constructor() : super(ElementType("colorpicker")) {
         generateColorMap()
 
-        mouse.exited.subscribe {
+        mouse.exited.listen {
             focussed = false
         }
 
-        mouse.scrolled.subscribe {
+        mouse.scrolled.listen {
             if (colorMap != null) {
                 //if (focussed) {
                 saturation = (saturation - it.rotation.y * 0.01).coerceIn(0.0, 1.0)
@@ -77,18 +77,18 @@ class Colorpicker : Element {
             }
         }
 
-        keyboard.focusLost.subscribe {
+        keyboard.focusLost.listen {
             keyboardInput = ""
             draw.dirty = true
         }
 
-        keyboard.character.subscribe {
+        keyboard.character.listen {
             keyboardInput += it.character
             draw.dirty = true
             it.cancelPropagation()
         }
 
-        keyboard.pressed.subscribe {
+        keyboard.pressed.listen {
             if (it.key == KEY_BACKSPACE) {
                 if (!keyboardInput.isEmpty()) {
                     keyboardInput = keyboardInput.substring(0, keyboardInput.length - 1)
@@ -114,7 +114,7 @@ class Colorpicker : Element {
                     val b = number and 0xff
                     val oldColor = color
                     color = ColorRGBa(r / 255.0, g / 255.0, b / 255.0)
-                    events.colorChanged.onNext(ColorChangedEvent(this, oldColor, realColor))
+                    events.colorChanged.trigger(ColorChangedEvent(this, oldColor, realColor))
                     keyboardInput = ""
                     draw.dirty = true
 
@@ -124,9 +124,9 @@ class Colorpicker : Element {
         }
 
 
-        mouse.pressed.subscribe { it.cancelPropagation(); focussed = true }
-        mouse.clicked.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
-        mouse.dragged.subscribe { it.cancelPropagation(); pick(it); focussed = true; }
+        mouse.pressed.listen { it.cancelPropagation(); focussed = true }
+        mouse.clicked.listen { it.cancelPropagation(); pick(it); focussed = true; }
+        mouse.dragged.listen { it.cancelPropagation(); pick(it); focussed = true; }
     }
 
     private fun generateColorMap() {

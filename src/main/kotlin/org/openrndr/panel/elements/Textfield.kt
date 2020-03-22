@@ -27,12 +27,12 @@ class Textfield : Element(ElementType("textfield")) {
     val events = Events()
 
     init {
-        keyboard.repeated.subscribe {
+        keyboard.repeated.listen {
             if (it.key == KEY_BACKSPACE) {
-                if (!value.isEmpty()) {
+                if (value.isNotEmpty()) {
                     val oldValue = value
                     value = value.substring(0, value.length - 1)
-                    events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
+                    events.valueChanged.trigger(ValueChangedEvent(this, oldValue, value))
                     requestRedraw()
                 }
 
@@ -40,7 +40,7 @@ class Textfield : Element(ElementType("textfield")) {
             it.cancelPropagation()
         }
 
-        keyboard.pressed.subscribe {
+        keyboard.pressed.listen {
             if (KeyModifier.CTRL in it.modifiers || KeyModifier.SUPER in it.modifiers) {
                 if (it.name == "v") {
                     val oldValue = value
@@ -48,32 +48,32 @@ class Textfield : Element(ElementType("textfield")) {
                         value += it
 
                     }
-                    events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
+                    events.valueChanged.trigger(ValueChangedEvent(this, oldValue, value))
                     it.cancelPropagation()
                 }
             }
             if (it.key == KEY_BACKSPACE) {
-                if (!value.isEmpty()) {
+                if (value.isNotEmpty()) {
                     val oldValue = value
                     value = value.substring(0, value.length - 1)
-                    events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
+                    events.valueChanged.trigger(ValueChangedEvent(this, oldValue, value))
                 }
             }
             requestRedraw()
             it.cancelPropagation()
         }
 
-        keyboard.character.subscribe {
+        keyboard.character.listen {
             val oldValue = value
             value += it.character
-            events.valueChanged.onNext(ValueChangedEvent(this, oldValue, value))
+            events.valueChanged.trigger(ValueChangedEvent(this, oldValue, value))
             it.cancelPropagation()
         }
 
-        mouse.pressed.subscribe {
+        mouse.pressed.listen {
             it.cancelPropagation()
         }
-        mouse.clicked.subscribe {
+        mouse.clicked.listen {
             it.cancelPropagation()
         }
     }
@@ -138,7 +138,7 @@ class Textfield : Element(ElementType("textfield")) {
 fun Textfield.bind(property: KMutableProperty0<String>) {
     var currentValue = property.get()
 
-    events.valueChanged.subscribe {
+    events.valueChanged.listen {
         currentValue = it.newValue
         property.set(it.newValue)
     }
