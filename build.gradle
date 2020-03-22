@@ -1,5 +1,5 @@
 buildscript {
-    ext.openrndr_version = "0.3.39"
+    ext.openrndr_version = "0.3.40-rc.5"
     repositories {
         jcenter()
         mavenCentral()
@@ -35,13 +35,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4'
-    api('io.reactivex.rxjava2:rxjava:2.2.0') {
-        exclude group: 'org.jetbrains.kotlin'
-    }
-    implementation 'io.github.microutils:kotlin-logging:1.7.8'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
+    implementation 'io.github.microutils:kotlin-logging:1.7.9'
 
-    api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+
     implementation "org.openrndr:openrndr-core:$openrndr_version"
     implementation "org.openrndr:openrndr-svg:$openrndr_version"
     implementation "org.openrndr:openrndr-filter:$openrndr_version"

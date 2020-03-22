@@ -3,10 +3,10 @@ package org.openrndr.panel.elements
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.FontImageMap
+import org.openrndr.events.Event
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
-import io.reactivex.subjects.PublishSubject
 import kotlin.math.round
 
 
@@ -15,7 +15,7 @@ class Button : Element(ElementType("button")) {
     var label: String = "OK"
 
     class ButtonEvent(val source: Button)
-    class Events(val clicked: PublishSubject<ButtonEvent> = PublishSubject.create())
+    class Events(val clicked: Event<ButtonEvent> = Event())
 
     var data: Any? = null
 

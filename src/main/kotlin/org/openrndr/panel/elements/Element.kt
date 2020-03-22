@@ -1,11 +1,11 @@
 package org.openrndr.panel.elements
 
-import io.reactivex.subjects.PublishSubject
 import org.openrndr.DropEvent
 import org.openrndr.KeyEvent
 import org.openrndr.MouseEvent
 import org.openrndr.Program
 import org.openrndr.draw.Drawer
+import org.openrndr.events.Event
 import org.openrndr.math.Vector2
 import org.openrndr.panel.collections.ObservableCopyOnWriteArrayList
 import org.openrndr.panel.collections.ObservableHashSet
@@ -34,31 +34,30 @@ open class Element(val type: ElementType) {
         }
 
     class MouseObservables {
-        val clicked = PublishSubject.create<MouseEvent>()
-        val doubleClicked = PublishSubject.create<MouseEvent>()
-        val entered = PublishSubject.create<MouseEvent>()
-        val exited = PublishSubject.create<MouseEvent>()
-        val dragged = PublishSubject.create<MouseEvent>()
-        val moved = PublishSubject.create<MouseEvent>()
-        val scrolled = PublishSubject.create<MouseEvent>()
-        val pressed = PublishSubject.create<MouseEvent>()
+        val clicked = Event<MouseEvent>("element-mouse-clicked")
+        val doubleClicked = Event<MouseEvent>("element-mouse-double-clicked")
+        val entered = Event<MouseEvent>("element-mouse-entered")
+        val exited = Event<MouseEvent>("element-mouse-exited")
+        val dragged = Event<MouseEvent>("element-mouse-dragged")
+        val moved = Event<MouseEvent>("element-mouse-moved")
+        val scrolled = Event<MouseEvent>("element-mouse-scrolled")
+        val pressed = Event<MouseEvent>("element-mouse-pressed")
     }
 
     class DropObserverables {
-        val dropped = PublishSubject.create<DropEvent>()
+        val dropped = Event<DropEvent>("element-dropped")
     }
 
     val drop = DropObserverables()
     val mouse = MouseObservables()
 
-
     class KeyboardObservables {
-        val pressed = PublishSubject.create<KeyEvent>()
-        val released = PublishSubject.create<KeyEvent>()
-        val repeated = PublishSubject.create<KeyEvent>()
-        val character = PublishSubject.create<Program.CharacterEvent>()
-        val focusGained = PublishSubject.create<FocusEvent>()
-        val focusLost = PublishSubject.create<FocusEvent>()
+        val pressed = Event<KeyEvent>("element-keyboard-pressed")
+        val released = Event<KeyEvent>("element-keyboard-released")
+        val repeated = Event<KeyEvent>("element-keyboard-repeated")
+        val character = Event<Program.CharacterEvent>("element-keyboard-character")
+        val focusGained = Event<FocusEvent>("element-keyboard-focus-gained")
+        val focusLost = Event<FocusEvent>("element-keyboard-focus-lost")
     }
 
     val keyboard = KeyboardObservables()
@@ -85,8 +84,8 @@ open class Element(val type: ElementType) {
 
     class ClassEvent(val source: Element, val `class`: ElementClass)
     class ClassObserverables {
-        val classAdded = PublishSubject.create<ClassEvent>()
-        val classRemoved = PublishSubject.create<ClassEvent>()
+        val classAdded = Event<ClassEvent>("element-class-added")
+        val classRemoved = Event<ClassEvent>("element-class-removed")
     }
 
     val classEvents = ClassObserverables()

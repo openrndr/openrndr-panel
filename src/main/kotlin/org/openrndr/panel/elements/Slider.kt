@@ -1,11 +1,11 @@
 package org.openrndr.panel.elements
 
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
 import mu.KotlinLogging
 import org.openrndr.*
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
+import org.openrndr.events.Event
 import org.openrndr.math.Vector2
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
@@ -68,7 +68,7 @@ class Slider : Element(ElementType("slider")) {
                             val newValue: Double)
 
     class Events {
-        val valueChanged: PublishSubject<ValueChangedEvent> = PublishSubject.create<ValueChangedEvent>()
+        val valueChanged = Event<ValueChangedEvent>("slider-value-changed")
     }
 
     val events = Events()

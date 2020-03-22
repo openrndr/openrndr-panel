@@ -1,11 +1,11 @@
 package org.openrndr.panel.collections
 
-import io.reactivex.subjects.PublishSubject
+import org.openrndr.events.Event
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ObservableCopyOnWriteArrayList<E> : CopyOnWriteArrayList<E>() {
 
-    val changed: PublishSubject<ObservableCopyOnWriteArrayList<E>> = PublishSubject.create()
+    val changed = Event<ObservableCopyOnWriteArrayList<E>>()
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
             changed.onNext(this)

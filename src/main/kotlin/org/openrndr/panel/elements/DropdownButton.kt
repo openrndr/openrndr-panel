@@ -6,11 +6,11 @@ import org.openrndr.draw.FontImageMap
 import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
 import org.openrndr.KEY_ARROW_DOWN
 import org.openrndr.KEY_ARROW_UP
 import org.openrndr.KEY_ENTER
+import org.openrndr.events.Event
 import org.openrndr.launch
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
@@ -22,7 +22,7 @@ class Item : Element(ElementType("item")) {
     class PickedEvent(val source: Item)
 
     class Events {
-        val picked = PublishSubject.create<Item.PickedEvent>()
+        val picked = Event<PickedEvent>()
     }
 
     val events = Events()
@@ -40,7 +40,7 @@ class DropdownButton : Element(ElementType("dropdown-button")) {
     class ValueChangedEvent(val source: DropdownButton, val value: Item)
 
     class Events {
-        val valueChanged = PublishSubject.create<ValueChangedEvent>()
+        val valueChanged = Event<ValueChangedEvent>()
     }
 
     val events = Events()

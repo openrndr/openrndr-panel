@@ -1,10 +1,10 @@
 package org.openrndr.panel.elements
 
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
 import org.openrndr.*
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
+import org.openrndr.events.Event
 import org.openrndr.math.Vector2
 import org.openrndr.math.clamp
 import org.openrndr.math.map
@@ -79,7 +79,7 @@ class XYPad : Element(ElementType("xy-pad")) {
     val events = Events()
 
     class Events {
-        val valueChanged = PublishSubject.create<ValueChangedEvent>()
+        val valueChanged = Event<ValueChangedEvent>("xypad-value-changed")
     }
 
 

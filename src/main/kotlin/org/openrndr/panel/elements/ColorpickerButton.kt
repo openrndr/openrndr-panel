@@ -3,9 +3,9 @@ package org.openrndr.panel.elements
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
+import org.openrndr.events.Event
 import org.openrndr.panel.style.*
 import org.openrndr.text.Writer
-import io.reactivex.subjects.PublishSubject
 
 class ColorpickerButton : Element(ElementType("colorpicker-button")) {
 
@@ -21,7 +21,7 @@ class ColorpickerButton : Element(ElementType("colorpicker-button")) {
     class ColorChangedEvent(val source: ColorpickerButton, val color: ColorRGBa)
 
     class Events {
-        val valueChanged = PublishSubject.create<ColorChangedEvent>()
+        val valueChanged = Event<ColorChangedEvent>()
     }
 
     val events = Events()

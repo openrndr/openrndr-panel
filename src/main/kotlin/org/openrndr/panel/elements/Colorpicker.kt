@@ -1,6 +1,5 @@
 package org.openrndr.panel.elements
 
-import io.reactivex.subjects.PublishSubject
 import org.openrndr.KEY_BACKSPACE
 import org.openrndr.KEY_ENTER
 import org.openrndr.KEY_ESCAPE
@@ -10,6 +9,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.ColorBuffer
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.colorBuffer
+import org.openrndr.events.Event
 import org.openrndr.panel.style.Color
 import org.openrndr.panel.style.color
 
@@ -39,7 +39,7 @@ class Colorpicker : Element {
                             val newColor: ColorRGBa)
 
     class Events {
-        val colorChanged = PublishSubject.create<ColorChangedEvent>()
+        val colorChanged = Event<ColorChangedEvent>()
     }
 
     val events = Events()

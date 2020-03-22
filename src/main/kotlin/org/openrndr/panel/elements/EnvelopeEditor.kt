@@ -4,8 +4,8 @@ import org.openrndr.MouseButton
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.math.Vector2
-import io.reactivex.subjects.PublishSubject
 import org.openrndr.KeyModifier
+import org.openrndr.events.Event
 
 class Envelope(constant:Double = 0.5) {
 
@@ -18,7 +18,7 @@ class Envelope(constant:Double = 0.5) {
     class EnvelopeChangedEvent(val envelope: Envelope)
 
     class Events {
-        val envelopeChanged = PublishSubject.create<EnvelopeChangedEvent>()
+        val envelopeChanged = Event<EnvelopeChangedEvent>("envelope-changed")
     }
     val events = Events()
 

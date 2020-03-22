@@ -5,10 +5,9 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.LineCap
 import org.openrndr.panel.style.*
-import org.openrndr.text.Writer
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
 import org.openrndr.KeyModifier
+import org.openrndr.events.Event
 import org.openrndr.launch
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Cursor
@@ -22,7 +21,7 @@ class Textfield : Element(ElementType("textfield")) {
 
     class ValueChangedEvent(val source: Textfield, val oldValue: String, val newValue: String)
     class Events {
-        val valueChanged: PublishSubject<ValueChangedEvent> = PublishSubject.create()
+        val valueChanged = Event<ValueChangedEvent>("textfield-value-changed")
     }
 
     val events = Events()

@@ -7,8 +7,8 @@ import org.openrndr.panel.style.*
 import org.openrndr.shape.Rectangle
 import org.openrndr.text.Writer
 
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.yield
+import org.openrndr.events.Event
 import org.openrndr.launch
 import kotlin.reflect.KMutableProperty0
 
@@ -21,7 +21,7 @@ class Toggle : Element(ElementType("toggle")) {
                             val newValue: Boolean)
 
     class Events {
-        val valueChanged = PublishSubject.create<ValueChangedEvent>()
+        val valueChanged = Event<ValueChangedEvent>("toggle-value-changed")
     }
 
     val events = Events()

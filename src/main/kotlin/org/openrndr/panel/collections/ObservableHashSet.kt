@@ -1,13 +1,13 @@
 package org.openrndr.panel.collections
 
-import io.reactivex.subjects.PublishSubject
+import org.openrndr.events.Event
 import java.util.*
 
 class ObservableHashSet<E> : HashSet<E>() {
 
     class ChangeEvent<E>(val source: ObservableHashSet<E>, val added: Set<E>, val removed: Set<E>)
 
-    val changed: PublishSubject<ChangeEvent<E>> = PublishSubject.create()
+    val changed = Event<ChangeEvent<E>>()
 
     override fun add(element: E): Boolean {
         return if (super.add(element)) {
